@@ -16,12 +16,13 @@ uniqueness and easy identification in system logs.
 """
 
 from typing import Any
-from sonic_py_common import syslogger
 
+from sonic_py_common import syslogger
 
 # Syslog identifiers for different platform modules
 # These identifiers are used to categorize log messages by functional area
 SYSLOG_IDENTIFIER_THERMAL: str = "nh_thermal"  # Thermal management and fan control
+SYSLOG_IDENTIFIER_THERMAL_CSV: str = "nh_thermal_csv"  # CSV logging control for thermal data
 
 
 class NhLoggerMixin(syslogger.SysLogger):
