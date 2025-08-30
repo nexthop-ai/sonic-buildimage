@@ -5,15 +5,6 @@
 {%- macro generate_buffer_pool_and_profiles() %}
     "BUFFER_POOL": {
         "ingress_lossless_pool": {
-<<<<<<< HEAD
-            "size": "165558216",
-            "type": "ingress",
-            "mode": "dynamic",
-            "xoff": "19312128"
-        },
-        "egress_lossless_pool": {
-            "size": "165558216",
-=======
             "size": "121964196",
             "type": "ingress",
             "mode": "dynamic",
@@ -21,7 +12,6 @@
         },
         "egress_lossless_pool": {
             "size": "121964196",
->>>>>>> faea8c6a0 (ISS-3082:Adjust buffer settings for qos tests (#1468))
             "type": "egress",
             "mode": "static"
         }
@@ -30,7 +20,7 @@
         "ingress_lossy_profile": {
             "pool": "ingress_lossless_pool",
             "size": "0",
-            "static_th": "82434938"
+            "static_th": "167546528"
         },
         "egress_lossy_profile": {
             "pool": "egress_lossless_pool",
@@ -40,11 +30,7 @@
         "egress_lossless_profile": {
             "pool": "egress_lossless_pool",
             "size": "0",
-<<<<<<< HEAD
-            "static_th": "82434938"
-=======
             "static_th": "125995684"
->>>>>>> faea8c6a0 (ISS-3082:Adjust buffer settings for qos tests (#1468))
         }
     },
 {%- endmacro %}
