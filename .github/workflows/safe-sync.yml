@@ -1,10 +1,10 @@
 
-name: Safe Sync Fork with Slack Notification
+name: Safe Upstream Sync
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # daily at 1 AM UTC
-  workflow_dispatch:      # manual trigger
+    - cron: '0 3 * * *'   # Runs daily at 03:00 UTC
+  workflow_dispatch:       # Allows manual trigger
 
 jobs:
   safe-sync:
@@ -12,24 +12,24 @@ jobs:
 
     steps:
       # -----------------------
-      # Checkout fork (shallow)
+      # Checkout fork (full history)
       # -----------------------
       - name: Checkout fork
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          fetch-depth: 1
+          fetch-depth: 0       # full clone to avoid origin/ ambiguity
           ref: master
 
       # -----------------------
       # Setup Git & upstream
       # -----------------------
-      - name: Setup Git & upstream
+      - name: Setup Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/sonic-net/sonic-buildimage.git
-          git fetch upstream master --depth=1
+          git fetch upstream master --depth=0
 
       # -----------------------
       # Attempt safe merge
@@ -37,32 +37,36 @@ jobs:
       - name: Attempt safe merge
         id: merge
         run: |
-          git checkout master
           set -e
+          SYNC_STATUS="success"
+          git checkout master
+          
           if git merge --no-commit --no-ff upstream/master; then
             git commit -m "Auto-sync from upstream/master"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/nexthop-ai/sonic-buildimage.git master
-            echo "SYNC_STATUS=success" >> $GITHUB_ENV
           else
             git merge --abort
-            echo "SYNC_STATUS=conflict" >> $GITHUB_ENV
+            SYNC_STATUS="conflict"
             echo "Merge conflict detected. Sync aborted."
-            exit 1
+          fi
+
+          echo "SYNC_STATUS=$SYNC_STATUS" >> $GITHUB_ENV
 
       # -----------------------
-      # Notify Slack if conflict
+      # Notify Slack after sync
       # -----------------------
-      - name: Notify Slack on conflict
-        if: env.SYNC_STATUS == 'conflict'
+      - name: Notify Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           BRANCH_NAME: master
           REPO_URL: https://github.com/nexthop-ai/sonic-buildimage
         run: |
-	  STATUS_MESSAGE="✅ Auto-sync completed successfully"
-          if [ "$SYNC_STATUS" == "conflict" ]; then
+          if [ "$SYNC_STATUS" == "success" ]; then
+            STATUS_MESSAGE="✅ Auto-sync completed successfully"
+          else
             STATUS_MESSAGE="⚠️ Auto-sync aborted due to merge conflicts"
           fi
+
           curl -X POST -H 'Content-type: application/json' \
           --data '{
             "blocks": [
@@ -75,3 +79,4 @@ jobs:
               }
             ]
           }' $SLACK_WEBHOOK_URL
+
