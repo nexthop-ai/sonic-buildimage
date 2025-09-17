@@ -59,6 +59,10 @@ jobs:
           BRANCH_NAME: master
           REPO_URL: https://github.com/nexthop-ai/sonic-buildimage
         run: |
+	  STATUS_MESSAGE="✅ Auto-sync completed successfully"
+          if [ "$SYNC_STATUS" == "conflict" ]; then
+            STATUS_MESSAGE="⚠️ Auto-sync aborted due to merge conflicts"
+          fi
           curl -X POST -H 'Content-type: application/json' \
           --data '{
             "blocks": [
@@ -66,7 +70,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": ":warning: *Auto-sync aborted!* \nBranch: '"$BRANCH_NAME"'\nRepo: <'"$REPO_URL"'|View Repo>\nCommit SHA: '"$GITHUB_SHA"'"
+                  "text": "'"$STATUS_MESSAGE"'\nBranch: '"$BRANCH_NAME"'\nRepo: <'"$REPO_URL"'|View Repo>\nCommit SHA: '"$GITHUB_SHA"'"
                 }
               }
             ]
