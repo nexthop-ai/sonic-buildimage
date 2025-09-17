@@ -1,0 +1,73 @@
+
+name: Safe Sync Fork with Slack Notification
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # daily at 1 AM UTC
+  workflow_dispatch:      # manual trigger
+
+jobs:
+  safe-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------
+      # Checkout fork (shallow)
+      # -----------------------
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: master
+
+      # -----------------------
+      # Setup Git & upstream
+      # -----------------------
+      - name: Setup Git & upstream
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/sonic-net/sonic-buildimage.git
+          git fetch upstream master --depth=1
+
+      # -----------------------
+      # Attempt safe merge
+      # -----------------------
+      - name: Attempt safe merge
+        id: merge
+        run: |
+          git checkout master
+          set -e
+          if git merge --no-commit --no-ff upstream/master; then
+            git commit -m "Auto-sync from upstream/master"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/nexthop-ai/sonic-buildimage.git master
+            echo "SYNC_STATUS=success" >> $GITHUB_ENV
+          else
+            git merge --abort
+            echo "SYNC_STATUS=conflict" >> $GITHUB_ENV
+            echo "Merge conflict detected. Sync aborted."
+            exit 1
+
+      # -----------------------
+      # Notify Slack if conflict
+      # -----------------------
+      - name: Notify Slack on conflict
+        if: env.SYNC_STATUS == 'conflict'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BRANCH_NAME: master
+          REPO_URL: https://github.com/nexthop-ai/sonic-buildimage
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": ":warning: *Auto-sync aborted!* \nBranch: '"$BRANCH_NAME"'\nRepo: <'"$REPO_URL"'|View Repo>\nCommit SHA: '"$GITHUB_SHA"'"
+                }
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
