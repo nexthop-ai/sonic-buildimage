@@ -1,0 +1,58 @@
+package(default_visibility = ["//visibility:public"])
+
+# SONiC Linux Headers
+# This rule provides the Linux kernel headers used by SONiC
+# Based on the sonic-linux-kernel package defined in rules/linux-kernel.mk
+genrule(
+    name = "sonic_linux_headers",
+    srcs = [
+        "rules/linux-kernel.mk",
+        "rules/linux-kernel.dep",
+    ] + glob([
+        "src/sonic-linux-kernel/**",
+    ], exclude = [
+        "**/*.git/**",
+        "**/.*",
+        "**/*.md",
+    ]),
+    outs = ["sonic_linux_headers.tar.gz"],
+    cmd = """
+        echo "=== Building SONiC Linux Headers ==="
+
+        # Extract kernel version information from linux-kernel.mk
+        KVERSION_SHORT=$$(grep "^KVERSION_SHORT = " $(location rules/linux-kernel.mk) | cut -d' ' -f3)
+        KERNEL_VERSION=$$(grep "^KERNEL_VERSION = " $(location rules/linux-kernel.mk) | cut -d' ' -f3)
+        KERNEL_SUBVERSION=$$(grep "^KERNEL_SUBVERSION = " $(location rules/linux-kernel.mk) | cut -d' ' -f3)
+
+        echo "Kernel version: $$KVERSION_SHORT, $$KERNEL_VERSION-$$KERNEL_SUBVERSION"
+
+        # Create a temporary directory for the headers
+        HEADERS_DIR=$$(mktemp -d)
+
+        # Copy all source files to the headers directory
+        for file in $(SRCS); do
+            # Skip if it's one of the config files (handle them separately)
+            if [[ "$$file" == *"rules/linux-kernel.mk" ]] || [[ "$$file" == *"rules/linux-kernel.dep" ]]; then
+                cp "$$file" "$$HEADERS_DIR/"
+                continue
+            fi
+
+            # For sonic-linux-kernel files, preserve directory structure
+            if [[ "$$file" == *"src/sonic-linux-kernel/"* ]]; then
+                # Extract the relative path after src/sonic-linux-kernel/
+                rel_path=$${file#*src/sonic-linux-kernel/}
+                target_dir=$$HEADERS_DIR/src/sonic-linux-kernel/$$(dirname "$$rel_path")
+                mkdir -p "$$target_dir"
+                cp "$$file" "$$target_dir/"
+            fi
+        done
+
+        # Create the output tar.gz file
+        tar -czf $@ -C $$HEADERS_DIR .
+
+        # Clean up
+        rm -rf $$HEADERS_DIR
+
+        echo "=== SONiC Linux Headers package created ==="
+    """,
+)
