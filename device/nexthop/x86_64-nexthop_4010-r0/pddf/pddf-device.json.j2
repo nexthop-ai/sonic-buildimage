@@ -34,12 +34,15 @@
     "std_kos": [
       "at24",
       "i2c-dev",
+      "spi-xilinx",
       "adm1266",
       "optoe"
     ],
     "pddf_kos": [
+      "pddf_spi_module",
       "pddf_multifpgapci_i2c_module",
       "pddf_multifpgapci_gpio_module",
+      "pddf_multifpgapci_spi_module",
       "pddf_client_module",
       "pddf_multifpgapci_driver",
       "pddf_multifpgapci_module",
@@ -253,6 +256,9 @@
         }
       ]
     },
+{%- if platform == 'x86_64-nexthop_4010-r1' %}
+    "spi_controllers": ["CPUCARD_SPI_CONTROLLER"],
+{%- endif %}
     "gpio": {
       "line0": {
         "attr_list": [
@@ -13202,6 +13208,55 @@
       ]
     }
   },
+{%- if platform == 'x86_64-nexthop_4010-r1' %}
+  "CPUCARD_SPI_CONTROLLER": {
+    "dev_info": {
+      "device_type": "SPI_CONTROLLER",
+      "device_parent": "MULTIFPGAPCIE0"
+    },
+    "spi_mode_commands": [
+      {
+        "enable": "fpga write32 CPUCARD_FPGA 0x4 --bits=0:0 0x1",
+        "disable": "fpga write32 CPUCARD_FPGA 0x4 --bits=0:0 0x0",
+        "comment": "Enable output to on-board SPI devices"
+      }
+    ],
+    "dev_attr": {
+      "spi_base_addr": "0x50000",
+      "virt_spi_controllers": "1",
+      "virt_spi_controller_size": "0x200",
+      "spi_driver": "xilinx_spi",
+      "spi_num_cs": 5,
+      "spi_controller_name": "CPUCARD_SPI_CONTROLLER",
+      "spi_controller_idx": 1
+    },
+    "spi_devices": ["SWITCHCARD_CONFIG_FLASH"]
+  },
+  "SWITCHCARD_CONFIG_FLASH": {
+    "dev_info": {
+      "device_type": "SPI_DEVICE",
+      "device_name": "SWITCHCARD_CONFIG_FLASH",
+      "device_parent": "CPUCARD_SPI_CONTROLLER"
+    },
+    "is_persistent": false,
+    "spi_mode_commands": [
+      {
+        "enable": "fpga write32 CPUCARD_FPGA 0x44 --bits=11:11 0x1",
+        "disable": "fpga write32 CPUCARD_FPGA 0x44 --bits=11:11 0x0",
+        "comment": "Komodo controls Switch Card SPI config Flash"
+      },
+      {
+        "enable": "fpga write32 CPUCARD_FPGA 0x44 --bits=10:10 0x0",
+        "comment": "Select SPI protocol for config flash"
+      }
+    ],
+    "dev_attr": {
+      "spi_device_driver": "spi-nor",
+      "max_speed_hz": 26000000,
+      "chip_select": 0
+    }
+  },
+{%- endif %}
   "WATCHDOG": {
     "dev_info": {
       "device_type": "WATCHDOG",
