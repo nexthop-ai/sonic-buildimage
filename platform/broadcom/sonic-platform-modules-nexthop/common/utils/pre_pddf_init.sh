@@ -13,6 +13,20 @@ log() {
 nh_gen pddf_device_json
 nh_gen pcie_yaml
 
+if lsmod | grep -q "i2c_designware_platform"; then
+  modprobe -r i2c_designware_platdrv 2>/dev/null || true
+  modprobe -r i2c_designware_platform 2>/dev/null || true
+  modprobe -r i2c_designware_core 2>/dev/null || true
+  modprobe -r i2c_piix4 2>/dev/null || true
+  cat << EOF > /etc/modprobe.d/blacklist-amd-i2c.conf
+blacklist i2c_designware_platdrv
+blacklist i2c_designware_platform
+blacklist i2c_designware_core
+blacklist i2c_piix4
+EOF
+  update-initramfs -u
+fi
+
 ASIC_INIT_PATH="/usr/local/bin/asic_init.sh"
 if [ -f "$ASIC_INIT_PATH" ]; then
   log "$ASIC_INIT_PATH found. Executing..."
