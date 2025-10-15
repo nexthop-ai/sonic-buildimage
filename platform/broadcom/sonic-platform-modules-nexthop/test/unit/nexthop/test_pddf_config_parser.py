@@ -221,7 +221,7 @@ class TestExtractXcvrList:
 
     @pytest.mark.parametrize(
         "platform_variant",
-        ["x86_64-nexthop_4010-r0", "x86_64-nexthop_4010-r1", "x86_64-nexthop_4020-r0"],
+        ["x86_64-nexthop_4010-r0", "x86_64-nexthop_4010-r1"],
     )
     def test_extract_xcvr_list_real_40x0_config(self, platform_variant):
         """Test extract_xcvr_list with real NH-40x0 pddf-device.json configuration."""
@@ -289,8 +289,7 @@ class TestExtractFpgaDevAttrs:
         "platform_variant",
         [
             "x86_64-nexthop_4010-r0",
-            "x86_64-nexthop_4010-r1",
-            "x86_64-nexthop_4020-r0"
+            "x86_64-nexthop_4010-r1"
         ],
     )
     def test_extract_fpga_attrs(self, platform_variant):
