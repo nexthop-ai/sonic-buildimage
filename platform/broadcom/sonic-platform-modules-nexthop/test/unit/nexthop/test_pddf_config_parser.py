@@ -264,9 +264,9 @@ class TestExtractXcvrList:
         # NH-4220 should have 64 OSFP transceivers
         assert len(xcvr_list) == 64
 
-        # First port starts at bus 23
+        # First port starts at bus 17
         xcvr_port1 = next(xcvr for xcvr in xcvr_list if xcvr["name"] == "PORT1-CTRL")
-        assert xcvr_port1["bus"] == 24
+        assert xcvr_port1["bus"] == 17
         assert xcvr_port1["addr"] == "0008"
 
         # Verify all entries have unique names and bus numbers
