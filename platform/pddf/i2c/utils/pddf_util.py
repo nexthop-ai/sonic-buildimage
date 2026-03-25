@@ -23,6 +23,7 @@ import subprocess
 import sys
 from sonic_py_common import device_info
 import pddfparse
+from pddf_logging import configure_logging
 
 PLATFORM_ROOT_PATH = '/usr/share/sonic/device'
 SONIC_CFGGEN_PATH = '/usr/local/bin/sonic-cfggen'
@@ -33,12 +34,16 @@ PROJECT_NAME = 'PDDF'
 version = '1.1'
 verbose = False
 DEBUG = False
+<<<<<<< HEAD
 logger = logging.getLogger("pddf.util")
 _handler = logging.StreamHandler()
 _handler.setFormatter(logging.Formatter("%(levelname)s: [%(funcName)s:%(lineno)d] %(message)s"))
 logger.addHandler(_handler)
 logger.setLevel(logging.INFO)
 logger.propagate = False
+=======
+logger = logging.getLogger(__name__)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 args = []
 ALL_DEVICE = {}               
 FORCE = 0
@@ -66,6 +71,11 @@ def main():
     global FORCE
     global kos
 
+<<<<<<< HEAD
+=======
+    configure_logging()
+
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
     if len(sys.argv)<2:
         show_help()
          
@@ -93,7 +103,11 @@ def main():
             show_help()
         elif opt in ('-d', '--debug'):            
             DEBUG = True
+<<<<<<< HEAD
             logging.getLogger("pddf").setLevel(logging.DEBUG)
+=======
+            logging.getLogger().setLevel(logging.DEBUG)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         elif opt in ('-f', '--force'): 
             FORCE = 1
         else:
@@ -101,6 +115,7 @@ def main():
     for arg in args:            
         if arg == 'install':
             try:
+<<<<<<< HEAD
                 status = do_install()
             except Exception:
                 logger.exception("Driver initialization failed")
@@ -108,6 +123,12 @@ def main():
             if status:
                 logger.error("do_install failed (rc=%s)", status)
                 sys.exit(1)
+=======
+                do_install()
+            except Exception:
+                logger.exception("Driver initialization failed")
+                sys.exit(1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         elif arg == 'clean':
             status = do_uninstall()
             if status:
@@ -133,8 +154,13 @@ def my_log(txt):
 def log_os_system(cmd):
     logger.info('Run :'+cmd)
     status, output = subprocess.getstatusoutput(cmd)
+<<<<<<< HEAD
     logger.debug("%s with result: %s", cmd, status)
     logger.debug("      output: "+ output)
+=======
+    logging.debug("%s with result: %s", cmd, status)
+    logging.debug("      output: "+ output)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
     if status:
         logger.error('Failed :'+cmd)
     return  status, output
@@ -181,7 +207,11 @@ def config_pddf_utils():
             # PDDF 2.0 ref API classes and some changes on top of it ... install it
             log_os_system('sync')
             shutil.copy(SONIC_PLATFORM_PDDF_WHL_PKG, SONIC_PLATFORM_BSP_WHL_PKG)
+<<<<<<< HEAD
             log_os_system('sync')
+=======
+            log_os_system('sync', 1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
             logger.info("Attempting to install the PDDF sonic_platform wheel package")
             if os.path.getsize(SONIC_PLATFORM_BSP_WHL_PKG) != 0:
                 status, output = log_os_system("pip3 install "+ SONIC_PLATFORM_BSP_WHL_PKG)
@@ -220,25 +250,41 @@ def config_pddf_utils():
                 # uninstall the existing bsp whl pkg
                 status, output = log_os_system("pip3 uninstall sonic-platform -y &> /dev/null")
                 if status:
+<<<<<<< HEAD
                     logger.error("Unable to uninstall BSP sonic-platform whl package")
+=======
+                    logger.error("Error: Unable to uninstall BSP sonic-platform whl package")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
                     return status
                 logger.info("Attempting to install the PDDF sonic_platform wheel package")
                 if os.path.getsize(SONIC_PLATFORM_BSP_WHL_PKG) != 0:
                     status, output = log_os_system("pip3 install "+ SONIC_PLATFORM_BSP_WHL_PKG)
                     if status:
+<<<<<<< HEAD
                         logger.error("Failed to install %s", SONIC_PLATFORM_BSP_WHL_PKG)
+=======
+                        logger.error("Error: Failed to install %s", SONIC_PLATFORM_BSP_WHL_PKG)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
                         return status
                     else:
                         logger.info("Successfully installed %s package", SONIC_PLATFORM_BSP_WHL_PKG)
                 else:
+<<<<<<< HEAD
                     logger.error("Failed to copy %s properly. Exiting", SONIC_PLATFORM_PDDF_WHL_PKG)
+=======
+                    logger.error("Error: Failed to copy %s properly. Exiting", SONIC_PLATFORM_PDDF_WHL_PKG)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
                     return -1
             else:
                 # system rebooted in pddf mode 
                 logger.info("System rebooted in PDDF mode, hence keeping the PDDF 2.0 classes")
         else:
             # pddf whl package doesnt exist
+<<<<<<< HEAD
             logger.error("PDDF 2.0 classes don't exist. PDDF mode can not be enabled")
+=======
+            logger.error("Error: PDDF 2.0 classes don't exist. PDDF mode can not be enabled")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
             sys.exit(1)
 
     # ##########################################################################
@@ -281,7 +327,11 @@ def cleanup_pddf_utils():
             log_os_system("mv "+backup_path+"/*"+" "+device_plugin_path)
             os.rmdir(backup_path)
         else:
+<<<<<<< HEAD
             logger.error("Unable to locate original device files")
+=======
+            logger.error("\nERR: Unable to locate original device files....\n")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 
     else:
         # PDDF 2.0 apis are supported and PDDF whl package is installed
@@ -291,10 +341,17 @@ def cleanup_pddf_utils():
                 log_os_system('mv '+SONIC_PLATFORM_BSP_WHL_PKG_BK+' '+SONIC_PLATFORM_BSP_WHL_PKG)
                 status, output = log_os_system("pip3 uninstall sonic-platform -y &> /dev/null")
                 if status:
+<<<<<<< HEAD
                     logger.error("Unable to uninstall PDDF sonic-platform whl package")
                     return status
                 logger.info("Attempting to install the BSP sonic_platform wheel package")
                 status, output = log_os_system("pip3 install "+ SONIC_PLATFORM_BSP_WHL_PKG)
+=======
+                    logger.error("Error: Unable to uninstall PDDF sonic-platform whl package")
+                    return status
+                logger.info("Attempting to install the BSP sonic_platform wheel package")
+                status, output = log_os_system("pip3 install "+ SONIC_PLATFORM_BSP_WHL_PKG, 1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
                 if status:
                     logger.error("Failed to install %s", SONIC_PLATFORM_BSP_WHL_PKG)
                     return status
@@ -307,11 +364,19 @@ def cleanup_pddf_utils():
                     os.remove(SONIC_PLATFORM_BSP_WHL_PKG)
                 status, output = log_os_system("pip3 uninstall sonic-platform -y &> /dev/null")
                 if status:
+<<<<<<< HEAD
                     logger.error("Unable to uninstall PDDF sonic-platform whl package")
                     return status
         else:
             # something seriously wrong. System is in PDDF mode but pddf whl pkg is not present
             logger.error("Fatal error as the system is in PDDF mode but the pddf .whl original is not present")
+=======
+                    logger.error("Error: Unable to uninstall PDDF sonic-platform whl package")
+                    return status
+        else:
+            # something seriously wrong. System is in PDDF mode but pddf whl pkg is not present
+            logger.error("Error: Fatal error as the system is in PDDF mode but the pddf .whl original is not present")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
     # ################################################################################################################
 
     if os.path.exists(device_path+"/fancontrol"):
@@ -335,9 +400,15 @@ def driver_install():
     # check for pre_driver_install script
     if os.path.exists('/usr/local/bin/pddf_pre_driver_install.sh'):
         logger.info("PDDF driver_install: running pre_driver_install script")
+<<<<<<< HEAD
         status, output = log_os_system('/usr/local/bin/pddf_pre_driver_install.sh')
         if status:
             logger.error("PDDF driver_install: pre_driver_install script failed (rc=%d)", status)
+=======
+        status, output = log_os_system('/usr/local/bin/pddf_pre_driver_install.sh', 1)
+        if status:
+            logger.error("Error: PDDF driver_install: pre_driver_install script failed (rc=%d)", status)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
             return status
         logger.debug("pre_driver_install output: %s", output)
 
@@ -370,7 +441,11 @@ def driver_install():
             continue
 
         logger.warning("PDDF driver_install: module %s failed, retrying with force", mod)
+<<<<<<< HEAD
         status, output = log_os_system("modprobe -f " + mod)
+=======
+        status, output = log_os_system("modprobe -f " + mod, 1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         if status:
             logger.error("PDDF driver_install: module %s force load also failed (rc=%d)", mod, status)
             if FORCE == 0:
@@ -383,11 +458,20 @@ def driver_install():
     # check for post_driver_install script
     if os.path.exists('/usr/local/bin/pddf_post_driver_install.sh'):
         logger.info("PDDF driver_install: running post_driver_install script")
+<<<<<<< HEAD
         status, output = log_os_system('/usr/local/bin/pddf_post_driver_install.sh')
         if status:
             logger.error("PDDF driver_install: post_driver_install script failed (rc=%d)", status)
             return status
         logger.debug("post_driver_install output: %s", output)
+=======
+        status, output = log_os_system('/usr/local/bin/pddf_post_driver_install.sh', 1)
+        if status:
+            logger.error("PDDF driver_install: post_driver_install script failed (rc=%d)", status)
+            return status
+        # Useful for debugging
+        print(output)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 
     logger.info("PDDF driver_install: completed successfully")
     return 0
@@ -418,7 +502,11 @@ def device_install():
     # check for pre_device_creation script
     if os.path.exists('/usr/local/bin/pddf_pre_device_create.sh'):
         logger.info("PDDF device_install: running pre_device_create script")
+<<<<<<< HEAD
         status, output = log_os_system('/usr/local/bin/pddf_pre_device_create.sh')
+=======
+        status, output = log_os_system('/usr/local/bin/pddf_pre_device_create.sh', 1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         if status:
             logger.error("PDDF device_install: pre_device_create script failed (rc=%d)", status)
             return status
@@ -434,7 +522,11 @@ def device_install():
     # check for post_device_create script
     if os.path.exists('/usr/local/bin/pddf_post_device_create.sh'):
         logger.info("PDDF device_install: running post_device_create script")
+<<<<<<< HEAD
         status, output = log_os_system('/usr/local/bin/pddf_post_device_create.sh')
+=======
+        status, output = log_os_system('/usr/local/bin/pddf_post_device_create.sh', 1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         if status:
             logger.error("PDDF device_install: post_device_create script failed (rc=%d)", status)
             return status
@@ -455,6 +547,7 @@ def device_uninstall():
         
 def do_install():
     logger.info("PDDF install: starting system check")
+<<<<<<< HEAD
     if not os.path.exists('/usr/share/sonic/platform/pddf_support'):
         logger.warning("PDDF install: pddf_support file not found, PDDF mode is not enabled")
         return
@@ -462,6 +555,19 @@ def do_install():
     if driver_check()== False :
         logger.info("%s has no PDDF driver installed", PROJECT_NAME.upper())
         logger.info("PDDF install: installing drivers")
+=======
+    print("Checking system....")
+    if not os.path.exists('/usr/share/sonic/platform/pddf_support'):
+        logger.warning("PDDF install: pddf_support file not found, PDDF mode is not enabled")
+        print(PROJECT_NAME.upper() +" mode is not enabled")
+        return
+
+    if driver_check()== False :
+        print(PROJECT_NAME.upper() +" has no PDDF driver installed....")
+        create_pddf_log_files()
+        logger.info("PDDF install: installing drivers")
+        print("Installing ...")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         status = driver_install()
         if status:
             logger.error("PDDF install: driver installation failed (rc=%d)", status)
@@ -469,8 +575,15 @@ def do_install():
         logger.info("PDDF install: driver installation completed successfully")
     else:
         logger.info("PDDF install: drivers already loaded, skipping driver install")
+<<<<<<< HEAD
 
     logger.info("PDDF install: creating devices")
+=======
+        print(PROJECT_NAME.upper() +" drivers detected....")
+
+    logger.info("PDDF install: creating devices")
+    print("Creating devices ...")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
     status = device_install()
     if status:
         logger.error("PDDF install: device creation failed (rc=%d)", status)
@@ -479,16 +592,28 @@ def do_install():
     # Check if S3IP support is enabled, if yes, start the service in no block mode
     if 'enable_s3ip' in pddf_obj.data['PLATFORM'].keys() and pddf_obj.data['PLATFORM']['enable_s3ip'] == 'yes':
         logger.info("PDDF install: enabling S3IP service")
+<<<<<<< HEAD
         log_os_system('systemctl enable pddf-s3ip-init.service')
         log_os_system('systemctl start --no-block pddf-s3ip-init.service')
+=======
+        log_os_system('systemctl enable pddf-s3ip-init.service', 1)
+        log_os_system('systemctl start --no-block pddf-s3ip-init.service', 1)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 
     logger.info("PDDF install: completed successfully")
     return
     
 def do_uninstall():
     logger.info("PDDF uninstall: starting")
+<<<<<<< HEAD
     if not os.path.exists('/usr/share/sonic/platform/pddf_support'):
         logger.warning("PDDF uninstall: pddf_support file not found, PDDF mode is not enabled")
+=======
+    print("Checking system....")
+    if not os.path.exists('/usr/share/sonic/platform/pddf_support'):
+        logger.warning("PDDF uninstall: pddf_support file not found, PDDF mode is not enabled")
+        print(PROJECT_NAME.upper() +" mode is not enabled")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         return
 
 
@@ -497,6 +622,10 @@ def do_uninstall():
         log_os_system("sudo rm -rf /var/log/pddf")
 
     logger.info("PDDF uninstall: removing devices")
+<<<<<<< HEAD
+=======
+    print("Remove all the devices...")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
     status = device_uninstall()
     if status:
         logger.error("PDDF uninstall: device removal failed (rc=%d)", status)
@@ -507,6 +636,10 @@ def do_uninstall():
         logger.info("%s has no PDDF driver installed", PROJECT_NAME.upper())
     else:
         logger.info("PDDF uninstall: removing drivers")
+<<<<<<< HEAD
+=======
+        print("Removing installed driver....")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         status = driver_uninstall()
         if status:
             logger.error("PDDF uninstall: driver removal failed (rc=%d)", status)

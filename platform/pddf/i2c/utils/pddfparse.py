@@ -10,10 +10,12 @@ import subprocess
 import sys
 import time
 import unicodedata
+import logging
 from sonic_py_common import device_info
 from sonic_platform_pddf_base.pddf_fpga_utils import is_supported_fpga
 from sonic_platform_pddf_base.pddf_platform_hooks import ChildCardEepromUnprogrammed
 
+<<<<<<< HEAD
 import logging
 import logging.handlers
 
@@ -27,6 +29,9 @@ _syslog.setLevel(logging.WARNING)
 logger.addHandler(_syslog)
 logger.setLevel(logging.INFO)
 logger.propagate = False
+=======
+logger = logging.getLogger(__name__)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 bmc_cache = {}
 cache = {}
 SONIC_CFGGEN_PATH = '/usr/local/bin/sonic-cfggen'
@@ -267,20 +272,33 @@ class PddfParse():
             os.symlink("/usr/share/sonic/device/"+platform, "/usr/share/sonic/platform")
 
         try:
+<<<<<<< HEAD
             logger.info("loading device JSON from %s", PDDF_DEVICE_JSON_PATH)
             with open(PDDF_DEVICE_JSON_PATH) as f:
                 self.data = json.load(f)
             logger.info("device JSON loaded successfully")
         except IOError:
             logger.exception("Driver initialization failed")
+=======
+            json_path = "/usr/share/sonic/platform/pddf/pddf-device.json"
+            logger.info("loading device JSON from %s", json_path)
+            with open(json_path) as f:
+                self.data = json.load(f)
+            logger.info("device JSON loaded successfully")
+        except IOError:
+            logger.exception("PDDF: Driver initialization failed")
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
             if os.path.exists('/usr/share/sonic/platform'):
                 os.unlink("/usr/share/sonic/platform")
             raise Exception('PDDF JSON file not found. PDDF is not supported on this platform')
 
         self.data_sysfs_obj = {}
         self.sysfs_obj = {}
+<<<<<<< HEAD
         # Populated by expand_child_cards() when a platform.json.base exists.
         self._platform_json = None
+=======
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
         logger.info("initialization completed")
 
 
@@ -290,6 +308,7 @@ class PddfParse():
     def runcmd(self, cmd):
         logger.debug("running cmd: %s", cmd)
         rc = os.system(cmd)
+        logger.debug("command received: ", cmd)
         if rc != 0:
             logger.error("device creation command failed (rc=%d): %s", rc, cmd)
         return rc
@@ -1809,12 +1828,20 @@ class PddfParse():
             with open(node, 'r') as f:
                 status = f.read()
         except IOError:
+<<<<<<< HEAD
             logger.exception("IOError: node:%s key:%s", node, key)
+=======
+            logger.exception("PDDF_VERIFY_ERR: IOError: node:%s key:%s", node, key)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
             return
 
         status = status.rstrip("\n\r")
         if attr[key] != status:
+<<<<<<< HEAD
             logger.error("verify mismatch: node: %s switch:%s", node, status)
+=======
+            logger.error("PDDF_VERIFY_ERR: node: %s switch:%s", node, status)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 
     def verify_device(self, attr, path, ops):
         for key in attr.keys():
@@ -1831,14 +1858,21 @@ class PddfParse():
         if (os.path.exists(dir) or validate_type == 'client'):
             for sysfs in obj[validate_type]:
                 if(not os.path.exists(sysfs)):
+<<<<<<< HEAD
                     logger.error("sysfs file %s: does not exist", sysfs)
         else:
             logger.error("sysfs dir %s: does not exist", dir)
+=======
+                    logger.error("[SYSFS FILE] %s: does not exist", sysfs)
+        else:
+            logger.error("[SYSFS DIR] %s: does not exist", dir)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 
     def validate_dsysfs_creation(self, obj, validate_type):
         if validate_type in obj.keys():
             # There is a possibility that some components dont have any device-self.data attr
             if not obj[validate_type]:
+<<<<<<< HEAD
                 logger.warning("sysfs attr for %s: empty", validate_type)
             else:
                 for sysfs in obj[validate_type]:
@@ -1846,6 +1880,15 @@ class PddfParse():
                         logger.error("sysfs file %s: does not exist", sysfs)
         else:
             logger.warning("sysfs key for %s: not configured", validate_type)
+=======
+                logger.warning("[SYSFS ATTR] for %s: empty", validate_type)
+            else:
+                for sysfs in obj[validate_type]:
+                    if(not os.path.exists(sysfs)):
+                        logger.error("[SYSFS FILE] %s: does not exist", sysfs)
+        else:
+            logger.warning("[SYSFS KEY] for %s: not configured", validate_type)
+>>>>>>> 3867532d7 (NOS-4475: Adding logging to PDDF initialization (#3877))
 
     def verify_sysfs_data(self, verify_type):
         if (verify_type == 'LED'):
@@ -2307,10 +2350,9 @@ class PddfParse():
     ) -> int:
         ret = getattr(self, ops["cmd"] + "_multifpgapci_spi_controller")(spi_controller, ops)
         if ret != 0:
-            print(
-                "{}_spi_controller() cmd failed for {}".format(
-                    ops["cmd"], spi_controller["dev_attr"]["spi_controller_name"]
-                )
+            logger.error(
+                "%s_spi_controller() cmd failed for %s",
+                ops["cmd"], spi_controller["dev_attr"]["spi_controller_name"]
             )
         return [ret]
 
@@ -2319,10 +2361,9 @@ class PddfParse():
     ) -> int:
         ret = getattr(self, ops["cmd"] + "_multifpgapci_spi_device")(spi_device, ops)
         if ret != 0:
-            print(
-                "{}_spi_device() cmd failed for {}".format(
-                    ops["cmd"], spi_device["dev_info"]["device_name"]
-                )
+            logger.error(
+                "%s_spi_device() cmd failed for %s",
+                ops["cmd"], spi_device["dev_info"]["device_name"]
             )
         return [ret]
 
