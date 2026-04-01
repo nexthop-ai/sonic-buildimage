@@ -1,0 +1,75 @@
+Allow dhcp6-ll-wait "no" to skip link-local check and start dhclient6 immediately
+
+Add support for dhcp6-ll-wait="no" as a config knob to bypass the link-local
+address wait loop and start dhclient6 unconditionally. This is consistent with
+the existing dhcp-wait="no" convention.
+
+When dhcp6-ll-wait is set to "no", ifupdown2 will start dhclient6 immediately
+without polling for a link-local address first. The dhclient6 daemon handles
+the case where no link-local address is present yet by retrying internally.
+
+This is needed for ZTP in-band discovery, where interfaces-config runs before
+orchagent has had time to bring all ports up. With dhcp6-ll-wait="no" in the
+ZTP DHCP policy, dhclient6 is started for all in-band ports immediately rather
+than only for ports that already have a link-local address at that moment.
+
+Upstream PR: https://github.com/CumulusNetworks/ifupdown2/pull/349
+---
+ ifupdown2/addons/dhcp.py | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/ifupdown2/addons/dhcp.py b/ifupdown2/addons/dhcp.py
+index 9b2f5f9..4d3b585 100644
+--- a/ifupdown2/addons/dhcp.py
++++ b/ifupdown2/addons/dhcp.py
+@@ -161,10 +161,16 @@ class dhcp(Addon, moduleBase):
+             wait = str(dhcp_wait).lower() != "no"
+             dhcp6_ll_wait = policymanager.policymanager_api.get_iface_default(module_name=self.__class__.__name__, \
+                 ifname=ifaceobj.name, attr='dhcp6-ll-wait')
+-            try:
+-                timeout = int(dhcp6_ll_wait)+1
+-            except Exception:
+-                timeout = 10
++            timeout = 10
++            start_dhcp6 = False
++            if str(dhcp6_ll_wait).lower() == "no":
++                timeout = 0
++                start_dhcp6 = True
++            else:
++                try:
++                    timeout = int(dhcp6_ll_wait)+1
++                except Exception:
++                    pass
+             dhcp6_duid = policymanager.policymanager_api.get_iface_default(module_name=self.__class__.__name__, \
+                 ifname=ifaceobj.name, attr='dhcp6-duid')
+             vrf = ifaceobj.get_attr_value_first('vrf')
+@@ -218,22 +224,19 @@ class dhcp(Addon, moduleBase):
+                             self.dhclientcmd.stop6(ifaceobj.name, duid=dhcp6_duid)
+                         except Exception:
+                             pass
+-                    #add delay before starting IPv6 dhclient to
+-                    #make sure the configured interface/link is up.
+-                    if timeout > 1:
+-                        time.sleep(1)
+                     while timeout:
+                         addr_output = utils.exec_command('%s -6 addr show %s'
+                                                          %(utils.ip_cmd, ifaceobj.name))
+                         r = re.search('inet6 .* scope link', addr_output)
+                         if r:
+-                            self.dhclientcmd.start6(ifaceobj.name,
+-                                                    wait=wait,
+-                                                    cmd_prefix=dhclient_cmd_prefix, duid=dhcp6_duid)
+-                            return
++                            start_dhcp6 = True
++                            break
++                        time.sleep(1)
+                         timeout -= 1
+-                        if timeout:
+-                            time.sleep(1)
++                    if start_dhcp6:
++                        self.dhclientcmd.start6(ifaceobj.name,
++                                                wait=wait,
++                                                cmd_prefix=dhclient_cmd_prefix, duid=dhcp6_duid)
+         except Exception as e:
+             self.logger.error("%s: %s" % (ifaceobj.name, str(e)))
+             ifaceobj.set_status(ifaceStatus.ERROR)
