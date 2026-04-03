@@ -7,7 +7,7 @@ set -e
 # Configuration
 GADGET_NAME="g1"
 FUNCTION_TYPE="ncm"
-INTERFACE_NAME="usb0"
+INTERFACE_NAME="bmc0"
 VENDOR_ID="0x1d6b"    # Linux Foundation
 PRODUCT_ID="0x0104"   # Multifunction Composite Gadget
 SERIAL_NUMBER="0123456789"
@@ -71,8 +71,8 @@ ln -s "functions/${FUNCTION_TYPE}.${INTERFACE_NAME}" configs/c.1/
 logger -t usb-network "Gadget '${GADGET_NAME}' created with ${FUNCTION_TYPE^^} function"
 
 # Step 4: Enable the gadget
-# Find the first available UDC (USB Device Controller)
-UDC_NAME=$(ls /sys/class/udc 2>/dev/null | head -n1)
+# Use the specific UDC port for AST2700 USB virtual hub
+UDC_NAME="12021000.usb-vhub:p1"
 
 if [ -z "${UDC_NAME}" ]; then
     logger -t usb-network "ERROR: No UDC (USB Device Controller) found!"
@@ -108,6 +108,39 @@ ip link set "${INTERFACE_NAME}" up
 
 # Enable IPv6 on the interface
 sysctl -w net.ipv6.conf.${INTERFACE_NAME}.disable_ipv6=0 2>/dev/null || true
+
+# Step 6b: Add static IPv4 for gNOI communication with switch host
+# Read configuration from bmc.json
+BMC_CONFIG="/usr/share/sonic/platform/bmc.json"
+BMC_IPV4=""
+
+if [ -f "${BMC_CONFIG}" ]; then
+    logger -t usb-network "Reading BMC configuration from ${BMC_CONFIG}"
+    BMC_IPV4=$(python3 -c "
+import json
+import sys
+try:
+    with open('${BMC_CONFIG}') as f:
+        data = json.load(f)
+    bmc_ip = data.get('usb_network', {}).get('bmc_ipv4', '')
+    if bmc_ip:
+        print(bmc_ip)
+    else:
+        sys.exit(1)
+except Exception as e:
+    print(f'Error reading BMC config: {e}', file=sys.stderr)
+    sys.exit(1)
+" 2>/dev/null)
+fi
+
+if [ -n "${BMC_IPV4}" ]; then
+	# Configure IPv4 address
+	ip addr add "${BMC_IPV4}" dev "${INTERFACE_NAME}"
+
+	# Display configuration
+	IPV4_ADDR=$(ip -4 addr show dev "${INTERFACE_NAME}" | grep -oP 'inet \K[0-9.]+')
+	logger -t usb-network "IPv4 address configured: ${IPV4_ADDR}"
+fi
 
 # Wait a moment for interface to stabilize
 sleep 1

@@ -24,6 +24,7 @@ set -e  # Exit on error
 # Configuration
 # We use 10GB as the 32G eMMC card in chipmunk will be 10G post pSLC partitioning
 EMMC_SIZE_MB=10240
+#EMMC_SIZE_MB=7168
 PARTITION_LABEL="SONiC-OS"  # Single partition for all SONiC images
 ROOT_PART_SIZE_MB=$((EMMC_SIZE_MB - 100))  # SONiC-OS partition size (leave 100MB for GPT overhead)
 
