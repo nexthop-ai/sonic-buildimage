@@ -10,6 +10,7 @@ rules/config.user
 # Build artifacts
 fsroot/
 fsroot-*/
+fsroot.docker.*/
 fs.*
 target/
 *.deb
