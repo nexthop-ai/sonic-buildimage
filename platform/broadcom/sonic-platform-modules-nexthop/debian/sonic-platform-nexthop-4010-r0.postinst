@@ -11,5 +11,7 @@ systemctl enable transceiver-init.service
 systemctl start transceiver-init.service
 systemctl enable adm1266-rtc-sync.timer
 systemctl start adm1266-rtc-sync.timer
+systemctl enable reboot-cause-rotate-log.timer
+systemctl start reboot-cause-rotate-log.timer
 systemctl enable watchdog.timer
 systemctl start watchdog.timer

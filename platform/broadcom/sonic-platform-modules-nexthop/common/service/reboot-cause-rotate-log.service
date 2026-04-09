@@ -1,0 +1,11 @@
+[Unit]
+Description=Rotate reboot-cause logs
+After=pddf-platform-init.service
+Requires=pddf-platform-init.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/nh_reboot_cause rotate-log
+
+[Install]
+WantedBy=multi-user.target

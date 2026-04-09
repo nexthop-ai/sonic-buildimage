@@ -259,6 +259,34 @@ def create_data_v1_hw_watchdog(dpm_logger_module):
     )
 
 
+def test_show_current_unknown_causes(dpm_logger_module, nh_reboot_cause_module):
+    """When causes list is empty but DPM records are present, display '[unknown] cause: unknown; description: n/a; source: n/a'."""
+    # Given
+    DATA_V1 = dpm_logger_module.DataV1(
+        gen_time="2025-10-02 23:24:32 UTC",
+        schema_version=1,
+        causes=[],
+        dpms=[
+            dpm_logger_module.DpmV1(name="cpu_card", type="adm1266", records=[{"uid": "1"}]),
+        ],
+    )
+    mock_logger = create_autospec(nh_reboot_cause_module.DpmLogger, instance=True)
+    mock_logger.load.return_value = DATA_V1
+
+    with patch.object(nh_reboot_cause_module, "DpmLogger", autospec=True, return_value=mock_logger):
+        # When
+        result = CliRunner().invoke(nh_reboot_cause_module.reboot_cause)
+
+        # Then
+        assert result.exit_code == 0
+        assert result.output == textwrap.dedent(
+            """\
+            === Captured at 2025-10-02 23:24:32 UTC ===
+            [unknown] cause: unknown; description: n/a; source: n/a
+            """
+        )
+
+
 def test_show_current(dpm_logger_module, nh_reboot_cause_module):
     # Given
     DATA_V1 = create_data_v1_sw_reboot(dpm_logger_module)
@@ -341,6 +369,7 @@ def test_read_blackbox(dpm_base_module, adm1266_module, nh_reboot_cause_module):
         assert normalized_output == textwrap.dedent(
             """\
             === Captured at IGNORED_TIMESTAMP ===
+            [unknown] cause: unknown; description: n/a; source: n/a
              DPM records:
               dpm1:powerup_456:uid_1234                timestamp: 1234.000000s after power-on
                                                        dpm_name: dpm1
@@ -549,7 +578,7 @@ def test_show_history(dpm_logger_module, nh_reboot_cause_module):
         create_data_v1_hw_watchdog(dpm_logger_module),
     ]
     mock_logger = create_autospec(nh_reboot_cause_module.DpmLogger, instance=True)
-    mock_logger.load_all.return_value = DATA_V1
+    mock_logger.load_all.return_value = (DATA_V1, 2, 0)
 
     with patch.object(nh_reboot_cause_module, "DpmLogger", autospec=True, return_value=mock_logger):
         # When
@@ -559,6 +588,7 @@ def test_show_history(dpm_logger_module, nh_reboot_cause_module):
         assert result.exit_code == 0
         assert result.output == textwrap.dedent(
             """\
+            Total reboots observed in this window = 2, showing 2
             === Captured at 2025-10-03 05:13:55 UTC ===
             [2025-10-03 05:12:39 UTC] cause: WATCHDOG; description: FPGA watchdog expired; source: switch_card
             === Captured at 2025-10-02 23:24:32 UTC ===
@@ -575,7 +605,7 @@ def test_show_history_verbosity_1(dpm_logger_module, nh_reboot_cause_module):
         create_data_v1_hw_watchdog(dpm_logger_module),
     ]
     mock_logger = create_autospec(nh_reboot_cause_module.DpmLogger, instance=True)
-    mock_logger.load_all.return_value = DATA_V1
+    mock_logger.load_all.return_value = (DATA_V1, 2, 0)
 
     with patch.object(nh_reboot_cause_module, "DpmLogger", autospec=True, return_value=mock_logger):
         # When
@@ -585,6 +615,7 @@ def test_show_history_verbosity_1(dpm_logger_module, nh_reboot_cause_module):
         assert result.exit_code == 0
         assert result.output == textwrap.dedent(
             """\
+            Total reboots observed in this window = 2, showing 2
             === Captured at 2025-10-03 05:13:55 UTC ===
             [2025-10-03 05:12:39 UTC] cause: WATCHDOG; description: FPGA watchdog expired; source: switch_card
              DPM records:
@@ -633,7 +664,7 @@ def test_show_history_verbosity_2(dpm_logger_module, nh_reboot_cause_module):
         create_data_v1_hw_watchdog(dpm_logger_module),
     ]
     mock_logger = create_autospec(nh_reboot_cause_module.DpmLogger, instance=True)
-    mock_logger.load_all.return_value = DATA_V1
+    mock_logger.load_all.return_value = (DATA_V1, 10, 8)
 
     with patch.object(nh_reboot_cause_module, "DpmLogger", autospec=True, return_value=mock_logger):
         # When
@@ -643,6 +674,7 @@ def test_show_history_verbosity_2(dpm_logger_module, nh_reboot_cause_module):
         assert result.exit_code == 0
         assert result.output == textwrap.dedent(
             """\
+            Total reboots observed in this window = 10, showing 2
             === Captured at 2025-10-03 05:13:55 UTC ===
             [2025-10-03 05:12:39 UTC] cause: WATCHDOG; description: FPGA watchdog expired; source: switch_card
              DPM records:
@@ -758,5 +790,37 @@ def test_show_history_verbosity_2(dpm_logger_module, nh_reboot_cause_module):
                                                             ff ff ff ff ff ff ff ff
                                                             ff ff ff ff ff ff ff ab
 
+            """
+        )
+
+
+def test_show_history_with_skipped_reboots(dpm_logger_module, nh_reboot_cause_module):
+    """Verify skipped reboots separator is displayed between entries."""
+    # Given - 2 entries with a SkippedReboots marker between them
+    items = [
+        create_data_v1_sw_reboot(dpm_logger_module),
+        dpm_logger_module.SkippedReboots(count=3),
+        create_data_v1_hw_watchdog(dpm_logger_module),
+    ]
+    mock_logger = create_autospec(nh_reboot_cause_module.DpmLogger, instance=True)
+    mock_logger.load_all.return_value = (items, 5, 3)
+
+    with patch.object(nh_reboot_cause_module, "DpmLogger", autospec=True, return_value=mock_logger):
+        # When
+        result = CliRunner().invoke(nh_reboot_cause_module.reboot_cause, ["history"])
+
+        # Then
+        assert result.exit_code == 0
+        assert result.output == textwrap.dedent(
+            """\
+            Total reboots observed in this window = 5, showing 2
+            === Captured at 2025-10-03 05:13:55 UTC ===
+            [2025-10-03 05:12:39 UTC] cause: WATCHDOG; description: FPGA watchdog expired; source: switch_card
+            ===
+            === Skipping 3 reboots
+            ===
+            === Captured at 2025-10-02 23:24:32 UTC ===
+            [2025-10-02 23:22:56 UTC] cause: FPGA_PWR_CYC_REQ; description: FPGA requested power cycle; source: cpu_card
+            [2025-10-02 23:22:06 UTC] cause: reboot; description: n/a; source: SW
             """
         )

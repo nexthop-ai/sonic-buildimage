@@ -1,0 +1,11 @@
+[Unit]
+Description=Mark boot as stable and rotate reboot-cause logs after 30 minutes uptime
+After=pddf-platform-init.service
+Requires=pddf-platform-init.service
+
+[Timer]
+Unit=reboot-cause-rotate-log.service
+OnBootSec=30min
+
+[Install]
+WantedBy=timers.target

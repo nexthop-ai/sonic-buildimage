@@ -12,7 +12,7 @@ import sys
 from nexthop import pddf_config_parser
 from sonic_platform import adm1266
 from sonic_platform.dpm_base import DpmType
-from sonic_platform.dpm_logger import DpmLogger, DataBase, DataV1
+from sonic_platform.dpm_logger import DpmLogger, DataBase, DataV1, SkippedReboots
 from sonic_platform.reboot_cause_manager import RebootCauseManager
 
 RECORD_NAME_WIDTH = 42
@@ -40,11 +40,14 @@ def _show_dpm_record(name: str, record: dict[str, str]) -> None:
 def _show_data_v1(data: DataV1, verbosity: int) -> None:
     click.secho(f"=== Captured at {data.gen_time} ===", fg="yellow")
 
-    for c in reversed(data.causes):
-        click.secho(
-            f"[{c.timestamp}] cause: {c.cause}; description: {c.description}; source: {c.source}",
-            fg="blue",
-        )
+    if not data.causes:
+        click.secho("[unknown] cause: unknown; description: n/a; source: n/a", fg="blue")
+    else:
+        for c in reversed(data.causes):
+            click.secho(
+                f"[{c.timestamp}] cause: {c.cause}; description: {c.description}; source: {c.source}",
+                fg="blue",
+            )
 
     if verbosity:
         records = [(dpm, record) for dpm in data.dpms for record in reversed(dpm.records)]
@@ -92,13 +95,28 @@ def reboot_cause(ctx, verbosity: int) -> None:
 @click.option("-vv", "verbosity", flag_value=2, help="Show all fields from DPM records")
 def history(verbosity: int) -> None:
     """Displays reboot-cause history with most recent entry first."""
-    datas = DpmLogger().load_all()
-    if not datas:
+    items, total_reboots, skipped_reboots = DpmLogger().load_all()
+    if not items:
         click.echo("No reboot-cause records found")
         return
 
-    for data in reversed(datas):
-        _show_data(data, verbosity)
+    showing = total_reboots - skipped_reboots
+    click.echo(f"Total reboots observed in this window = {total_reboots}, showing {showing}")
+
+    for item in reversed(items):
+        if isinstance(item, SkippedReboots):
+            click.secho("===", fg="yellow")
+            click.secho(f"=== Skipping {item.count} reboots", fg="yellow")
+            click.secho("===", fg="yellow")
+        else:
+            _show_data(item, verbosity)
+
+
+@reboot_cause.command()
+def rotate_log() -> None:
+    """Rotates initial/recent reboot logs into the history log (up to 20 entries)."""
+    check_root_privileges()
+    DpmLogger().drain_to_history()
 
 
 @reboot_cause.command()
