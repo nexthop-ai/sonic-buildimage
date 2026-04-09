@@ -197,12 +197,12 @@ fi
 CONSOLE_DEV=${CONSOLE_DEV:-12}
 CONSOLE_SPEED=${CONSOLE_SPEED:-115200}
 EARLYCON=${EARLYCON:-"earlycon=uart8250,mmio32,0x14c33b00"}
-VAR_LOG_SIZE=${VAR_LOG_SIZE:-512}
+VAR_LOG_SIZE=${VAR_LOG_SIZE:-128}  # 128MB for /var/log tmpfs
 
 # Construct console device name
 CONSOLE_PORT="ttyS${CONSOLE_DEV}"
 
-fw_setenv linuxargs "console=${CONSOLE_PORT},${CONSOLE_SPEED}n8 ${EARLYCON} loopfstype=squashfs loop=$IMAGE_DIR/fs.squashfs varlog_size=${VAR_LOG_SIZE}" || log "ERROR: Failed to set linuxargs"
+fw_setenv linuxargs "console=${CONSOLE_PORT},${CONSOLE_SPEED}n8 ${EARLYCON} loopfstype=squashfs loop=$IMAGE_DIR/fs.squashfs varlog_size=${VAR_LOG_SIZE} logs_inram=on" || log "ERROR: Failed to set linuxargs"
 
 # Boot commands
 fw_setenv sonic_boot_load "ext4load ${disk_interface} 0:${demo_part} \${loadaddr} \${fit_name}" || log "ERROR: Failed to set sonic_boot_load"
