@@ -22,6 +22,7 @@ $(DOCKER_PLATFORM_MONITOR)_PYTHON_WHEELS += $(SONIC_SENSORMOND_PY3)
 $(DOCKER_PLATFORM_MONITOR)_PYTHON_WHEELS += $(SONIC_XCVRD_PY3)
 $(DOCKER_PLATFORM_MONITOR)_PYTHON_WHEELS += $(SONIC_YCABLED_PY3)
 $(DOCKER_PLATFORM_MONITOR)_PYTHON_WHEELS += $(SONIC_CHASSISD_PY3)
+$(DOCKER_PLATFORM_MONITOR)_PYTHON_WHEELS += $(SONIC_BMCCTLD_PY3)
 $(DOCKER_PLATFORM_MONITOR)_PYTHON_WHEELS += $(SONIC_STORMOND_PY3)
 
 ifeq ($(PDDF_SUPPORT),y)
@@ -55,6 +56,7 @@ $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /etc/sonic:/etc/sonic:ro
 $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /etc/localtime:/etc/localtime:ro 
 $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /host/reboot-cause:/host/reboot-cause:rw
 $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /host/pmon/stormond:/usr/share/stormond:rw
+$(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /host/bmc:/host/bmc:rw
 $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /var/run/platform_cache:/var/run/platform_cache:ro
 $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /usr/share/sonic/device/pddf:/usr/share/sonic/device/pddf:ro
 $(DOCKER_PLATFORM_MONITOR)_RUN_OPT += -v /var/lock/pddf-locks:/var/lock/pddf-locks:rw
