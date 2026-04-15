@@ -1033,8 +1033,8 @@ ifneq ($(CROSS_BUILD_ENVIRON),y)
 ifneq ($(filter bookworm trixie,$(BLDENV)),)
 		{ \
 		echo "Building Wheels package $@"; \
-		if case "$@" in *trixie*sonic_chassisd*) true;; *) false;; esac; then \
-		    echo "Skipping tests for sonic_chassisd on trixie ($@)"; \
+		if case "$@" in *trixie*sonic_chassisd*) true;; *trixie*sonic_bmcctld*) true;; *) false;; esac; then \
+		    echo "Skipping tests for sonic_chassisd and sonic_bmcctld on trixie ($@)"; \
 		elif [ ! "$($*_TEST)" = "n" ] && [ ! "$(BUILD_SKIP_TEST)" = "y" ]; then \
 		    pip$($*_PYTHON_VERSION) install ".[testing]" && \
 		    pip$($*_PYTHON_VERSION) uninstall --yes `python$($*_PYTHON_VERSION) setup.py --name` && \
