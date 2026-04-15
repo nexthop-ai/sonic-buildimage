@@ -87,3 +87,9 @@ def get_switchcard_fpga_bdf(vars_filepath=f"{PLATFORM_FOLDER}/pcie-variables.yam
     return get_pcie_variables(vars_filepath, vars_to_get={"switchcard_fpga_bdf"}).get(
         "switchcard_fpga_bdf"
     )
+
+
+def get_switchcard_fpga_0_bdf(vars_filepath=f"{PLATFORM_FOLDER}/pcie-variables.yaml") -> str | None:
+    return get_pcie_variables(vars_filepath, vars_to_get={"switchcard_fpga_0_bdf"}).get(
+        "switchcard_fpga_0_bdf"
+    )
