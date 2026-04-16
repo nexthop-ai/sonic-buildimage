@@ -40,6 +40,9 @@ BMC_EXCLUDED_SERVICES = {
     # Console - not needed if no local display
     'getty@tty1.service',            # Local console - only if VGA/HDMI available
 
+    # Zero Touch Provisioning - not needed on BMC for now
+    'ztp.service',                   # ZTP for automated device provisioning (TODO: enable when needed)
+
 }
 
 # Services to ENSURE are included for BMC
@@ -60,9 +63,6 @@ BMC_REQUIRED_SERVICES = {
 
     # Time synchronization
     'chrony.service',                 # Chrony time synchronization
-
-    # Zero Touch Provisioning
-    'ztp.service',                    # ZTP for automated device provisioning
 
     # System health monitoring
     'system-health.service',          # SONiC system health monitor
