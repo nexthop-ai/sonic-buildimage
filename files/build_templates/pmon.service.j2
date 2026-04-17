@@ -1,7 +1,8 @@
 [Unit]
 Description=Platform monitor container
 Requires=database.service config-setup.service
-After=database.service config-setup.service
+After=database.service config-setup.service{% if sonic_asic_platform == 'aspeed' %} sonic-platform-init.service{% endif %}
+
 BindsTo=sonic.target
 After=sonic.target
 StartLimitIntervalSec=1200

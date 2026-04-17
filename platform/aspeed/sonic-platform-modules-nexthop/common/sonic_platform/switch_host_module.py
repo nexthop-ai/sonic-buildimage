@@ -303,7 +303,9 @@ class SwitchHostModule(ModuleBase):
                 return
             try:
                 with open(delete_path_bus, "w") as f:
-                    f.write("10-0050\n")
+                    # Write only the device address, not the full bus-address notation
+                    # Kernel expects "0x50" not "10-0050"
+                    f.write("0x50\n")
             except OSError:
                 pass
 
