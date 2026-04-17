@@ -194,7 +194,14 @@ class Chassis(ChassisBase):
         Returns:
             String containing the model number of the chassis
         """
-        return self._eeprom.modelstr()
+        if self._eeprom:
+            try:
+                e = self._eeprom.read_eeprom()
+                model = self._eeprom.modelstr(e)
+                return model if model else "N/A"
+            except Exception:
+                pass
+        return "N/A"
 
     def get_revision(self):
         """
@@ -202,7 +209,14 @@ class Chassis(ChassisBase):
         Returns:
             string: Label Revision value of device
         """
-        return self._eeprom.label_revision_str()
+        if self._eeprom:
+            try:
+                e = self._eeprom.read_eeprom()
+                revision = self._eeprom.label_revision_str(e)
+                return revision if revision else "N/A"
+            except Exception:
+                pass
+        return "N/A"
 
     def get_serial_number(self):
         """
