@@ -274,10 +274,9 @@ void delete_all_fpga_data_nodes(void)
 	struct fpga_data_node *node, *tmp;
 	struct list_head local_list;
 
-	// Clear the global list after copying over the pointer
+	// Clear the global list after moving it to local
 	mutex_lock(&fpga_list_lock);
-	local_list = fpga_list;
-	INIT_LIST_HEAD(&fpga_list);
+	list_replace_init(&fpga_list, &local_list);
 	mutex_unlock(&fpga_list_lock);
 
 	// Work on the local copy without the need for a lock
@@ -720,8 +719,7 @@ static void cleanup_all_protocols(void)
 
 	// Move the list to a local one to be able to process without lock
 	mutex_lock(&protocol_modules_lock);
-	local_list = protocol_modules;
-	INIT_LIST_HEAD(&protocol_modules);
+	list_replace_init(&protocol_modules, &local_list);
 	mutex_unlock(&protocol_modules_lock);
 
 	// Work on local copy without any locks
@@ -963,6 +961,7 @@ static void run_bar_op_for_all_fpgas(struct protocol_module *proto, bool map)
 			work_item->pci_dev = fpga_node->dev;
 			work_item->kobj = fpga_node->kobj;
 			work_item->map_bar = proto->ops->map_bar;
+			work_item->unmap_bar = proto->ops->unmap_bar;
 			// Get bar length from pci_privdata
 			struct pddf_multifpgapci_drvdata *pci_privdata =
 				dev_get_drvdata(&fpga_node->dev->dev);
@@ -979,18 +978,18 @@ static void run_bar_op_for_all_fpgas(struct protocol_module *proto, bool map)
 
 	// Execute work items without locks
 	list_for_each_entry_safe(work_item, tmp, &work_list, list) {
-		if (work_item->map_bar) {
-			if (map) {
+		if (map) {
+			if (work_item->map_bar)
 				work_item->map_bar(work_item->pci_dev,
 						   work_item->bar_base,
 						   work_item->bar_start,
 						   work_item->bar_len);
-			} else {
+		} else {
+			if (work_item->unmap_bar)
 				work_item->unmap_bar(work_item->pci_dev,
 						     work_item->bar_base,
 						     work_item->bar_start,
 						     work_item->bar_len);
-			}
 		}
 		list_del(&work_item->list);
 		kfree(work_item);
