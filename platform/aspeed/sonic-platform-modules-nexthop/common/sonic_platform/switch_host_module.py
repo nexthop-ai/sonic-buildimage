@@ -131,9 +131,10 @@ class SwitchHostModule(ModuleBase):
             sys.stderr.write("SwitchHost: Failed to assert reset\n")
             return False
 
-        sys.stderr.write("SwitchHost: Reset asserted, waiting 2 seconds...\n")
+        # 5 seconds is the minimum wait time
+        sys.stderr.write("SwitchHost: Reset asserted, waiting 6 seconds...\n")
 
-        time.sleep(2)
+        time.sleep(6)
 
         # Step 3: Deassert reset (power on)
         if not self._write_reset_register(self.RESET_VALUE_DEASSERT):
