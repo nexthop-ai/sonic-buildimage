@@ -1177,7 +1177,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "asic_pcie_fw_version"
+        "get_cmd": "bcmcmd 'dsh -c \"pciephy fwinfo\"' | grep 'FW version' | awk -F': ' '{print $2}'"
       },
       {
         "attr_name": "model",
