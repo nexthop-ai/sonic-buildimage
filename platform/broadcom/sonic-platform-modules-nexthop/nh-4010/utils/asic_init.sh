@@ -106,6 +106,12 @@ if [ "$IS_OPENNSL_INITIALLY_LOADED" -eq 0 ]; then
   /etc/init.d/opennsl-modules stop
 fi
 
+# Set DP_PWR_ON = 1
+# DP_POWR_ON should already be 1 in normal circumstances, but it's possible
+# a power glitch brings it to 0. The system may kernel panic if we bring up
+# the ASIC when DP_PWR_ON = 0.
+fpga_write 0x90  0x1 "24:24"
+
 # Try power cycling, up to two times, or until Switch ASIC chip is found
 for attempt in {0..2}; do
   # Powercycle the asic, then take it out of reset
@@ -117,6 +123,15 @@ for attempt in {0..2}; do
 
   # We need to wait for the asic to come up
   sleep 3
+
+  # Log ASIC_PGOOD
+  pg_bit=$(fpga_read 0x98 "31:31")
+  logger -t "$LOG_TAG" -p "$LOG_PRIO" "ASIC_PGOOD = $pg_bit"
+  if [ $(( pg_bit )) -eq 1 ]; then
+    logger -t "$LOG_TAG" -p "$LOG_PRIO" "ASIC power good"
+  else
+    logger -t "$LOG_TAG" -p "$LOG_ERR" "ASIC power good bit not set"
+  fi
 
   # Check if switch ASIC is up
   lspci -n | grep -q "$ASIC_BDF"
