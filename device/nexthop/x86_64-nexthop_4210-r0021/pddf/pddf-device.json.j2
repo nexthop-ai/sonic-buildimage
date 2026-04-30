@@ -14,10 +14,8 @@
       "i2c-dev"
     ],
     "pddf_kos": [
-      "pddf_spi_module",
       "pddf_multifpgapci_i2c_module",
       "pddf_multifpgapci_gpio_module",
-      "pddf_multifpgapci_spi_module",
       "pddf_client_module",
       "pddf_multifpgapci_driver",
       "pddf_multifpgapci_module",
@@ -28,8 +26,7 @@
       "pddf_xcvr_module",
       "pddf_xcvr_driver_module",
       "pddf_cpldmux_module",
-      "pddf_cpldmux_driver",
-      "pddf_multifpgapci_gpio_driver"
+      "pddf_cpldmux_driver"
     ],
     "custom_kos": [
       "pddf_custom_fpga_algo",
@@ -2133,8 +2130,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x400",
-          "attr_cmpval": "0x400",
+          "attr_mask": "0x200",
+          "attr_cmpval": "0x200",
           "attr_len": "1"
         },
         {
@@ -2142,8 +2139,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x1000",
-          "attr_cmpval": "0x1000",
+          "attr_mask": "0x800",
+          "attr_cmpval": "0x800",
           "attr_len": "1"
         },
         {
@@ -2167,14 +2164,6 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
-          "attr_mask": "0x0",
-          "attr_cmpval": "0x00"
-        },
-        {
-          "attr_name": "psu_fw_version",
-          "attr_devaddr": "0x58",
-          "attr_devtype": "pmbus",
-          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -2405,8 +2394,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x400",
-          "attr_cmpval": "0x400",
+          "attr_mask": "0x2000",
+          "attr_cmpval": "0x2000",
           "attr_len": "1"
         },
         {
@@ -2414,8 +2403,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x1000",
-          "attr_cmpval": "0x1000",
+          "attr_mask": "0x8000",
+          "attr_cmpval": "0x8000",
           "attr_len": "1"
         },
         {
@@ -2439,14 +2428,6 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
-          "attr_mask": "0x0",
-          "attr_cmpval": "0x00"
-        },
-        {
-          "attr_name": "psu_fw_version",
-          "attr_devaddr": "0x58",
-          "attr_devtype": "pmbus",
-          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -2677,8 +2658,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x400",
-          "attr_cmpval": "0x400",
+          "attr_mask": "0x2",
+          "attr_cmpval": "0x2",
           "attr_len": "1"
         },
         {
@@ -2686,8 +2667,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x1000",
-          "attr_cmpval": "0x1000",
+          "attr_mask": "0x8",
+          "attr_cmpval": "0x8",
           "attr_len": "1"
         },
         {
@@ -2711,14 +2692,6 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
-          "attr_mask": "0x0",
-          "attr_cmpval": "0x00"
-        },
-        {
-          "attr_name": "psu_fw_version",
-          "attr_devaddr": "0x58",
-          "attr_devtype": "pmbus",
-          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -2949,8 +2922,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x400",
-          "attr_cmpval": "0x400",
+          "attr_mask": "0x20",
+          "attr_cmpval": "0x20",
           "attr_len": "1"
         },
         {
@@ -2958,8 +2931,8 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x2c",
-          "attr_mask": "0x1000",
-          "attr_cmpval": "0x1000",
+          "attr_mask": "0x80",
+          "attr_cmpval": "0x80",
           "attr_len": "1"
         },
         {
@@ -2983,14 +2956,6 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
-          "attr_mask": "0x0",
-          "attr_cmpval": "0x00"
-        },
-        {
-          "attr_name": "psu_fw_version",
-          "attr_devaddr": "0x58",
-          "attr_devtype": "pmbus",
-          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
