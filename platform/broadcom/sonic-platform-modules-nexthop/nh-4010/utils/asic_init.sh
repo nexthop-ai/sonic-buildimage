@@ -35,6 +35,25 @@ fpga_write() {
   fi
 }
 
+fpga_read() {
+  local offset="$1"
+  local bits="$2"
+  local result
+
+  if [ -n "$bits" ]; then
+    result=$(fpga read32 "$FPGA_BDF" "$offset" --bits "$bits")
+  else
+    result=$(fpga read32 "$FPGA_BDF" "$offset")
+  fi
+
+  if [ $? -ne 0 ]; then
+    logger -t $LOG_TAG -p $LOG_ERR "Error reading reg $offset on fpga $FPGA_BDF"
+    exit 1
+  fi
+
+  echo "$result"
+}
+
 function acquire_lock() {
   if [[ ! -f $LOCKFILE ]]; then
     touch $LOCKFILE
