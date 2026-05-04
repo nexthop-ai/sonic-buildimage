@@ -1,0 +1,53 @@
+From a176285f2bad602e1a30c2f2f27e7e10999cc446 Mon Sep 17 00:00:00 2001
+From: Abdurrahman Hussain <abdurrahman@nexthop.ai>
+Date: Sun, 19 Apr 2026 22:56:45 -0700
+Subject: [PATCH] Add ACPI enumerated I2C driver name support
+
+ACPI enumerated I2C devices appear in sysfs as i2c-PRP0001:04.
+Previously lm-sensors classified these as virtual devices.
+---
+ lib/sysfs.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/lib/sysfs.c b/lib/sysfs.c
+index 9516cec4..3f202909 100644
+--- a/lib/sysfs.c
++++ b/lib/sysfs.c
+@@ -615,7 +615,8 @@ int sensors_init_sysfs(void)
+ 	return 1;
+ }
+ 
+-static int classify_device(const char *dev_name,
++static int classify_device(const char *dev_path,
++                           const char *dev_name,
+                            const char *subsys,
+                            sensors_chip_features *entry)
+ {
+@@ -647,6 +648,15 @@ static int classify_device(const char *dev_name,
+ 			}
+ 		}
+ 	} else
++	if ((!subsys || !strcmp(subsys, "i2c")) &&
++	    sscanf(dev_name, "i2c-%*[a-zA-Z0-9_]%*1[.:]%x", &entry->chip.addr) == 1) {
++		entry->chip.bus.type = SENSORS_BUS_TYPE_I2C;
++		strncpy(bus_path, dev_path, sizeof(bus_path));
++		strrchr(bus_path, '/')[0] = 0;
++		char *bus_name = strrchr(bus_path, '/') + 1;
++		if (sscanf(bus_name, "i2c-%hd", &entry->chip.bus.nr) != 1)
++			entry->chip.bus.nr = 0;
++	} else
+ 	if ((!subsys || !strcmp(subsys, "spi")) &&
+ 	    sscanf(dev_name, "spi%hd.%d", &entry->chip.bus.nr,
+ 		   &entry->chip.addr) == 2) {
+@@ -736,7 +746,7 @@ static int find_bus_type(const char *dev_path,
+ 			subsys_path[sub_len] = '\0';
+ 			subsys = strrchr(subsys_path, '/') + 1;
+ 		}
+-		ret = classify_device(dev_name, subsys, entry);
++		ret = classify_device(dev_path, dev_name, subsys, entry);
+ 		if (!ret) {
+ 			snprintf(linkpath, NAME_MAX, "%s/device", my_dev_path);
+ 			free(my_dev_path);
+-- 
+2.53.0
+
