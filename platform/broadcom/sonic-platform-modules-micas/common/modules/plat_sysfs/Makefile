@@ -12,6 +12,10 @@ $(SUBDIRS):ECHO
 	#@echo $@
 	make -C $@
 
+# dev_sysfs imports KBUILD_EXTRA_SYMBOLS from dev_cfg/Module.symvers, so dev_cfg
+# must finish before dev_sysfs starts under parallel make.
+dev_sysfs: dev_cfg
+
 ECHO:
 	@echo $(SUBDIRS)
 
