@@ -284,6 +284,11 @@ class NexthopFpgaAsicThermal(ThermalBase, MinMaxTempMixin, PidThermalMixin):
         reg_val = fpga_lib.read_32(self._fpga_pci_addr, self._reg_addr)
         field_val = reg_val >> self._field_range_start
         field_val = field_val & ((1 << (self._field_range_end - self._field_range_start + 1)) - 1)
+        # field_val == 0 means the FPGA register is uninitialized (e.g. ASIC init failed).
+        # All conversion formulas would yield a physically impossible temp (~380-500 C),
+        # which falsely trips Warning=True and ramps fans. Report N/A instead.
+        if field_val == 0:
+            return None
         get_celsius_fn = TYPE_TO_CELSIUS_LAMBDA_DICT.get(self._value_type)
         if get_celsius_fn:
             val = get_celsius_fn(field_val)
