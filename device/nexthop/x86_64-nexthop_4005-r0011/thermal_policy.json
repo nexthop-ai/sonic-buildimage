@@ -2,7 +2,7 @@
     "interval": 5,
     "info_types": [
         {
-            "type": "fan_info"
+            "type": "fan_drawer_info"
         },
         {
             "type": "thermal_info"
@@ -13,25 +13,19 @@
     ],
     "policies": [
         {
-<<<<<<< HEAD
-            "name": "Two or fewer fans present",
-            "conditions": [
-                {
-                    "type": "fan.two.or.fewer.present"
-=======
             "name": "One fan drawer functional",
             "conditions": [
                 {
                     "type": "fandrawer.one.functional"
->>>>>>> 8932f415b (NOS-6726: Update NH platforms thermal policy to consider functional fans only (#4483))
                 }
             ],
             "actions": [
                 {
+                    "type": "fan.set_max_speed",
+                    "max_speed": 100
+                },
+                {
                     "type": "fan.set_speed",
-<<<<<<< HEAD
-                    "speed": "100"
-=======
                     "speed": 100
                 }
             ]
@@ -69,21 +63,6 @@
             ]
         },
         {
-            "name": "Four fan drawers functional",
-            "conditions": [
-                {
-                    "type": "fandrawer.four.functional"
-                }
-            ],
-            "actions": [
-                {
-                    "type": "fan.set_max_speed",
-                    "max_speed": 75
->>>>>>> 8932f415b (NOS-6726: Update NH platforms thermal policy to consider functional fans only (#4483))
-                }
-            ]
-        },
-        {
             "name": "thermal control algorithm",
             "conditions": [
                 {
@@ -94,8 +73,7 @@
                 {
                     "type": "thermal.control_algo",
                     "fan_limits": {
-                        "min": 30,
-                        "max": 70
+                        "min": 65
                     },
                     "pid_domains": {
                         "asic": {

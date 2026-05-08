@@ -34,6 +34,19 @@ class FanDrawerInfo(ThermalPolicyInfoBase):
     
     def get_num_present_fan_drawers(self):
         return sum([fan_drawer.get_presence() for fan_drawer in self._fan_drawers])
+
+    def get_num_functional_fan_drawers(self):
+        """
+        Count fan drawers that are present and have all fans reporting a good status.
+        A drawer with any faulted fan is not counted as functional.
+        """
+        count = 0
+        for fan_drawer in self._fan_drawers:
+            if not fan_drawer.get_presence():
+                continue
+            if all(fan.get_status() for fan in fan_drawer.get_all_fans()):
+                count += 1
+        return count
     
 @thermal_json_object('thermal_info')
 class ThermalInfo(ThermalPolicyInfoBase):

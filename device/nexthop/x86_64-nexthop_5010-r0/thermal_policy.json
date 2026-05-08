@@ -13,10 +13,10 @@
     ],
     "policies": [
         {
-            "name": "One fan drawer present",
+            "name": "One fan drawer functional",
             "conditions": [
                 {
-                    "type": "fandrawer.one.present"
+                    "type": "fandrawer.one.functional"
                 }
             ],
             "actions": [
@@ -31,10 +31,10 @@
             ]
         },
         {
-            "name": "Two fan drawers present",
+            "name": "Two fan drawers functional",
             "conditions": [
                 {
-                    "type": "fandrawer.two.present"
+                    "type": "fandrawer.two.functional"
                 }
             ],
             "actions": [
@@ -49,10 +49,10 @@
             ]
         },
         {
-            "name": "Three fan drawers present",
+            "name": "Three fan drawers functional",
             "conditions": [
                 {
-                    "type": "fandrawer.three.present"
+                    "type": "fandrawer.three.functional"
                 }
             ],
             "actions": [
@@ -63,10 +63,10 @@
             ]
         },
         {
-            "name": "Four fan drawers present",
+            "name": "Four fan drawers functional",
             "conditions": [
                 {
-                    "type": "fandrawer.four.present"
+                    "type": "fandrawer.four.functional"
                 }
             ],
             "actions": [
