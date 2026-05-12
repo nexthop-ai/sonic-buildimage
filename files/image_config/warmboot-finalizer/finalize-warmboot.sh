@@ -221,6 +221,7 @@ function restore_counters_folder()
     fi
 }
 
+<<<<<<< HEAD
 function check_warm_boot_and_fast_boot_or_exit()
 {
     check_fast_reboot
@@ -260,6 +261,39 @@ function wait_for_components_to_reconcile() {
 
 wait_for_database_service
 check_warm_boot_and_fast_boot_or_exit
+=======
+FLOW_CNT_TRAP_MARKER="/host/warmboot/flow_cnt_trap_need_re_enable"
+
+# Re-enable FLOW_CNT_TRAP if /usr/local/bin/fast-reboot disabled it
+# pre-warmboot. The marker is written only when re-enable is needed.
+function restore_flow_cnt_trap()
+{
+    if [[ ! -f "$FLOW_CNT_TRAP_MARKER" ]]; then
+        return
+    fi
+    debug "Restoring FLOW_CNT_TRAP=enable after warmboot reconcile"
+    sonic-db-cli CONFIG_DB HSET "FLEX_COUNTER_TABLE|FLOW_CNT_TRAP" FLEX_COUNTER_STATUS enable > /dev/null
+    rm -f "$FLOW_CNT_TRAP_MARKER"
+}
+
+
+wait_for_database_service
+
+check_fast_reboot
+check_warm_boot
+
+if [[ x"${WARM_BOOT}" != x"true" ]]; then
+    debug "warmboot is not enabled ..."
+    # Drop a stale marker from a prior aborted warm-reboot. Only warm-reboot
+    # writes/honors it; on any other boot path it would falsely re-enable a
+    # counter the user may have disabled.
+    rm -f "$FLOW_CNT_TRAP_MARKER"
+    if [[ x"${FAST_REBOOT}" != x"true" ]]; then
+	    debug "fastboot is not enabled ..."
+	    exit 0
+    fi
+fi
+>>>>>>> ea14cde72 (NOS-6934: re-enable FLOW_CNT_TRAP after warm-boot reconcile (#4938))
 
 if [[ (x"${WARM_BOOT}" == x"true") && (x"${FAST_REBOOT}" != x"true") ]]; then
     restore_counters_folder
@@ -304,6 +338,8 @@ finalize_global
 if [[ (x"${WARM_BOOT}" == x"true") && (x"${FAST_REBOOT}" != x"true") ]]; then
     stop_control_plane_assistant
 fi
+
+restore_flow_cnt_trap
 
 # Save DB after stopped control plane assistant to avoid extra entries
 debug "Save in-memory database after warm/fast reboot ..."
