@@ -9,7 +9,11 @@
     "num_voltage_sensors" : 24,
     "num_current_sensors" : 8,
     "num_nexthop_fpga_asic_temp_sensors": 2,
+<<<<<<< HEAD
     "num_components": 6,
+=======
+    "num_components": 10,
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
     "nexthop_thermal_xcvr_setpoint_margin" : 8,
     "nexthop_thermal_xcvr_setpoint_override" : null,
     "nexthop_thermal_xcvr_pid_domain": "main",
@@ -34,6 +38,12 @@
     "std_kos": [
       "at24",
       "i2c-dev",
+<<<<<<< HEAD
+=======
+      "i2c-xiic",
+      "spi-xilinx",
+      "xdpe1a2g7b",
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
       "optoe"
     ],
     "pddf_kos": [
@@ -55,7 +65,10 @@
       "pddf_custom_fpga_algo",
       "nh_pmbus_core",
       "nh_isl68137",
+<<<<<<< HEAD
       "nh_tda38740",
+=======
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
       "nh_adm1266",
       "nh_tmp464"
     ]
@@ -155,6 +168,36 @@
           { "attr_name": "revision", "get_cmd": "echo N/A" },
           { "attr_name": "update", "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py NH-4010-F NVMe {}" }
       ]
+  },
+  "COMPONENT10": {
+    "comp_attr": {
+      "name": "DCDC0",
+      "type": "dcdc",
+      "description": "DCDC voltage regulator",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "sudo xdpe1a2g7b_version --bus 91 --address 0x70"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "get_cmd": "echo 'N/A'"
+      }
+    ]
   },
   "SYSTEM": {
     "dev_info": {

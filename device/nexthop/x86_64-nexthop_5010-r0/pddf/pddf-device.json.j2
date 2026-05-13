@@ -8,7 +8,11 @@
     "num_asic_temps": 52,
     "num_voltage_sensors": 82,
     "num_current_sensors": 20,
+<<<<<<< HEAD
     "num_components": 36,
+=======
+    "num_components": 42,
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
     "nexthop_thermal_xcvr_setpoint_margin" : 8,
     "nexthop_thermal_xcvr_setpoint_override" : null,
     "nexthop_thermal_xcvr_pid_domain": "main",
@@ -394,6 +398,66 @@
   },
   "COMPONENT12": {
     "comp_attr": {
+      "name": "DCDC0",
+      "type": "dcdc",
+      "description": "DCDC voltage regulator",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "sudo xdpe1a2g7b_version --bus 89 --address 0x68"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "get_cmd": "echo 'N/A'"
+      }
+    ]
+  },
+  "COMPONENT13": {
+    "comp_attr": {
+      "name": "DCDC1",
+      "type": "dcdc",
+      "description": "DCDC voltage regulator",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "sudo xdpe1a2g7b_version --bus 89 --address 0x70"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "get_cmd": "echo 'N/A'"
+      }
+    ]
+  },
+  "COMPONENT14": {
+    "comp_attr": {
       "name": "DCDC2",
       "type": "dcdc",
       "description": "DCDC voltage regulator",
@@ -422,7 +486,7 @@
       }
     ]
   },
-  "COMPONENT13": {
+  "COMPONENT15": {
     "comp_attr": {
       "name": "DCDC3",
       "type": "dcdc",
@@ -452,7 +516,7 @@
       }
     ]
   },
-  "COMPONENT14": {
+  "COMPONENT16": {
     "comp_attr": {
       "name": "DCDC4",
       "type": "dcdc",
@@ -482,7 +546,7 @@
       }
     ]
   },
-  "COMPONENT15": {
+  "COMPONENT17": {
     "comp_attr": {
       "name": "DCDC5",
       "type": "dcdc",
@@ -512,7 +576,7 @@
       }
     ]
   },
-  "COMPONENT16": {
+  "COMPONENT18": {
     "comp_attr": {
       "name": "DCDC6",
       "type": "dcdc",
@@ -542,7 +606,7 @@
       }
     ]
   },
-  "COMPONENT17": {
+  "COMPONENT19": {
     "comp_attr": {
       "name": "DCDC7",
       "type": "dcdc",
@@ -572,7 +636,7 @@
       }
     ]
   },
-  "COMPONENT18": {
+  "COMPONENT20": {
     "comp_attr": {
       "name": "DCDC8",
       "type": "dcdc",
@@ -602,7 +666,7 @@
       }
     ]
   },
-  "COMPONENT19": {
+  "COMPONENT21": {
     "comp_attr": {
       "name": "DCDC9",
       "type": "dcdc",
@@ -632,7 +696,7 @@
       }
     ]
   },
-  "COMPONENT20": {
+  "COMPONENT22": {
     "comp_attr": {
       "name": "DCDC10",
       "type": "dcdc",
@@ -662,7 +726,7 @@
       }
     ]
   },
-  "COMPONENT21": {
+  "COMPONENT23": {
     "comp_attr": {
       "name": "PHY0",
       "type": "gearbox",
@@ -692,7 +756,7 @@
       }
     ]
   },
-  "COMPONENT22": {
+  "COMPONENT24": {
     "comp_attr": {
       "name": "PHY1",
       "type": "gearbox",
@@ -722,7 +786,7 @@
       }
     ]
   },
-  "COMPONENT23": {
+  "COMPONENT25": {
     "comp_attr": {
       "name": "PHY2",
       "type": "gearbox",
@@ -752,7 +816,7 @@
       }
     ]
   },
-  "COMPONENT24": {
+  "COMPONENT26": {
     "comp_attr": {
       "name": "PHY3",
       "type": "gearbox",
@@ -782,7 +846,7 @@
       }
     ]
   },
-  "COMPONENT25": {
+  "COMPONENT27": {
     "comp_attr": {
       "name": "PHY4",
       "type": "gearbox",
@@ -812,7 +876,7 @@
       }
     ]
   },
-  "COMPONENT26": {
+  "COMPONENT28": {
     "comp_attr": {
       "name": "PHY5",
       "type": "gearbox",
@@ -842,7 +906,7 @@
       }
     ]
   },
-  "COMPONENT27": {
+  "COMPONENT29": {
     "comp_attr": {
       "name": "PHY6",
       "type": "gearbox",
@@ -872,7 +936,7 @@
       }
     ]
   },
-  "COMPONENT28": {
+  "COMPONENT30": {
     "comp_attr": {
       "name": "PHY7",
       "type": "gearbox",
@@ -902,7 +966,7 @@
       }
     ]
   },
-  "COMPONENT29": {
+  "COMPONENT31": {
     "comp_attr": {
       "name": "PHY8",
       "type": "gearbox",
@@ -932,7 +996,7 @@
       }
     ]
   },
-  "COMPONENT30": {
+  "COMPONENT32": {
     "comp_attr": {
       "name": "PHY9",
       "type": "gearbox",
@@ -962,7 +1026,7 @@
       }
     ]
   },
-  "COMPONENT31": {
+  "COMPONENT33": {
     "comp_attr": {
       "name": "PHY10",
       "type": "gearbox",
@@ -992,7 +1056,7 @@
       }
     ]
   },
-  "COMPONENT32": {
+  "COMPONENT34": {
     "comp_attr": {
       "name": "PHY11",
       "type": "gearbox",
@@ -1022,7 +1086,7 @@
       }
     ]
   },
-  "COMPONENT33": {
+  "COMPONENT35": {
     "comp_attr": {
       "name": "PHY12",
       "type": "gearbox",
@@ -1052,7 +1116,7 @@
       }
     ]
   },
-  "COMPONENT34": {
+  "COMPONENT36": {
     "comp_attr": {
       "name": "PHY13",
       "type": "gearbox",
@@ -1082,7 +1146,7 @@
       }
     ]
   },
-  "COMPONENT35": {
+  "COMPONENT37": {
     "comp_attr": {
       "name": "PHY14",
       "type": "gearbox",
@@ -1112,7 +1176,7 @@
       }
     ]
   },
-  "COMPONENT36": {
+  "COMPONENT38": {
     "comp_attr": {
       "name": "PHY15",
       "type": "gearbox",
@@ -1142,6 +1206,129 @@
       }
     ]
   },
+<<<<<<< HEAD
+=======
+  "COMPONENT39": {
+    "comp_attr": {
+      "name": "PSU1",
+      "type": "psu",
+      "description": "Power Supply Unit 1",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "cat /sys/bus/i2c/devices/85-0058/psu_fw_version"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "cat /sys/bus/i2c/devices/85-0058/psu_model_name"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "cat /sys/bus/i2c/devices/85-0058/psu_serial_num"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "get_cmd": "echo 'N/A'"
+      }
+    ]
+  },
+  "COMPONENT40": {
+    "comp_attr": {
+      "name": "PSU2",
+      "type": "psu",
+      "description": "Power Supply Unit 2",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "cat /sys/bus/i2c/devices/86-0058/psu_fw_version"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "cat /sys/bus/i2c/devices/86-0058/psu_model_name"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "cat /sys/bus/i2c/devices/86-0058/psu_serial_num"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "get_cmd": "echo 'N/A'"
+      }
+    ]
+  },
+  "COMPONENT41": {
+    "comp_attr": {
+      "name": "ASIC_PCIE_D0",
+      "type": "pci",
+      "description": "ASIC PCIe firmware (D0)",
+      "boot_type": "cold"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "asic_pcie_fw_version 0"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo N/A"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo N/A"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo N/A"
+      },
+      {
+        "attr_name": "update",
+        "cmd": "echo N/A"
+      }
+    ]
+  },
+  "COMPONENT42": {
+    "comp_attr": {
+      "name": "ASIC_PCIE_D1",
+      "type": "pci",
+      "description": "ASIC PCIe firmware (D1)",
+      "boot_type": "cold"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "asic_pcie_fw_version 1"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo N/A"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo N/A"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo N/A"
+      },
+      {
+        "attr_name": "update",
+        "cmd": "echo N/A"
+      }
+    ]
+  },
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
   "SYSTEM": {
     "dev_info": {
       "device_type": "CPU",

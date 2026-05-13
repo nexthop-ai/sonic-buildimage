@@ -430,6 +430,21 @@
             },
             {
                 "name": "NVMe"
+<<<<<<< HEAD
+=======
+            },
+            {
+                "name": "PSU1"
+            },
+            {
+                "name": "PSU2"
+            },
+            {
+                "name": "ASIC_PCIE"
+            },
+            {
+                "name": "DCDC0"
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
             }
         ],
         "fans": [

@@ -7,9 +7,6 @@
                 "BIOS": {},
                 "ONIE": {},
                 "TPM": {},
-<<<<<<< HEAD
-                "NVMe": {}
-=======
                 "NVMe": {},
                 "ASIC_PCIE": {},
                 "DPM1": {},
@@ -28,7 +25,6 @@
                 "DCDC10": {},
                 "PSU1": {},
                 "PSU2": {}
->>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
             }
         }
     }

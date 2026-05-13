@@ -838,6 +838,60 @@
             },
             {
                 "name": "NVMe"
+<<<<<<< HEAD
+=======
+            },
+            {
+                "name": "ASIC_PCIE"
+            },
+            {
+                "name": "PSU1"
+            },
+            {
+                "name": "PSU2"
+            },
+            {
+                "name": "DPM1"
+            },
+            {
+                "name": "DPM2"
+            },
+            {
+                "name": "DPM3"
+            },
+            {
+                "name": "DCDC0"
+            },
+            {
+                "name": "DCDC1"
+            },
+            {
+                "name": "DCDC2"
+            },
+            {
+                "name": "DCDC3"
+            },
+            {
+                "name": "DCDC4"
+            },
+            {
+                "name": "DCDC5"
+            },
+            {
+                "name": "DCDC6"
+            },
+            {
+                "name": "DCDC7"
+            },
+            {
+                "name": "DCDC8"
+            },
+            {
+                "name": "DCDC9"
+            },
+            {
+                "name": "DCDC10"
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
             }
         ],
         "fans": [

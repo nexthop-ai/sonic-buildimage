@@ -5025,8 +5025,2138 @@
             }
         }
     },
+<<<<<<< HEAD:device/nokia/x86_64-nokia_ixr7220_h6_128-r0/platform.json
     "asic_sensors": {
         "poll_interval": "10",
         "poll_admin_status": "enable"
+=======
+    "chassis": {
+        "name": "NH-4210-F",
+        "thermals": [
+            {
+                "name": "CPU",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "Switch Card Rear",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "Chassis Intake",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "ASIC Diode 0",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "ASIC Diode 1",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "ASIC Diode 2",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC0",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC1",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC2",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC3",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC4",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC5",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC6",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC7",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC8",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC9",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC10",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC0_MEZZ0",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC0_MEZZ1",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "ASIC core.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon5",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon7",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon8",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt0.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC Min",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC Max",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            }
+        ],
+        "components": [
+            {
+                "name": "CPUCARD_FPGA"
+            },
+            {
+                "name": "SWITCHCARD_FPGA0"
+            },
+            {
+                "name": "SWITCHCARD_FPGA1"
+            },
+            {
+                "name": "BIOS"
+            },
+            {
+                "name": "ONIE"
+            },
+            {
+                "name": "TPM"
+            },
+            {
+                "name": "NVMe"
+            },
+            {
+                "name": "ASIC_PCIE"
+            },
+            {
+                "name": "PSU1"
+            },
+            {
+                "name": "PSU2"
+            },
+            {
+                "name": "PSU3"
+            },
+            {
+                "name": "PSU4"
+            },
+            {
+                "name": "DPM1"
+            },
+            {
+                "name": "DPM2"
+            },
+            {
+                "name": "DPM3"
+            },
+            {
+                "name": "DCDC0"
+            },
+            {
+                "name": "DCDC1"
+            },
+            {
+                "name": "DCDC2"
+            },
+            {
+                "name": "DCDC3"
+            },
+            {
+                "name": "DCDC4"
+            },
+            {
+                "name": "DCDC5"
+            },
+            {
+                "name": "DCDC6"
+            },
+            {
+                "name": "DCDC7"
+            },
+            {
+                "name": "DCDC8"
+            },
+            {
+                "name": "DCDC9"
+            },
+            {
+                "name": "DCDC10"
+            },
+            {
+                "name": "DCDC11"
+            },
+            {
+                "name": "DCDC12"
+            }
+        ],
+        "fans": [
+            {
+                "name": "Fantray1_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray1_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray2_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray2_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray3_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray3_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray4_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray4_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray5_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray5_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray6_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray6_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray7_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray7_2",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray8_1",
+                "status_led": {
+                    "available": false
+                }
+            },
+            {
+                "name": "Fantray8_2",
+                "status_led": {
+                    "available": false
+                }
+            }
+        ],
+        "fan_drawers": [
+            {
+                "name": "Fantray1",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray1_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray1_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray2",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray2_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray2_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray3",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray3_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray3_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray4",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray4_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray4_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray5",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray5_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray5_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray6",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray6_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray6_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray7",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray7_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray7_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            },
+            {
+                "name": "Fantray8",
+                "num_fans": 2,
+                "max_consumed_power": false,
+                "fans": [
+                    {
+                        "name": "Fantray8_1",
+                        "status_led": {
+                            "available": false
+                        }
+                    },
+                    {
+                        "name": "Fantray8_2",
+                        "status_led": {
+                            "available": false
+                        }
+                    }
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
+            }
+        ],
+        "psus": [
+            {
+                "name": "PSU1",
+                "status_led": {
+                    "controllable": false
+                },
+                "fans": [
+                    {
+                        "name": "PSU1_FAN1",
+                        "speed": {
+                            "controllable": false
+                        },
+                        "status_led": {
+                            "controllable": false
+                        }
+                    }
+                ],
+                "thermals": [
+                    {
+                        "name": "PSU1_TEMP1"
+                    },
+                    {
+                        "name": "PSU1_TEMP2"
+                    },
+                    {
+                        "name": "PSU1_TEMP3"
+                    }
+                ]
+            },
+            {
+                "name": "PSU2",
+                "status_led": {
+                    "controllable": false
+                },
+                "fans": [
+                    {
+                        "name": "PSU2_FAN1",
+                        "speed": {
+                            "controllable": false
+                        },
+                        "status_led": {
+                            "controllable": false
+                        }
+                    }
+                ],
+                "thermals": [
+                    {
+                        "name": "PSU2_TEMP1"
+                    },
+                    {
+                        "name": "PSU2_TEMP2"
+                    },
+                    {
+                        "name": "PSU2_TEMP3"
+                    }
+                ]
+            },
+            {
+                "name": "PSU3",
+                "status_led": {
+                    "controllable": false
+                },
+                "fans": [
+                    {
+                        "name": "PSU3_FAN1",
+                        "speed": {
+                            "controllable": false
+                        },
+                        "status_led": {
+                            "controllable": false
+                        }
+                    }
+                ],
+                "thermals": [
+                    {
+                        "name": "PSU3_TEMP1"
+                    },
+                    {
+                        "name": "PSU3_TEMP2"
+                    },
+                    {
+                        "name": "PSU3_TEMP3"
+                    }
+                ]
+            },
+            {
+                "name": "PSU4",
+                "status_led": {
+                    "controllable": false
+                },
+                "fans": [
+                    {
+                        "name": "PSU4_FAN1",
+                        "speed": {
+                            "controllable": false
+                        },
+                        "status_led": {
+                            "controllable": false
+                        }
+                    }
+                ],
+                "thermals": [
+                    {
+                        "name": "PSU4_TEMP1"
+                    },
+                    {
+                        "name": "PSU4_TEMP2"
+                    },
+                    {
+                        "name": "PSU4_TEMP3"
+                    }
+                ]
+            }
+        ],
+        "sfps": [
+            {
+                "name": "PORT1"
+            },
+            {
+                "name": "PORT2"
+            },
+            {
+                "name": "PORT3"
+            },
+            {
+                "name": "PORT4"
+            },
+            {
+                "name": "PORT5"
+            },
+            {
+                "name": "PORT6"
+            },
+            {
+                "name": "PORT7"
+            },
+            {
+                "name": "PORT8"
+            },
+            {
+                "name": "PORT9"
+            },
+            {
+                "name": "PORT10"
+            },
+            {
+                "name": "PORT11"
+            },
+            {
+                "name": "PORT12"
+            },
+            {
+                "name": "PORT13"
+            },
+            {
+                "name": "PORT14"
+            },
+            {
+                "name": "PORT15"
+            },
+            {
+                "name": "PORT16"
+            },
+            {
+                "name": "PORT17"
+            },
+            {
+                "name": "PORT18"
+            },
+            {
+                "name": "PORT19"
+            },
+            {
+                "name": "PORT20"
+            },
+            {
+                "name": "PORT21"
+            },
+            {
+                "name": "PORT22"
+            },
+            {
+                "name": "PORT23"
+            },
+            {
+                "name": "PORT24"
+            },
+            {
+                "name": "PORT25"
+            },
+            {
+                "name": "PORT26"
+            },
+            {
+                "name": "PORT27"
+            },
+            {
+                "name": "PORT28"
+            },
+            {
+                "name": "PORT29"
+            },
+            {
+                "name": "PORT30"
+            },
+            {
+                "name": "PORT31"
+            },
+            {
+                "name": "PORT32"
+            },
+            {
+                "name": "PORT33"
+            },
+            {
+                "name": "PORT34"
+            },
+            {
+                "name": "PORT35"
+            },
+            {
+                "name": "PORT36"
+            },
+            {
+                "name": "PORT37"
+            },
+            {
+                "name": "PORT38"
+            },
+            {
+                "name": "PORT39"
+            },
+            {
+                "name": "PORT40"
+            },
+            {
+                "name": "PORT41"
+            },
+            {
+                "name": "PORT42"
+            },
+            {
+                "name": "PORT43"
+            },
+            {
+                "name": "PORT44"
+            },
+            {
+                "name": "PORT45"
+            },
+            {
+                "name": "PORT46"
+            },
+            {
+                "name": "PORT47"
+            },
+            {
+                "name": "PORT48"
+            },
+            {
+                "name": "PORT49"
+            },
+            {
+                "name": "PORT50"
+            },
+            {
+                "name": "PORT51"
+            },
+            {
+                "name": "PORT52"
+            },
+            {
+                "name": "PORT53"
+            },
+            {
+                "name": "PORT54"
+            },
+            {
+                "name": "PORT55"
+            },
+            {
+                "name": "PORT56"
+            },
+            {
+                "name": "PORT57"
+            },
+            {
+                "name": "PORT58"
+            },
+            {
+                "name": "PORT59"
+            },
+            {
+                "name": "PORT60"
+            },
+            {
+                "name": "PORT61"
+            },
+            {
+                "name": "PORT62"
+            },
+            {
+                "name": "PORT63"
+            },
+            {
+                "name": "PORT64"
+            },
+            {
+                "name": "PORT65"
+            },
+            {
+                "name": "PORT66"
+            },
+            {
+                "name": "PORT67"
+            },
+            {
+                "name": "PORT68"
+            },
+            {
+                "name": "PORT69"
+            },
+            {
+                "name": "PORT70"
+            },
+            {
+                "name": "PORT71"
+            },
+            {
+                "name": "PORT72"
+            },
+            {
+                "name": "PORT73"
+            },
+            {
+                "name": "PORT74"
+            },
+            {
+                "name": "PORT75"
+            },
+            {
+                "name": "PORT76"
+            },
+            {
+                "name": "PORT77"
+            },
+            {
+                "name": "PORT78"
+            },
+            {
+                "name": "PORT79"
+            },
+            {
+                "name": "PORT80"
+            },
+            {
+                "name": "PORT81"
+            },
+            {
+                "name": "PORT82"
+            },
+            {
+                "name": "PORT83"
+            },
+            {
+                "name": "PORT84"
+            },
+            {
+                "name": "PORT85"
+            },
+            {
+                "name": "PORT86"
+            },
+            {
+                "name": "PORT87"
+            },
+            {
+                "name": "PORT88"
+            },
+            {
+                "name": "PORT89"
+            },
+            {
+                "name": "PORT90"
+            },
+            {
+                "name": "PORT91"
+            },
+            {
+                "name": "PORT92"
+            },
+            {
+                "name": "PORT93"
+            },
+            {
+                "name": "PORT94"
+            },
+            {
+                "name": "PORT95"
+            },
+            {
+                "name": "PORT96"
+            },
+            {
+                "name": "PORT97"
+            },
+            {
+                "name": "PORT98"
+            },
+            {
+                "name": "PORT99"
+            },
+            {
+                "name": "PORT100"
+            },
+            {
+                "name": "PORT101"
+            },
+            {
+                "name": "PORT102"
+            },
+            {
+                "name": "PORT103"
+            },
+            {
+                "name": "PORT104"
+            },
+            {
+                "name": "PORT105"
+            },
+            {
+                "name": "PORT106"
+            },
+            {
+                "name": "PORT107"
+            },
+            {
+                "name": "PORT108"
+            },
+            {
+                "name": "PORT109"
+            },
+            {
+                "name": "PORT110"
+            },
+            {
+                "name": "PORT111"
+            },
+            {
+                "name": "PORT112"
+            },
+            {
+                "name": "PORT113"
+            },
+            {
+                "name": "PORT114"
+            },
+            {
+                "name": "PORT115"
+            },
+            {
+                "name": "PORT116"
+            },
+            {
+                "name": "PORT117"
+            },
+            {
+                "name": "PORT118"
+            },
+            {
+                "name": "PORT119"
+            },
+            {
+                "name": "PORT120"
+            },
+            {
+                "name": "PORT121"
+            },
+            {
+                "name": "PORT122"
+            },
+            {
+                "name": "PORT123"
+            },
+            {
+                "name": "PORT124"
+            },
+            {
+                "name": "PORT125"
+            },
+            {
+                "name": "PORT126"
+            },
+            {
+                "name": "PORT127"
+            },
+            {
+                "name": "PORT128"
+            },
+            {
+                "name": "PORT129"
+            }
+        ]
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918)):device/nexthop/x86_64-nexthop_4210-r0021/platform.json
     }
 }

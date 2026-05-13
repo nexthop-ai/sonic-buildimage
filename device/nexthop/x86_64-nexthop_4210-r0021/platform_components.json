@@ -1,17 +1,19 @@
 {
     "chassis": {
-        "NH-4220-F": {
+        "NH-4210-F": {
             "component": {
-                "SWITCHCARD_FPGA": {},
                 "CPUCARD_FPGA": {},
+                "SWITCHCARD_FPGA0": {},
+                "SWITCHCARD_FPGA1": {},
                 "BIOS": {},
                 "ONIE": {},
                 "TPM": {},
-<<<<<<< HEAD
-                "NVMe": {}
-=======
                 "NVMe": {},
                 "ASIC_PCIE": {},
+                "PSU1": {},
+                "PSU2": {},
+                "PSU3": {},
+                "PSU4": {},
                 "DPM1": {},
                 "DPM2": {},
                 "DPM3": {},
@@ -26,9 +28,8 @@
                 "DCDC8": {},
                 "DCDC9": {},
                 "DCDC10": {},
-                "PSU1": {},
-                "PSU2": {}
->>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
+                "DCDC11": {},
+                "DCDC12": {}
             }
         }
     }

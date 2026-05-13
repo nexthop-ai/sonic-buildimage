@@ -515,6 +515,12 @@
                 "name": "DPM4"
             },
             {
+                "name": "DCDC0"
+            },
+            {
+                "name": "DCDC1"
+            },
+            {
                 "name": "DCDC2"
             },
             {

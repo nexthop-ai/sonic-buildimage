@@ -411,6 +411,41 @@
                 "low-crit-threshold": false,
                 "controllable": false
             }
+<<<<<<< HEAD
+=======
+        ],
+        "components": [
+            {
+                "name": "SWITCHCARD_FPGA"
+            },
+            {
+                "name": "CPUCARD_FPGA"
+            },
+            {
+                "name": "BIOS"
+            },
+            {
+                "name": "ONIE"
+            },
+            {
+                "name": "TPM"
+            },
+            {
+                "name": "NVMe"
+            },
+            {
+                "name": "PSU1"
+            },
+            {
+                "name": "PSU2"
+            },
+            {
+                "name": "ASIC_PCIE"
+            },
+            {
+                "name": "DCDC0"
+            }
+>>>>>>> 200a58767 (NOS-5168: Expose MFR_REVISION using DebugFS -- PDDF config (#4918))
         ]
     },
     "interfaces": {
