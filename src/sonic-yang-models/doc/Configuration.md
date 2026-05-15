@@ -84,6 +84,7 @@
   * [VLAN](#vlan)
   * [VLAN_MEMBER](#vlan_member)
   * [VNET](#vnet)
+  * [VNET_ROUTE](#vnet_route)
   * [VNET_ROUTE_TUNNEL](#vnet_route_tunnel)
   * [VOQ Inband Interface](#voq-inband-interface)
   * [VXLAN](#vxlan)
@@ -493,6 +494,21 @@ The IDF isolation state **idf_isolation_state** could be one of isolated_no_expo
     "STATE": {
         "idf_isolation_state": "isolated_no_export"
     }
+}
+```
+
+The **CONFED** object contains BGP confederation configuration for disaggregated T2 devices (LowerSpineRouter, UpperSpineRouter, FabricSpineRouter).  
+**asn** is the confederation identifier (the ASN visible to external peers).  
+**peers** is a semicolon-separated list of sub-AS numbers that are members of the confederation.
+
+```json
+{
+"BGP_DEVICE_GLOBAL": {
+    "CONFED": {
+        "asn": 65100,
+        "peers": "66000;63000"
+    }
+}
 }
 ```
 
@@ -2784,6 +2800,27 @@ monitoring sessions for the vnet routes and is optional.
 		"scope": "default",
 		"vni": "10011",
 	}
+  }
+}
+```
+
+### VNET_ROUTE
+
+VNET_ROUTE table has vnet_name|prefix as the object key, where vnet_name is the name of the VNet and prefix is the ip4 prefix associated with the vnet route. The table includes the following attributes:
+- NEXTHOP: Comma-separated nexthop IPs (mandatory). They are used to identify the nexthops of the vnet route.
+- IFNAME: The interface names (mandatory), such as "Ethernet1". It identifies the outgoing interfaces for the vnet route.
+
+```
+{
+  "VNET_ROUTE": {
+    "Vnet_2000|100.100.3.0/24": {
+        "nexthop": "100.100.3.1,100.100.3.2",
+        "ifname": "Ethernet1,Ethernet2"
+    },
+    "Vnet_3000|100.100.4.0/24": {
+        "nexthop": "100.100.4.1",
+        "ifname": "Ethernet2"
+    }
   }
 }
 ```
