@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+
+import array
+import fcntl
+import glob
+import os
+import syslog
+
+import click
+
+# include/uapi/linux/i2c-dev.h
+I2C_FUNCS = 0x0705
+# include/uapi/linux/i2c.h
+I2C_FUNC_SMBUS_READ_BLOCK_DATA = 0x01000000
+
+
+def log(level: int, msg: str) -> None:
+    syslog.syslog(level, f"xdpe1a2g7b mfr_revision: {msg}")
+
+
+def adapter_has_smbus_block_read(bus: int) -> bool:
+    """Return True iff /dev/i2c-<bus> advertises SMBus block-read."""
+    funcs = array.array("L", [0])
+    with open(f"/dev/i2c-{bus}", "rb") as f:
+        fcntl.ioctl(f, I2C_FUNCS, funcs, True)
+    return bool(funcs[0] & I2C_FUNC_SMBUS_READ_BLOCK_DATA)
+
+
+@click.command()
+@click.option("--bus", type=int, required=True, help="I2C bus number, e.g. 85")
+@click.option("--address", required=True, help="I2C device address in hex, e.g. 0x70")
+def xdpe1a2g7b_version(bus, address):
+    """Read xdpe1a2g7b/xdpe1a2g5b mfr_revision via the pmbus debugfs entry.
+
+    The upstream xdpe1a2g7b driver does not expose mfr_revision as a sysfs
+    attribute. The pmbus core publishes it under
+    /sys/kernel/debug/pmbus/<hwmonN>/mfr_revision as raw block data with a
+    trailing newline.
+    """
+    try:
+        if not adapter_has_smbus_block_read(bus):
+            log(
+                syslog.LOG_WARNING,
+                f"SMBus block-read unavailable on bus {bus}; mfr_revision not exposed by pmbus_core",
+            )
+            click.echo("N/A")
+            return
+    except OSError as e:
+        log(syslog.LOG_ERR, f"I2C_FUNCS query failed on bus {bus}: {e}")
+        click.echo("N/A")
+        return
+
+    address = int(address, 16)
+    i2c_path = f"{bus}-{address:04x}"
+    hwmon_pattern = f"/sys/bus/i2c/devices/{i2c_path}/hwmon/hwmon*"
+    hwmon_paths = glob.glob(hwmon_pattern)
+    if not hwmon_paths:
+        log(syslog.LOG_ERR, f"No hwmon entry matching {hwmon_pattern}")
+        click.echo("N/A")
+        return
+    if len(hwmon_paths) > 1:
+        log(
+            syslog.LOG_ERR,
+            f"Multiple hwmon entries matching {hwmon_pattern}: {hwmon_paths}. Using first.",
+        )
+    hwmon_name = os.path.basename(hwmon_paths[0])
+
+    debug_path = f"/sys/kernel/debug/pmbus/{hwmon_name}/mfr_revision"
+    try:
+        with open(debug_path, "rb") as f:
+            data = f.read()
+    except FileNotFoundError:
+        log(syslog.LOG_ERR, f"{debug_path} not found")
+        click.echo("N/A")
+        return
+    except PermissionError:
+        log(syslog.LOG_ERR, f"Permission denied reading {debug_path}")
+        click.echo("N/A")
+        return
+    except OSError as e:
+        log(syslog.LOG_ERR, f"Failed to read {debug_path}: {e}")
+        click.echo("N/A")
+        return
+
+    #   Byte 0: Minor revision
+    #   Byte 1: Major revision
+    if len(data) < 2:
+        log(
+            syslog.LOG_ERR,
+            f"{debug_path} returned {len(data)} bytes; expected at least 2",
+        )
+        click.echo("N/A")
+        return
+    major, minor = data[1], data[0]
+    click.echo(f"{major}.{minor}")
+
+
+if __name__ == "__main__":
+    xdpe1a2g7b_version()
