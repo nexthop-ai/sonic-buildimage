@@ -29,6 +29,51 @@
         "desc": "BGP Address Family l2vpn_evpn with advertise-svi-ip set to an invalid value",
         "eStr": "Invalid value \"invalid value\" in \"advertise-svi-ip\" element."
     },
+<<<<<<< HEAD
+=======
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_DISABLED": {
+        "desc": "BGP Address Family with install_backup_path set to disabled (explicit default)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_PIC": {
+        "desc": "BGP Address Family with install_backup_path set to pic (single backup path)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_PIC_ECMP": {
+        "desc": "BGP Address Family with install_backup_path set to pic-ecmp (ECMP backup paths)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_DIFFERENT_PER_AFI_SAFI": {
+        "desc": "install_backup_path can be set independently per address family: pic on ipv4, pic-ecmp on ipv6"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_INVALID": {
+        "desc": "BGP Address Family with install_backup_path set to an invalid enum value",
+        "eStrKey": "InvalidValue",
+        "eStr": ["install_backup_path"]
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_NON_UNICAST_INVALID": {
+        "desc": "install_backup_path pic on a non-unicast AFI (l2vpn_evpn) must be rejected by the must constraint",
+        "eStr": ["unicast address families"]
+    },
+    "BGP_GLOBALS_LLGR_STALE_TIME_VALID": {
+        "desc": "BGP global with llgr_stale_time set to a valid value (3600s). LLGR can operate independently of GR per RFC 9494."
+    },
+    "BGP_GLOBALS_LLGR_STALE_TIME_BELOW_RANGE_INVALID": {
+        "desc": "llgr_stale_time of 0 is below the valid range (1-16777215) and must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_LLGR_STALE_TIME_ABOVE_RANGE_INVALID": {
+        "desc": "llgr_stale_time of 16777216 exceeds the 24-bit capability field maximum and must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_GR_SELECT_DEFER_TIME_VALID": {
+        "desc": "BGP global with gr_select_defer_time set to 240s. Controls how long bgpd defers best-path selection after graceful restart."
+    },
+    "BGP_GLOBALS_GR_SELECT_DEFER_TIME_ZERO_VALID": {
+        "desc": "gr_select_defer_time of 0 is valid (disables the defer timer)."
+    },
+    "BGP_GLOBALS_GR_SELECT_DEFER_TIME_ABOVE_RANGE_INVALID": {
+        "desc": "gr_select_defer_time of 3601 exceeds the maximum of 3600 and must be rejected.",
+        "eStrKey": "Range"
+    },
+>>>>>>> d8c8041df (NOS-8575: Sonic config option to set BGP graceful-restart select-defer-time (#5190))
     "BGP_NEIGHBOR_ALL_VALID": {
         "desc": "Configure BGP neighbor table."
     },
