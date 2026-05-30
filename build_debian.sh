@@ -506,6 +506,8 @@ ins #comment before /files/etc/ssh/sshd_config/ClientAliveInterval
 set /files/etc/ssh/sshd_config/#comment[following-sibling::*[1][self::ClientAliveInterval]] "Close inactive client sessions after 5 minutes"
 rm /files/etc/ssh/sshd_config/MaxAuthTries
 set /files/etc/ssh/sshd_config/MaxAuthTries 3
+rm /files/etc/ssh/sshd_config/MaxStartups
+set /files/etc/ssh/sshd_config/MaxStartups 20:30:100
 rm /files/etc/ssh/sshd_config/Banner
 set /files/etc/ssh/sshd_config/Banner /etc/issue
 rm /files/etc/ssh/sshd_config/LogLevel
