@@ -28,16 +28,9 @@ module sonic-bgp-global {
     description
         "SONIC BGP Global YANG";
 
-<<<<<<< HEAD
-=======
     revision 2026-05-25 {
         description
             "Add gr_select_defer_time to BGP_GLOBALS.";
-    }
-
-    revision 2026-04-23 {
-        description
-            "Add origin attribute to BGP_GLOBALS_AF_AGGREGATE_ADDR.";
     }
 
     revision 2026-04-22 {
@@ -45,17 +38,6 @@ module sonic-bgp-global {
             "Add llgr_stale_time for BGP Long-Lived Graceful Restart (RFC 9494).";
     }
 
-    revision 2026-04-07 {
-        description
-            "Restrict install_backup_path to unicast address families only.";
-    }
-
-    revision 2026-04-04 {
-        description
-            "Add install_backup_path enum (disabled/pic/pic-ecmp) to BGP_GLOBALS_AF.";
-    }
-
->>>>>>> d8c8041df (NOS-8575: Sonic config option to set BGP graceful-restart select-defer-time (#5190))
     revision 2021-02-26 {
         description
             "Initial revision.";
@@ -125,8 +107,6 @@ module sonic-bgp-global {
                     description "Set the max time to hold onto restarting peer's stale paths";
                 }
 
-<<<<<<< HEAD
-=======
                 leaf llgr_stale_time {
                     type uint32 {
                         range "1..16777215";
@@ -146,7 +126,6 @@ module sonic-bgp-global {
                          advertisements after graceful restart. A value of 0 disables the timer.";
                 }
 
->>>>>>> d8c8041df (NOS-8575: Sonic config option to set BGP graceful-restart select-defer-time (#5190))
                 leaf external_compare_router_id {
                     type boolean;
                     description "Compare router-id for identical EBGP paths";
