@@ -35,6 +35,36 @@ fpga_write() {
   fi
 }
 
+<<<<<<< HEAD
+=======
+fpga_read() {
+  local offset="$1"
+  local bits="$2"
+  local result
+
+  if [ -n "$bits" ]; then
+    result=$(fpga read32 "$FPGA_BDF" "$offset" --bits "$bits")
+  else
+    result=$(fpga read32 "$FPGA_BDF" "$offset")
+  fi
+
+  if [ $? -ne 0 ]; then
+    logger -t $LOG_TAG -p $LOG_ERR "Error reading reg $offset on fpga $FPGA_BDF"
+    exit 1
+  fi
+
+  echo "$result"
+}
+
+function cleanup() {
+  /usr/bin/flock -u ${LOCKFD}
+  if [ -n "$XCVR_CACHE_TTL_PID" ]; then
+    kill "$XCVR_CACHE_TTL_PID" 2>/dev/null
+    rm -f "$XCVR_CACHE"
+  fi
+}
+
+>>>>>>> bbd3e458e (NOS-7082: Cache xcvr presence during ASIC power cycle to suppress spurious sff_mgr errors (#4803))
 function acquire_lock() {
   if [[ ! -f $LOCKFILE ]]; then
     touch $LOCKFILE
@@ -44,7 +74,7 @@ function acquire_lock() {
 
   exec {LOCKFD}>${LOCKFILE}
   /usr/bin/flock -x ${LOCKFD}
-  trap "/usr/bin/flock -u ${LOCKFD}" EXIT
+  trap cleanup EXIT
 
   logger -t $LOG_TAG -p $LOG_PRIO "Acquired ${LOCKFILE}"
 }
@@ -106,6 +136,26 @@ if [ "$IS_OPENNSL_INITIALLY_LOADED" -eq 0 ]; then
   /etc/init.d/opennsl-modules stop
 fi
 
+<<<<<<< HEAD
+=======
+# On NH-4010 when ASIC is powercycled via switchcard FPGA register 0x8 bit 3, the XCVRs can briefly
+# report all present. We create a short lived XCVR presence cache to avoid incorrectly reporting
+# XCVR presence.
+XCVR_CACHE=/var/run/platform_cache/xcvr_presence_cache.yaml
+XCVR_CACHE_TTL_PID=
+LOG_TAG="$LOG_TAG" write_xcvr_presence_cache "$XCVR_CACHE"
+if [ -f "$XCVR_CACHE" ]; then
+  (sleep 30; rm -f "$XCVR_CACHE") &
+  XCVR_CACHE_TTL_PID=$!
+fi
+
+# Set DP_PWR_ON = 1
+# DP_POWR_ON should already be 1 in normal circumstances, but it's possible
+# a power glitch brings it to 0. The system may kernel panic if we bring up
+# the ASIC when DP_PWR_ON = 0.
+fpga_write 0x90  0x1 "24:24"
+
+>>>>>>> bbd3e458e (NOS-7082: Cache xcvr presence during ASIC power cycle to suppress spurious sff_mgr errors (#4803))
 # Try power cycling, up to two times, or until Switch ASIC chip is found
 for attempt in {0..2}; do
   # Powercycle the asic, then take it out of reset

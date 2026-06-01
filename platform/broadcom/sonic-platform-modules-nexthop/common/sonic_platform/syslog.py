@@ -22,6 +22,11 @@ from sonic_py_common import syslogger
 # Syslog identifiers for different platform modules
 # These identifiers are used to categorize log messages by functional area
 SYSLOG_IDENTIFIER_THERMAL: str = "nh_thermal"  # Thermal management and fan control
+<<<<<<< HEAD
+=======
+SYSLOG_IDENTIFIER_THERMAL_CSV: str = "nh_thermal_csv"  # CSV logging control for thermal data
+SYSLOG_IDENTIFIER_SFP: str = "nh_sfp"  # SFP / transceiver presence and EEPROM
+>>>>>>> bbd3e458e (NOS-7082: Cache xcvr presence during ASIC power cycle to suppress spurious sff_mgr errors (#4803))
 
 
 class NhLoggerMixin(syslogger.SysLogger):

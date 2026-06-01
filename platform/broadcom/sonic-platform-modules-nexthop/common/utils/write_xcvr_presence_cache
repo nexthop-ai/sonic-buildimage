@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+from nexthop.write_xcvr_presence_cache import main
+
+if __name__ == "__main__":
+    main()

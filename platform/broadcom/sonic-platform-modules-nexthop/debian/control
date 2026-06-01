@@ -5,6 +5,7 @@ Maintainer: Michael Chan <michaelc@nexthop.ai>
 Build-Depends: debhelper-compat (= 12),
                dh-python,
                python3-all,
+               python3-pytest-mock,
                python3-setuptools
 Standards-Version: 4.6.0
 Homepage: https://nexthop.ai
