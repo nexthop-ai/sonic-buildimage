@@ -112,10 +112,30 @@
 {%- endif %}
     "FEATURE": {
 {# delayed field if set, will start the feature systemd .timer unit instead of .service unit #}
+
+{# List of BMC features. #}
+{%- set is_bmc = sonic_asic_platform == "aspeed" %}
+{# Services not applicable on BMC - force disabled. #}
+{%- set bmc_disabled_features = ["eventd", "restapi", "mgmt-framework", "snmp", "swss", "syncd", "bgp", "teamd", "dhcp_relay", "nat", "sflow", "macsec", "radv"] %}
+{# Services required on BMC. #}
+{%- set bmc_enabled_features = ["gnmi", "telemetry"] %}
+{# Services that must start without delay on BMC. #}
+{%- set bmc_no_delay_features = ["database", "pmon", "lldp", "gnmi", "snmp", "telemetry", "redfish"] %}
+
 {%- for feature, state, delayed, autorestart in features %}
         "{{feature}}": {
+{%- if is_bmc and feature in bmc_disabled_features %}
+            "state": "disabled",
+{%- elif is_bmc and feature in bmc_enabled_features %}
+            "state": "enabled",
+{%- else %}
             "state": "{{state}}",
+{%- endif %}
+{%- if is_bmc and feature in bmc_no_delay_features %}
+            "delayed" : "false",
+{%- else %}
             "delayed" : "{{delayed}}",
+{%- endif %}
 {%- if feature in ["lldp"] %}
             "has_global_scope": {% raw %}"{% if ('CHASSIS_METADATA' in DEVICE_RUNTIME_METADATA and DEVICE_RUNTIME_METADATA['CHASSIS_METADATA']['module_type'] in ['linecard']) %}False{% else %}True{% endif %}"{% endraw %},
             "has_per_asic_scope": {% raw %}"{% if not DEVICE_RUNTIME_METADATA['ETHERNET_PORTS_PRESENT'] or ('CHASSIS_METADATA' in DEVICE_RUNTIME_METADATA and DEVICE_RUNTIME_METADATA['CHASSIS_METADATA']['module_type'] in ['supervisor']) %}False{% else %}True{% endif %}"{% endraw %},

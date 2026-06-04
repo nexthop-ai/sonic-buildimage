@@ -37,6 +37,9 @@ BMC_EXCLUDED_SERVICES = {
     # Console - not needed if no local display
     'getty@tty1.service',            # Local console - only if VGA/HDMI available
 
+    # Route counter for SNMP MIB - no FRR/vtysh and SNMP disabled on BMC
+    'route-counter.service',
+    'route-counter.timer',
 }
 
 # Services to ENSURE are included for BMC
@@ -274,4 +277,3 @@ if __name__ == '__main__':
 
     filesystem_root = sys.argv[3] if len(sys.argv) > 3 else None
     filter_services(sys.argv[1], sys.argv[2], filesystem_root)
-
