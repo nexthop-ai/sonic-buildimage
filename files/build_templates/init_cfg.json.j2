@@ -113,8 +113,6 @@
     "FEATURE": {
 {# delayed field if set, will start the feature systemd .timer unit instead of .service unit #}
 
-{# List of BMC features. #}
-{%- set is_bmc = sonic_asic_platform == "aspeed" %}
 {# Services not applicable on BMC - force disabled. #}
 {%- set bmc_disabled_features = ["eventd", "restapi", "mgmt-framework", "snmp", "swss", "syncd", "bgp", "teamd", "dhcp_relay", "nat", "sflow", "macsec", "radv"] %}
 {# Services required on BMC. #}
@@ -124,15 +122,15 @@
 
 {%- for feature, state, delayed, autorestart in features %}
         "{{feature}}": {
-{%- if is_bmc and feature in bmc_disabled_features %}
-            "state": "disabled",
-{%- elif is_bmc and feature in bmc_enabled_features %}
-            "state": "enabled",
+{%- if feature in bmc_disabled_features %}
+            "state": "{% raw %}{% if DEVICE_RUNTIME_METADATA['IS_SWITCH_BMC'] %}disabled{% else %}{% endraw %}{{state}}{% raw %}{% endif %}{% endraw %}",
+{%- elif feature in bmc_enabled_features %}
+            "state": "{% raw %}{% if DEVICE_RUNTIME_METADATA['IS_SWITCH_BMC'] %}enabled{% else %}{% endraw %}{{state}}{% raw %}{% endif %}{% endraw %}",
 {%- else %}
             "state": "{{state}}",
 {%- endif %}
-{%- if is_bmc and feature in bmc_no_delay_features %}
-            "delayed" : "false",
+{%- if feature in bmc_no_delay_features %}
+            "delayed" : "{% raw %}{% if DEVICE_RUNTIME_METADATA['IS_SWITCH_BMC'] %}false{% else %}{% endraw %}{{delayed}}{% raw %}{% endif %}{% endraw %}",
 {%- else %}
             "delayed" : "{{delayed}}",
 {%- endif %}
