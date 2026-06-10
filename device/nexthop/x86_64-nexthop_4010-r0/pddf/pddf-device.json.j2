@@ -159,6 +159,87 @@
           { "attr_name": "update", "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py NH-4010-F NVMe {}" }
       ]
   },
+<<<<<<< HEAD
+=======
+  "COMPONENT7": {
+      "comp_attr":{
+          "name": "PSU1",
+          "type": "psu",
+          "description": "Power Supply Unit 1",
+          "boot_type": "none"
+      },
+      "attr_list":
+      [
+          { "attr_name": "version", "get_cmd": "cat /sys/bus/i2c/devices/87-0058/psu_fw_version" },
+          { "attr_name": "model", "get_cmd": "cat /sys/bus/i2c/devices/87-0058/psu_model_name" },
+          { "attr_name": "serial", "get_cmd": "cat /sys/bus/i2c/devices/87-0058/psu_serial_num" },
+          { "attr_name": "revision", "get_cmd": "echo 'N/A'" },
+          { "attr_name": "update", "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py {{model_name}} PSU1 {}" }
+      ]
+  },
+  "COMPONENT8": {
+      "comp_attr":{
+          "name": "PSU2",
+          "type": "psu",
+          "description": "Power Supply Unit 2",
+          "boot_type": "none"
+      },
+      "attr_list":
+      [
+          { "attr_name": "version", "get_cmd": "cat /sys/bus/i2c/devices/88-0058/psu_fw_version" },
+          { "attr_name": "model", "get_cmd": "cat /sys/bus/i2c/devices/88-0058/psu_model_name" },
+          { "attr_name": "serial", "get_cmd": "cat /sys/bus/i2c/devices/88-0058/psu_serial_num" },
+          { "attr_name": "revision", "get_cmd": "echo 'N/A'" },
+          { "attr_name": "update", "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py {{model_name}} PSU2 {}" }
+      ]
+  },
+  "COMPONENT9": {
+      "comp_attr":{
+          "name": "ASIC_PCIE",
+          "type": "pci",
+          "description": "ASIC PCIe firmware",
+          "boot_type": "cold"
+      },
+      "attr_list":
+      [
+          { "attr_name": "version", "get_cmd": "asic_pcie_fw_version" },
+          { "attr_name": "model", "get_cmd": "echo N/A" },
+          { "attr_name": "serial", "get_cmd": "echo N/A" },
+          { "attr_name": "revision", "get_cmd": "echo N/A" },
+          { "attr_name": "update", "cmd": "echo N/A" }
+      ]
+  },
+  "COMPONENT10": {
+    "comp_attr": {
+      "name": "DCDC0",
+      "type": "dcdc",
+      "description": "DCDC voltage regulator",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "sudo xdpe1a2g7b_version --bus 91 --address 0x70"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "get_cmd": "echo 'N/A'"
+      }
+    ]
+  },
+>>>>>>> 442bf6d8e (NOS-6115: Install pyipmi and PDDF config for PSU FW upgrade (#5065))
   "SYSTEM": {
     "dev_info": {
       "device_type": "CPU",

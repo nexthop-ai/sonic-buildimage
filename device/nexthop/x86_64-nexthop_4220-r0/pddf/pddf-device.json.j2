@@ -2060,6 +2060,7 @@
         {"attr_name": "volt1_crit_low_threshold", "drv_attr_name": "in3_lcrit"}
     ]}
   },
+<<<<<<< HEAD
   "VOLTAGE37": {
     "dev_info": {"device_type": "VOLTAGE_SENSOR", "device_name": "DCDC10-RAIL2", "device_parent": "MULTIFPGAPCIE1", "virt_parent": "DCDC10"},
     "dev_attr": {"display_name": "POS0V75_EAST"},
@@ -2070,6 +2071,37 @@
         {"attr_name": "volt1_crit_high_threshold", "drv_attr_name": "in4_crit"},
         {"attr_name": "volt1_crit_low_threshold", "drv_attr_name": "in4_lcrit"}
     ]}
+=======
+  "COMPONENT8": {
+    "comp_attr": {
+      "name": "PSU1",
+      "type": "psu",
+      "description": "Power Supply Unit 1",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "cat /sys/bus/i2c/devices/81-0058/psu_fw_version"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "cat /sys/bus/i2c/devices/81-0058/psu_model_name"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "cat /sys/bus/i2c/devices/81-0058/psu_serial_num"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py {{model_name}} PSU1 {}"
+      }
+    ]
+>>>>>>> 442bf6d8e (NOS-6115: Install pyipmi and PDDF config for PSU FW upgrade (#5065))
   },
   "CURRENT20": {
     "dev_info": {"device_type": "CURRENT_SENSOR", "device_name": "DCDC10-RAIL1", "device_parent": "MULTIFPGAPCIE1", "virt_parent": "DCDC10"},
@@ -2080,6 +2112,7 @@
         { "attr_name": "current1_crit_high_threshold", "drv_attr_name": "curr3_crit" }
     ]}
   },
+<<<<<<< HEAD
   "CURRENT21": {
     "dev_info": {"device_type": "CURRENT_SENSOR", "device_name": "DCDC10-RAIL2", "device_parent": "MULTIFPGAPCIE1", "virt_parent": "DCDC10"},
     "dev_attr": {"display_name": "POS0V75_EAST"},
@@ -2088,6 +2121,480 @@
         { "attr_name": "current1_high_threshold", "drv_attr_name": "curr4_max" },
         { "attr_name": "current1_crit_high_threshold", "drv_attr_name": "curr4_crit" }
     ]}
+=======
+  "PSU2-PMBUS": {
+    "dev_info": {
+      "device_type": "PSU-PMBUS",
+      "device_name": "PSU2-PMBUS",
+      "device_parent": "CPLDMUX0",
+      "virt_parent": "PSU2"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x52",
+        "dev_addr": "0x58",
+        "dev_type": "psu_pmbus"
+      },
+      "attr_list": [
+        {
+          "attr_name": "psu_present",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x2c",
+          "attr_mask": "0x800",
+          "attr_cmpval": "0x800",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "psu_power_good",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x2c",
+          "attr_mask": "0x2000",
+          "attr_cmpval": "0x2000",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "psu_model_name",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x9a",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff"
+        },
+        {
+          "attr_name": "psu_serial_num",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x9e",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_mfr_id",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x99",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_fan_dir",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x9a",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff"
+        },
+        {
+          "attr_name": "psu_p_out",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x96",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_v_out",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x8b",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_data_format": "linear16",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_i_out",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x8c",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_p_in",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x97",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_v_in",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x88",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_i_in",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x89",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_fan1_speed_rpm",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x90",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_temp1_input",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x8d",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_temp1_high_threshold",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xc0",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_temp2_input",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x8e",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_temp2_high_threshold",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xc1",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_temp3_input",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0x8f",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_temp3_high_threshold",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xc2",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_v_out_max",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xa5",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_data_format": "linear16",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_v_out_min",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xa4",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_data_format": "linear16",
+          "attr_len": "2"
+        },
+        {
+          "attr_name": "psu_p_out_max",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xa7",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0xff",
+          "attr_len": "2"
+        }
+      ]
+    }
+  },
+  "PSU2-EEPROM": {
+    "dev_info": {
+      "device_type": "EEPROM",
+      "device_name": "PSU2-EEPROM",
+      "device_parent": "CPLDMUX0",
+      "virt_parent": "PSU2"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x52",
+        "dev_addr": "0x50",
+        "dev_type": "24c02"
+      },
+      "dev_attr": {
+        "access_mode": "BLOCK"
+      },
+      "attr_list": [
+        {
+          "attr_name": "eeprom"
+        }
+      ]
+    }
+  },
+  "COMPONENT9": {
+    "comp_attr": {
+      "name": "PSU2",
+      "type": "psu",
+      "description": "Power Supply Unit 2",
+      "boot_type": "none"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "cat /sys/bus/i2c/devices/82-0058/psu_fw_version"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "cat /sys/bus/i2c/devices/82-0058/psu_model_name"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "cat /sys/bus/i2c/devices/82-0058/psu_serial_num"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py {{model_name}} PSU2 {}"
+      }
+    ]
+  },
+  "PORT65": {
+    "dev_info": {
+      "device_type": "SFP",
+      "device_name": "PORT65",
+      "device_parent": "CPLDMUX2"
+    },
+    "dev_attr": {
+      "dev_idx": "65"
+    },
+    "i2c": {
+      "interface": [
+        {
+          "itf": "eeprom",
+          "dev": "PORT65-EEPROM"
+        },
+        {
+          "itf": "control",
+          "dev": "PORT65-CTRL"
+        }
+      ]
+    }
+  },
+  "PORT65-EEPROM": {
+    "dev_info": {
+      "device_type": "",
+      "device_name": "PORT65-EEPROM",
+      "device_parent": "CPLDMUX2",
+      "virt_parent": "PORT65"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x5b",
+        "dev_addr": "0x50",
+        "dev_type": "optoe2"
+      },
+      "attr_list": [
+        {
+          "attr_name": "eeprom"
+        }
+      ]
+    }
+  },
+  "PORT65-CTRL": {
+    "dev_info": {
+      "device_type": "",
+      "device_name": "PORT65-CTRL",
+      "device_parent": "CPLDMUX2",
+      "virt_parent": "PORT65"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x5b",
+        "dev_addr": "0x8",
+        "dev_type": "pddf_xcvr"
+      },
+      "attr_list": [
+        {
+          "attr_name": "xcvr_present",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x8c",
+          "attr_mask": "0xa",
+          "attr_cmpval": "0x0",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "xcvr_rxlos",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x8c",
+          "attr_mask": "0xb",
+          "attr_cmpval": "0x800",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "xcvr_txfault",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x8c",
+          "attr_mask": "0xc",
+          "attr_cmpval": "0x1000",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "xcvr_txdisable",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x88",
+          "attr_mask": "0x3",
+          "attr_cmpval": "0x8",
+          "attr_len": "1"
+        }
+      ]
+    }
+  },
+  "PORT66": {
+    "dev_info": {
+      "device_type": "SFP",
+      "device_name": "PORT66",
+      "device_parent": "CPLDMUX2"
+    },
+    "dev_attr": {
+      "dev_idx": "66"
+    },
+    "i2c": {
+      "interface": [
+        {
+          "itf": "eeprom",
+          "dev": "PORT66-EEPROM"
+        },
+        {
+          "itf": "control",
+          "dev": "PORT66-CTRL"
+        }
+      ]
+    }
+  },
+  "PORT66-EEPROM": {
+    "dev_info": {
+      "device_type": "",
+      "device_name": "PORT66-EEPROM",
+      "device_parent": "CPLDMUX2",
+      "virt_parent": "PORT66"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x5c",
+        "dev_addr": "0x50",
+        "dev_type": "optoe2"
+      },
+      "attr_list": [
+        {
+          "attr_name": "eeprom"
+        }
+      ]
+    }
+  },
+  "PORT66-CTRL": {
+    "dev_info": {
+      "device_type": "",
+      "device_name": "PORT66-CTRL",
+      "device_parent": "CPLDMUX2",
+      "virt_parent": "PORT66"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x5c",
+        "dev_addr": "0x8",
+        "dev_type": "pddf_xcvr"
+      },
+      "attr_list": [
+        {
+          "attr_name": "xcvr_present",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x8c",
+          "attr_mask": "0xd",
+          "attr_cmpval": "0x0",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "xcvr_rxlos",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x8c",
+          "attr_mask": "0xe",
+          "attr_cmpval": "0x4000",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "xcvr_txfault",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x8c",
+          "attr_mask": "0xf",
+          "attr_cmpval": "0x8000",
+          "attr_len": "1"
+        },
+        {
+          "attr_name": "xcvr_txdisable",
+          "attr_devaddr": "0x0",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "SWITCHCARD_FPGA",
+          "attr_offset": "0x88",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x1",
+          "attr_len": "1"
+        }
+      ]
+    }
+>>>>>>> 442bf6d8e (NOS-6115: Install pyipmi and PDDF config for PSU FW upgrade (#5065))
   },
   "PORT1": {
     "dev_info": {"device_type": "OSFP", "device_name": "PORT1", "device_parent": "MULTIFPGAPCIE1"},
