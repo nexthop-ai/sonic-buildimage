@@ -20,6 +20,7 @@ DEFAULT_PCIE_VARS_FILEPATH = f"{PLATFORM_FOLDER}/pcie-variables.yaml"
 DEFAULT_PLATFORM_JSON_FILEPATH = f"{PLATFORM_FOLDER}/platform.json"
 
 DEFAULT_PDDF_DEVICE_JSON_TEMPLATE_FILEPATH = f"{PDDF_FOLDER}/pddf-device.json.j2"
+<<<<<<< HEAD
 DEFAULT_PDDF_DEVICE_JSON_OUTPUT_FILEPATH = f"{PDDF_FOLDER}/pddf-device.json.base"
 # Optional artifact: present only for platforms that declare FPGA-version
 # feature flags. Each flag is evaluated at boot and exposed as a Jinja boolean
@@ -28,6 +29,13 @@ DEFAULT_FEATURE_FLAGS_FILEPATH = f"{PDDF_FOLDER}/feature-flags.json"
 
 DEFAULT_PD_PLUGIN_JSON_TEMPLATE_FILEPATH = f"{PDDF_FOLDER}/pd-plugin.json.j2"
 DEFAULT_PD_PLUGIN_JSON_OUTPUT_FILEPATH = f"{PDDF_FOLDER}/pd-plugin.json"
+=======
+DEFAULT_PDDF_DEVICE_JSON_OUTPUT_FILEPATH = f"{PDDF_FOLDER}/pddf-device.json"
+# Optional artifact: present only for platforms that declare FPGA-version
+# feature flags. Each flag is evaluated at boot and exposed as a Jinja boolean
+# for pddf-device.json.j2.
+DEFAULT_FEATURE_FLAGS_FILEPATH = f"{PDDF_FOLDER}/feature-flags.json"
+>>>>>>> 307f3e5bf (NOS-8577: Add FPGA based feature flags to handle change in fan registers. (#5286))
 
 DEFAULT_PCIE_YAML_TEMPLATE_FILEPATH = f"{PLATFORM_FOLDER}/pcie.yaml.j2"
 DEFAULT_PCIE_YAML_OUTPUT_FILEPATH = f"{PLATFORM_FOLDER}/pcie.yaml"
@@ -111,7 +119,11 @@ def cli():
     default=DEFAULT_PDDF_DEVICE_JSON_OUTPUT_FILEPATH,
     help="Filepath to store the generated pddf-device.json.base. If the file already exists, it will be overwritten.",
 )
+<<<<<<< HEAD
 def pddf_device_json_base(template_filepath, vars_filepath, platform_json_filepath, feature_flags_filepath, output_filepath):
+=======
+def pddf_device_json(template_filepath, vars_filepath, platform_json_filepath, feature_flags_filepath, output_filepath):
+>>>>>>> 307f3e5bf (NOS-8577: Add FPGA based feature flags to handle change in fan registers. (#5286))
     check_file_exists_if_not_default(template_filepath, DEFAULT_PDDF_DEVICE_JSON_TEMPLATE_FILEPATH, "--template_filepath")
     check_file_exists_if_not_default(vars_filepath, DEFAULT_PCIE_VARS_FILEPATH, "--vars_filepath")
     check_file_exists_if_not_default(platform_json_filepath, DEFAULT_PLATFORM_JSON_FILEPATH, "--platform_json_filepath")
@@ -147,6 +159,7 @@ def pddf_device_json_base(template_filepath, vars_filepath, platform_json_filepa
         syslog.syslog(syslog.LOG_ERR, f"Failed to generate {output_filepath}: {e}")
         sys.exit(1)
 
+<<<<<<< HEAD
     generate_file_from_jinja2_template(template_filepath, vars, output_filepath)
 
 
@@ -203,6 +216,8 @@ def pd_plugin_json(template_filepath, vars_filepath, feature_flags_filepath, out
         syslog.syslog(syslog.LOG_ERR, f"Failed to generate {output_filepath}: {e}")
         sys.exit(1)
 
+=======
+>>>>>>> 307f3e5bf (NOS-8577: Add FPGA based feature flags to handle change in fan registers. (#5286))
     generate_file_from_jinja2_template(template_filepath, vars, output_filepath)
 
 

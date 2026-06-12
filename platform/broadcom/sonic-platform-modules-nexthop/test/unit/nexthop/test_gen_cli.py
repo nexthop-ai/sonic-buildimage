@@ -186,7 +186,11 @@ def test_generate_pddf_device_json_resolves_feature_flag(gen_cli_module, monkeyp
 
         def render():
             result = runner.invoke(
+<<<<<<< HEAD
                 gen_cli_module.pddf_device_json_base,
+=======
+                gen_cli_module.pddf_device_json,
+>>>>>>> 307f3e5bf (NOS-8577: Add FPGA based feature flags to handle change in fan registers. (#5286))
                 [
                     f"--template_filepath={template_path}",
                     f"--vars_filepath={vars_path}",
@@ -208,6 +212,7 @@ def test_generate_pddf_device_json_resolves_feature_flag(gen_cli_module, monkeyp
         assert '"attr_offset": "0x250"' in render()
 
 
+<<<<<<< HEAD
 def test_generate_pd_plugin_json_resolves_feature_flag(gen_cli_module, monkeypatch):
     """End-to-end through the command: a `{% if flag %}` in pd-plugin.json.j2 is
     resolved from feature-flags.json by reading the FPGA revision register. The
@@ -309,6 +314,8 @@ def test_generate_pd_plugin_json_raises_when_user_input_template_not_found(gen_c
         assert not os.path.exists(output_path)
 
 
+=======
+>>>>>>> 307f3e5bf (NOS-8577: Add FPGA based feature flags to handle change in fan registers. (#5286))
 def test_generate_pcie_yaml_success(gen_cli_module):
     INPUT_PCIE_TEMPLATE = textwrap.dedent(
         """
