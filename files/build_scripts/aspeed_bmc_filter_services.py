@@ -30,8 +30,17 @@ BMC_EXCLUDED_SERVICES = {
     'dhcp_dos_logger.service',       # DHCP DoS detection - no switch ports on BMC
     'warmboot-finalizer.service',    # Warm boot reconciliation - no SWSS/BGP on BMC
 
+<<<<<<< HEAD
     # ZTP - not needed for BMC
     'ztp.service',
+=======
+    # Route counter for SNMP MIB - no FRR/vtysh and SNMP disabled on BMC
+    'route-counter.service',
+    'route-counter.timer',
+
+    # SONiC NOS services - not needed for BMC
+    'sonic-hostservice.service',     # SONiC host services (VLAN, LAG, etc.) - NOS-specific
+>>>>>>> b9d902aec (NOS-9425: Configure features and services on SONiC BMC (#5446))
 
     # UUID daemon - not needed
     'uuidd.service',                 # UUID daemon - kernel provides UUID generation
@@ -274,4 +283,3 @@ if __name__ == '__main__':
 
     filesystem_root = sys.argv[3] if len(sys.argv) > 3 else None
     filter_services(sys.argv[1], sys.argv[2], filesystem_root)
-
