@@ -1907,12 +1907,12 @@ port_init_speed_cc.BCM8887X=200000
 port_init_speed_ge.BCM8887X=1000
 
 outlif_logical_to_physical_phase_map_1.BCM8887X=S1
-outlif_logical_to_physical_phase_map_2.BCM8887X=L1
+outlif_logical_to_physical_phase_map_2.BCM8887X=M3
 outlif_logical_to_physical_phase_map_3.BCM8887X=XL
 outlif_logical_to_physical_phase_map_4.BCM8887X=L2
 outlif_logical_to_physical_phase_map_5.BCM8887X=M1
 outlif_logical_to_physical_phase_map_6.BCM8887X=M2
-outlif_logical_to_physical_phase_map_7.BCM8887X=M3
+outlif_logical_to_physical_phase_map_7.BCM8887X=L1
 outlif_logical_to_physical_phase_map_8.BCM8887X=S2
 
 outlif_physical_phase_data_granularity_S1.BCM8887X=60
@@ -2061,6 +2061,14 @@ ucode_port_339.BCM8887X_ADAPTER=OAMP:core_7.239
 
 #OAMP
 oamp_dual_mode.BCM8887X=1
+appl_param_sys_port332=0:332:0:232:10000:
+appl_param_sys_port333=0:333:1:233:10000:
+appl_param_sys_port334=0:334:2:234:10000:
+appl_param_sys_port335=0:335:3:235:10000:
+appl_param_sys_port336=0:336:4:236:10000:
+appl_param_sys_port337=0:337:5:237:10000:
+appl_param_sys_port338=0:338:6:238:10000:
+appl_param_sys_port339=0:339:7:239:10000:
 
 sai_disable_srcmacqedstmac_ctrl=1
 sai_instru_stat_accum_enable=1
@@ -2276,15 +2284,14 @@ macsec_fips_enable=1
 xflow_macsec_secure_chan_to_num_secure_assoc=4
 xflow_macsec_secure_chan_to_num_secure_assoc_encrypt=2
 xflow_macsec_secure_chan_to_num_secure_assoc_decrypt=4
-sai_ecmp_group_members_increment=8
+
+#Tunnel support for SRv6
+sai_tunnel_support=0x10
 
 #Disable hardware PFC watchdog
 sai_pfc_dlr_init_capability=0
-<<<<<<< HEAD
-=======
 
 sai_ecmp_group_members_increment=8
 
 #reduce the chance of stuck-clear interrupt
 appl_param_clear_fail_threshold=5
->>>>>>> c841bbdbe (NOS-10107: fix the interrupt stuck on clear and enable prev missed interrupt (#6057))

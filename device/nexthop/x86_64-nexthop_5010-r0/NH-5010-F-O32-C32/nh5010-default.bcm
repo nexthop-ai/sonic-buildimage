@@ -2273,3 +2273,11 @@ sai_ecmp_group_members_increment=8
 
 #Disable hardware PFC watchdog
 sai_pfc_dlr_init_capability=0
+<<<<<<< HEAD:device/nexthop/x86_64-nexthop_5010-r0/NH-5010-F-O32-C32/nh5010-default.bcm
+=======
+
+sai_ecmp_group_members_increment=8
+
+#reduce the chance of stuck-clear interrupt
+appl_param_clear_fail_threshold=5
+>>>>>>> c841bbdbe (NOS-10107: fix the interrupt stuck on clear and enable prev missed interrupt (#6057)):device/nexthop/x86_64-nexthop_5010-r0/NH-5010-F-O32-C32/templates/nh5010-default.bcm.j2
