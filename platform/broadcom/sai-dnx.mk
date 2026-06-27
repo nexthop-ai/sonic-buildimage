@@ -1,8 +1,12 @@
 # Broadcom DNX SAI definitions
-LIBSAIBCM_DNX_VERSION = 15.2.0.0.0.0.3.1
-LIBSAIBCM_DNX_BRANCH_NAME = SAI_15.2.0_GA
+# Nexthop-CUSTOM DNX SAI: built from nhbroadcomsai/sonic-dnx (private-bcm-sai-sonic,
+# NH_SAI_15.2.0_GA) against the GA HSDK (KCOM_VERSION 24) and published to the
+# nh-custom-sai S3 bucket. Replaces the stock upstream libsaibcm_dnx
+# (15.2.0.0.0.0.3.1, SDK 6.5.35-SP1, KCOM != 24), which mismatched the KCOM-24
+# kernel modules built from saibcm-modules-dnx and lacked Nexthop Q3D/NH-5010 support.
+LIBSAIBCM_DNX_VERSION = 15.2.0.0.0.0.0.0
 
-LIBSAIBCM_DNX_URL_PREFIX = "$(BUILD_PUBLIC_URL)/sai/sai-broadcom/$(LIBSAIBCM_DNX_BRANCH_NAME)/$(LIBSAIBCM_DNX_VERSION)/dnx"
+LIBSAIBCM_DNX_URL_PREFIX = "https://nh-custom-sai.s3.us-east-2.amazonaws.com/$(LIBSAIBCM_DNX_VERSION)/dnx_v1"
 
 # SAI module for DNX Asic family
 BRCM_DNX_SAI = libsaibcm_dnx_$(LIBSAIBCM_DNX_VERSION)_amd64.deb
