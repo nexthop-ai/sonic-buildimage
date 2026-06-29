@@ -1,6 +1,10 @@
 {
+    "asic_sensors": {
+        "poll_interval": "10",
+        "poll_admin_status": "enable"
+    },
     "chassis": {
-        "name": "NH-4010-F",
+        "name": "NH-4220-F",
         "thermals": [
             {
                 "name": "Switch Card Lower Rear",
@@ -23,7 +27,7 @@
                 "low-crit-threshold": false
             },
             {
-                "name": "PSU 1 Intake",
+                "name": "ASIC Diode 2",
                 "low-threshold": false,
                 "low-crit-threshold": false
             },
@@ -31,12 +35,6 @@
                 "name": "Chassis Intake",
                 "low-threshold": false,
                 "low-crit-threshold": false
-            },
-            {
-                "name": "CPU",
-                "low-threshold": false,
-                "low-crit-threshold": false,
-                "controllable": false
             },
             {
                 "name": "DCDC0",
@@ -64,343 +62,784 @@
                 "low-crit-threshold": false
             },
             {
+                "name": "DCDC5",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC6",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC7",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC8",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC9",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "DCDC10",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "IBV_DCDC0",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "IBV_DCDC1",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "IBV_DCDC2",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "CPU",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
                 "name": "NVMe",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon0",
+                "name": "ASIC core.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon1",
+                "name": "ASIC core.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon2",
+                "name": "ASIC core.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon3",
+                "name": "ASIC core.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon4",
+                "name": "ASIC core.pvtmon4",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon5",
+                "name": "ASIC core.pvtmon5",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon6",
+                "name": "ASIC core.pvtmon6",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon7",
+                "name": "ASIC core.pvtmon7",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon8",
+                "name": "ASIC core.pvtmon8",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon9",
+                "name": "ASIC pt0.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon10",
+                "name": "ASIC pt0.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon11",
+                "name": "ASIC pt0.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon12",
+                "name": "ASIC pt0.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC top.pvtmon13",
+                "name": "ASIC pt1.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm_mgmt",
+                "name": "ASIC pt1.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm0",
+                "name": "ASIC pt1.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm1",
+                "name": "ASIC pt1.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm2",
+                "name": "ASIC pt2.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm3",
+                "name": "ASIC pt2.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm4",
+                "name": "ASIC pt2.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm5",
+                "name": "ASIC pt2.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm6",
+                "name": "ASIC pt3.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm7",
+                "name": "ASIC pt3.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm8",
+                "name": "ASIC pt3.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm9",
+                "name": "ASIC pt3.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm10",
+                "name": "ASIC pt4.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm11",
+                "name": "ASIC pt4.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm12",
+                "name": "ASIC pt4.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm13",
+                "name": "ASIC pt4.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm14",
+                "name": "ASIC pt5.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm15",
+                "name": "ASIC pt5.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm16",
+                "name": "ASIC pt5.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm17",
+                "name": "ASIC pt5.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm18",
+                "name": "ASIC pt6.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm19",
+                "name": "ASIC pt6.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm20",
+                "name": "ASIC pt6.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm21",
+                "name": "ASIC pt6.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm22",
+                "name": "ASIC pt7.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm23",
+                "name": "ASIC pt7.pvtmon1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm24",
+                "name": "ASIC pt7.pvtmon2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm25",
+                "name": "ASIC pt7.pvtmon3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm26",
+                "name": "ASIC pt0.pvtmon0.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm27",
+                "name": "ASIC pt0.pvtmon0.remote1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm28",
+                "name": "ASIC pt0.pvtmon0.remote2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm29",
+                "name": "ASIC pt0.pvtmon1.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm30",
+                "name": "ASIC pt0.pvtmon2.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm31",
+                "name": "ASIC pt0.pvtmon2.remote1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm32",
+                "name": "ASIC pt0.pvtmon2.remote2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm33",
+                "name": "ASIC pt0.pvtmon3.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm34",
+                "name": "ASIC pt1.pvtmon0.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm35",
+                "name": "ASIC pt1.pvtmon0.remote1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm36",
+                "name": "ASIC pt1.pvtmon0.remote2",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm37",
+                "name": "ASIC pt1.pvtmon1.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm38",
+                "name": "ASIC pt1.pvtmon2.remote0",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm39",
+                "name": "ASIC pt1.pvtmon2.remote1",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
             },
             {
-                "name": "ASIC pm40",
+                "name": "ASIC pt1.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt1.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt2.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt3.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt4.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt5.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt6.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon0.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon2.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC pt7.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon1.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon3.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon4.remote3",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote2",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "ASIC core.pvtmon6.remote3",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
@@ -420,10 +859,10 @@
         ],
         "components": [
             {
-                "name": "SWITCHCARD_FPGA"
+                "name": "CPUCARD_FPGA"
             },
             {
-                "name": "CPUCARD_FPGA"
+                "name": "SWITCHCARD_FPGA"
             },
             {
                 "name": "BIOS"
@@ -436,6 +875,57 @@
             },
             {
                 "name": "NVMe"
+            },
+            {
+                "name": "ASIC_PCIE"
+            },
+            {
+                "name": "PSU1"
+            },
+            {
+                "name": "PSU2"
+            },
+            {
+                "name": "DPM1"
+            },
+            {
+                "name": "DPM2"
+            },
+            {
+                "name": "DPM3"
+            },
+            {
+                "name": "DCDC0"
+            },
+            {
+                "name": "DCDC1"
+            },
+            {
+                "name": "DCDC2"
+            },
+            {
+                "name": "DCDC3"
+            },
+            {
+                "name": "DCDC4"
+            },
+            {
+                "name": "DCDC5"
+            },
+            {
+                "name": "DCDC6"
+            },
+            {
+                "name": "DCDC7"
+            },
+            {
+                "name": "DCDC8"
+            },
+            {
+                "name": "DCDC9"
+            },
+            {
+                "name": "DCDC10"
             }
         ],
         "fans": [
@@ -488,19 +978,11 @@
                 }
             }
         ],
-        "fan_drawers":[
+        "fan_drawers": [
             {
                 "name": "Fantray1",
-                "num_fans" : 2,
+                "num_fans": 2,
                 "max_consumed_power": false,
-                "status_led": {
-                    "controllable": true,
-                    "colors": [
-                        "off",
-                        "red",
-                        "green"
-                    ]
-                },
                 "fans": [
                     {
                         "name": "Fantray1_1",
@@ -514,20 +996,20 @@
                             "available": false
                         }
                     }
-                ]
-            },
-            {
-                "name": "Fantray2",
-                "num_fans" : 2,
-                "max_consumed_power": false,
+                ],
                 "status_led": {
                     "controllable": true,
                     "colors": [
-                        "off",
+                        "green",
                         "red",
-                        "green"
+                        "off"
                     ]
-                },
+                }
+            },
+            {
+                "name": "Fantray2",
+                "num_fans": 2,
+                "max_consumed_power": false,
                 "fans": [
                     {
                         "name": "Fantray2_1",
@@ -541,20 +1023,20 @@
                             "available": false
                         }
                     }
-                ]
-            },
-            {
-                "name": "Fantray3",
-                "num_fans" : 2,
-                "max_consumed_power": false,
+                ],
                 "status_led": {
                     "controllable": true,
                     "colors": [
-                        "off",
+                        "green",
                         "red",
-                        "green"
+                        "off"
                     ]
-                },
+                }
+            },
+            {
+                "name": "Fantray3",
+                "num_fans": 2,
+                "max_consumed_power": false,
                 "fans": [
                     {
                         "name": "Fantray3_1",
@@ -568,20 +1050,20 @@
                             "available": false
                         }
                     }
-                ]
-            },
-            {
-                "name": "Fantray4",
-                "num_fans" : 2,
-                "max_consumed_power": false,
+                ],
                 "status_led": {
                     "controllable": true,
                     "colors": [
-                        "off",
+                        "green",
                         "red",
-                        "green"
+                        "off"
                     ]
-                },
+                }
+            },
+            {
+                "name": "Fantray4",
+                "num_fans": 2,
+                "max_consumed_power": false,
                 "fans": [
                     {
                         "name": "Fantray4_1",
@@ -595,7 +1077,15 @@
                             "available": false
                         }
                     }
-                ]
+                ],
+                "status_led": {
+                    "controllable": true,
+                    "colors": [
+                        "green",
+                        "red",
+                        "off"
+                    ]
+                }
             }
         ],
         "psus": [
@@ -658,208 +1148,211 @@
         ],
         "sfps": [
             {
-              "name": "PORT1"
+                "name": "PORT1"
             },
             {
-              "name": "PORT2"
+                "name": "PORT2"
             },
             {
-              "name": "PORT3"
+                "name": "PORT3"
             },
             {
-              "name": "PORT4"
+                "name": "PORT4"
             },
             {
-              "name": "PORT5"
+                "name": "PORT5"
             },
             {
-              "name": "PORT6"
+                "name": "PORT6"
             },
             {
-              "name": "PORT7"
+                "name": "PORT7"
             },
             {
-              "name": "PORT8"
+                "name": "PORT8"
             },
             {
-              "name": "PORT9"
+                "name": "PORT9"
             },
             {
-              "name": "PORT10"
+                "name": "PORT10"
             },
             {
-              "name": "PORT11"
+                "name": "PORT11"
             },
             {
-              "name": "PORT12"
+                "name": "PORT12"
             },
             {
-              "name": "PORT13"
+                "name": "PORT13"
             },
             {
-              "name": "PORT14"
+                "name": "PORT14"
             },
             {
-              "name": "PORT15"
+                "name": "PORT15"
             },
             {
-              "name": "PORT16"
+                "name": "PORT16"
             },
             {
-              "name": "PORT17"
+                "name": "PORT17"
             },
             {
-              "name": "PORT18"
+                "name": "PORT18"
             },
             {
-              "name": "PORT19"
+                "name": "PORT19"
             },
             {
-              "name": "PORT20"
+                "name": "PORT20"
             },
             {
-              "name": "PORT21"
+                "name": "PORT21"
             },
             {
-              "name": "PORT22"
+                "name": "PORT22"
             },
             {
-              "name": "PORT23"
+                "name": "PORT23"
             },
             {
-              "name": "PORT24"
+                "name": "PORT24"
             },
             {
-              "name": "PORT25"
+                "name": "PORT25"
             },
             {
-              "name": "PORT26"
+                "name": "PORT26"
             },
             {
-              "name": "PORT27"
+                "name": "PORT27"
             },
             {
-              "name": "PORT28"
+                "name": "PORT28"
             },
             {
-              "name": "PORT29"
+                "name": "PORT29"
             },
             {
-              "name": "PORT30"
+                "name": "PORT30"
             },
             {
-              "name": "PORT31"
+                "name": "PORT31"
             },
             {
-              "name": "PORT32"
+                "name": "PORT32"
             },
             {
-              "name": "PORT33"
+                "name": "PORT33"
             },
             {
-              "name": "PORT34"
+                "name": "PORT34"
             },
             {
-              "name": "PORT35"
+                "name": "PORT35"
             },
             {
-              "name": "PORT36"
+                "name": "PORT36"
             },
             {
-              "name": "PORT37"
+                "name": "PORT37"
             },
             {
-              "name": "PORT38"
+                "name": "PORT38"
             },
             {
-              "name": "PORT39"
+                "name": "PORT39"
             },
             {
-              "name": "PORT40"
+                "name": "PORT40"
             },
             {
-              "name": "PORT41"
+                "name": "PORT41"
             },
             {
-              "name": "PORT42"
+                "name": "PORT42"
             },
             {
-              "name": "PORT43"
+                "name": "PORT43"
             },
             {
-              "name": "PORT44"
+                "name": "PORT44"
             },
             {
-              "name": "PORT45"
+                "name": "PORT45"
             },
             {
-              "name": "PORT46"
+                "name": "PORT46"
             },
             {
-              "name": "PORT47"
+                "name": "PORT47"
             },
             {
-              "name": "PORT48"
+                "name": "PORT48"
             },
             {
-              "name": "PORT49"
+                "name": "PORT49"
             },
             {
-              "name": "PORT50"
+                "name": "PORT50"
             },
             {
-              "name": "PORT51"
+                "name": "PORT51"
             },
             {
-              "name": "PORT52"
+                "name": "PORT52"
             },
             {
-              "name": "PORT53"
+                "name": "PORT53"
             },
             {
-              "name": "PORT54"
+                "name": "PORT54"
             },
             {
-              "name": "PORT55"
+                "name": "PORT55"
             },
             {
-              "name": "PORT56"
+                "name": "PORT56"
             },
             {
-              "name": "PORT57"
+                "name": "PORT57"
             },
             {
-              "name": "PORT58"
+                "name": "PORT58"
             },
             {
-              "name": "PORT59"
+                "name": "PORT59"
             },
             {
-              "name": "PORT60"
+                "name": "PORT60"
             },
             {
-              "name": "PORT61"
+                "name": "PORT61"
             },
             {
-              "name": "PORT62"
+                "name": "PORT62"
             },
             {
-              "name": "PORT63"
+                "name": "PORT63"
             },
             {
-              "name": "PORT64"
+                "name": "PORT64"
             },
             {
-              "name": "PORT65"
+                "name": "PORT65"
             },
             {
-              "name": "PORT66"
+                "name": "PORT66"
             }
         ]
     },
     "interfaces": {
         "Ethernet0": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port1"
+                ],
                 "1x400G": [
                     "Port1"
                 ],
@@ -871,6 +1364,10 @@
                     "Port1/2"
                 ],
                 "2x400G": [
+                    "Port1/1",
+                    "Port1/2"
+                ],
+                "2x800G": [
                     "Port1/1",
                     "Port1/2"
                 ],
@@ -886,7 +1383,23 @@
                     "Port1/3",
                     "Port1/4"
                 ],
+                "4x400G": [
+                    "Port1/1",
+                    "Port1/2",
+                    "Port1/3",
+                    "Port1/4"
+                ],
                 "8x100G": [
+                    "Port1/1",
+                    "Port1/2",
+                    "Port1/3",
+                    "Port1/4",
+                    "Port1/5",
+                    "Port1/6",
+                    "Port1/7",
+                    "Port1/8"
+                ],
+                "8x200G": [
                     "Port1/1",
                     "Port1/2",
                     "Port1/3",
@@ -908,10 +1421,13 @@
                 ]
             },
             "index": "1,1,1,1,1,1,1,1",
-            "lanes": "9,10,11,12,13,14,15,16"
+            "lanes": "17,18,19,20,21,22,23,24"
         },
         "Ethernet8": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port2"
+                ],
                 "1x400G": [
                     "Port2"
                 ],
@@ -923,6 +1439,10 @@
                     "Port2/2"
                 ],
                 "2x400G": [
+                    "Port2/1",
+                    "Port2/2"
+                ],
+                "2x800G": [
                     "Port2/1",
                     "Port2/2"
                 ],
@@ -938,7 +1458,23 @@
                     "Port2/3",
                     "Port2/4"
                 ],
+                "4x400G": [
+                    "Port2/1",
+                    "Port2/2",
+                    "Port2/3",
+                    "Port2/4"
+                ],
                 "8x100G": [
+                    "Port2/1",
+                    "Port2/2",
+                    "Port2/3",
+                    "Port2/4",
+                    "Port2/5",
+                    "Port2/6",
+                    "Port2/7",
+                    "Port2/8"
+                ],
+                "8x200G": [
                     "Port2/1",
                     "Port2/2",
                     "Port2/3",
@@ -960,10 +1496,13 @@
                 ]
             },
             "index": "2,2,2,2,2,2,2,2",
-            "lanes": "1,2,3,4,5,6,7,8"
+            "lanes": "25,26,27,28,29,30,31,32"
         },
         "Ethernet16": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port3"
+                ],
                 "1x400G": [
                     "Port3"
                 ],
@@ -975,6 +1514,10 @@
                     "Port3/2"
                 ],
                 "2x400G": [
+                    "Port3/1",
+                    "Port3/2"
+                ],
+                "2x800G": [
                     "Port3/1",
                     "Port3/2"
                 ],
@@ -990,7 +1533,23 @@
                     "Port3/3",
                     "Port3/4"
                 ],
+                "4x400G": [
+                    "Port3/1",
+                    "Port3/2",
+                    "Port3/3",
+                    "Port3/4"
+                ],
                 "8x100G": [
+                    "Port3/1",
+                    "Port3/2",
+                    "Port3/3",
+                    "Port3/4",
+                    "Port3/5",
+                    "Port3/6",
+                    "Port3/7",
+                    "Port3/8"
+                ],
+                "8x200G": [
                     "Port3/1",
                     "Port3/2",
                     "Port3/3",
@@ -1012,10 +1571,13 @@
                 ]
             },
             "index": "3,3,3,3,3,3,3,3",
-            "lanes": "25,26,27,28,29,30,31,32"
+            "lanes": "1,2,3,4,5,6,7,8"
         },
         "Ethernet24": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port4"
+                ],
                 "1x400G": [
                     "Port4"
                 ],
@@ -1027,6 +1589,10 @@
                     "Port4/2"
                 ],
                 "2x400G": [
+                    "Port4/1",
+                    "Port4/2"
+                ],
+                "2x800G": [
                     "Port4/1",
                     "Port4/2"
                 ],
@@ -1042,7 +1608,23 @@
                     "Port4/3",
                     "Port4/4"
                 ],
+                "4x400G": [
+                    "Port4/1",
+                    "Port4/2",
+                    "Port4/3",
+                    "Port4/4"
+                ],
                 "8x100G": [
+                    "Port4/1",
+                    "Port4/2",
+                    "Port4/3",
+                    "Port4/4",
+                    "Port4/5",
+                    "Port4/6",
+                    "Port4/7",
+                    "Port4/8"
+                ],
+                "8x200G": [
                     "Port4/1",
                     "Port4/2",
                     "Port4/3",
@@ -1064,10 +1646,13 @@
                 ]
             },
             "index": "4,4,4,4,4,4,4,4",
-            "lanes": "17,18,19,20,21,22,23,24"
+            "lanes": "9,10,11,12,13,14,15,16"
         },
         "Ethernet32": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port5"
+                ],
                 "1x400G": [
                     "Port5"
                 ],
@@ -1079,6 +1664,10 @@
                     "Port5/2"
                 ],
                 "2x400G": [
+                    "Port5/1",
+                    "Port5/2"
+                ],
+                "2x800G": [
                     "Port5/1",
                     "Port5/2"
                 ],
@@ -1094,7 +1683,23 @@
                     "Port5/3",
                     "Port5/4"
                 ],
+                "4x400G": [
+                    "Port5/1",
+                    "Port5/2",
+                    "Port5/3",
+                    "Port5/4"
+                ],
                 "8x100G": [
+                    "Port5/1",
+                    "Port5/2",
+                    "Port5/3",
+                    "Port5/4",
+                    "Port5/5",
+                    "Port5/6",
+                    "Port5/7",
+                    "Port5/8"
+                ],
+                "8x200G": [
                     "Port5/1",
                     "Port5/2",
                     "Port5/3",
@@ -1120,6 +1725,9 @@
         },
         "Ethernet40": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port6"
+                ],
                 "1x400G": [
                     "Port6"
                 ],
@@ -1131,6 +1739,10 @@
                     "Port6/2"
                 ],
                 "2x400G": [
+                    "Port6/1",
+                    "Port6/2"
+                ],
+                "2x800G": [
                     "Port6/1",
                     "Port6/2"
                 ],
@@ -1146,7 +1758,23 @@
                     "Port6/3",
                     "Port6/4"
                 ],
+                "4x400G": [
+                    "Port6/1",
+                    "Port6/2",
+                    "Port6/3",
+                    "Port6/4"
+                ],
                 "8x100G": [
+                    "Port6/1",
+                    "Port6/2",
+                    "Port6/3",
+                    "Port6/4",
+                    "Port6/5",
+                    "Port6/6",
+                    "Port6/7",
+                    "Port6/8"
+                ],
+                "8x200G": [
                     "Port6/1",
                     "Port6/2",
                     "Port6/3",
@@ -1172,6 +1800,9 @@
         },
         "Ethernet48": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port7"
+                ],
                 "1x400G": [
                     "Port7"
                 ],
@@ -1183,6 +1814,10 @@
                     "Port7/2"
                 ],
                 "2x400G": [
+                    "Port7/1",
+                    "Port7/2"
+                ],
+                "2x800G": [
                     "Port7/1",
                     "Port7/2"
                 ],
@@ -1198,7 +1833,23 @@
                     "Port7/3",
                     "Port7/4"
                 ],
+                "4x400G": [
+                    "Port7/1",
+                    "Port7/2",
+                    "Port7/3",
+                    "Port7/4"
+                ],
                 "8x100G": [
+                    "Port7/1",
+                    "Port7/2",
+                    "Port7/3",
+                    "Port7/4",
+                    "Port7/5",
+                    "Port7/6",
+                    "Port7/7",
+                    "Port7/8"
+                ],
+                "8x200G": [
                     "Port7/1",
                     "Port7/2",
                     "Port7/3",
@@ -1224,6 +1875,9 @@
         },
         "Ethernet56": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port8"
+                ],
                 "1x400G": [
                     "Port8"
                 ],
@@ -1235,6 +1889,10 @@
                     "Port8/2"
                 ],
                 "2x400G": [
+                    "Port8/1",
+                    "Port8/2"
+                ],
+                "2x800G": [
                     "Port8/1",
                     "Port8/2"
                 ],
@@ -1250,7 +1908,23 @@
                     "Port8/3",
                     "Port8/4"
                 ],
+                "4x400G": [
+                    "Port8/1",
+                    "Port8/2",
+                    "Port8/3",
+                    "Port8/4"
+                ],
                 "8x100G": [
+                    "Port8/1",
+                    "Port8/2",
+                    "Port8/3",
+                    "Port8/4",
+                    "Port8/5",
+                    "Port8/6",
+                    "Port8/7",
+                    "Port8/8"
+                ],
+                "8x200G": [
                     "Port8/1",
                     "Port8/2",
                     "Port8/3",
@@ -1276,6 +1950,9 @@
         },
         "Ethernet64": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port9"
+                ],
                 "1x400G": [
                     "Port9"
                 ],
@@ -1287,6 +1964,10 @@
                     "Port9/2"
                 ],
                 "2x400G": [
+                    "Port9/1",
+                    "Port9/2"
+                ],
+                "2x800G": [
                     "Port9/1",
                     "Port9/2"
                 ],
@@ -1302,7 +1983,23 @@
                     "Port9/3",
                     "Port9/4"
                 ],
+                "4x400G": [
+                    "Port9/1",
+                    "Port9/2",
+                    "Port9/3",
+                    "Port9/4"
+                ],
                 "8x100G": [
+                    "Port9/1",
+                    "Port9/2",
+                    "Port9/3",
+                    "Port9/4",
+                    "Port9/5",
+                    "Port9/6",
+                    "Port9/7",
+                    "Port9/8"
+                ],
+                "8x200G": [
                     "Port9/1",
                     "Port9/2",
                     "Port9/3",
@@ -1324,10 +2021,13 @@
                 ]
             },
             "index": "9,9,9,9,9,9,9,9",
-            "lanes": "73,74,75,76,77,78,79,80"
+            "lanes": "81,82,83,84,85,86,87,88"
         },
         "Ethernet72": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port10"
+                ],
                 "1x400G": [
                     "Port10"
                 ],
@@ -1339,6 +2039,10 @@
                     "Port10/2"
                 ],
                 "2x400G": [
+                    "Port10/1",
+                    "Port10/2"
+                ],
+                "2x800G": [
                     "Port10/1",
                     "Port10/2"
                 ],
@@ -1354,7 +2058,23 @@
                     "Port10/3",
                     "Port10/4"
                 ],
+                "4x400G": [
+                    "Port10/1",
+                    "Port10/2",
+                    "Port10/3",
+                    "Port10/4"
+                ],
                 "8x100G": [
+                    "Port10/1",
+                    "Port10/2",
+                    "Port10/3",
+                    "Port10/4",
+                    "Port10/5",
+                    "Port10/6",
+                    "Port10/7",
+                    "Port10/8"
+                ],
+                "8x200G": [
                     "Port10/1",
                     "Port10/2",
                     "Port10/3",
@@ -1376,10 +2096,13 @@
                 ]
             },
             "index": "10,10,10,10,10,10,10,10",
-            "lanes": "65,66,67,68,69,70,71,72"
+            "lanes": "89,90,91,92,93,94,95,96"
         },
         "Ethernet80": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port11"
+                ],
                 "1x400G": [
                     "Port11"
                 ],
@@ -1391,6 +2114,10 @@
                     "Port11/2"
                 ],
                 "2x400G": [
+                    "Port11/1",
+                    "Port11/2"
+                ],
+                "2x800G": [
                     "Port11/1",
                     "Port11/2"
                 ],
@@ -1406,7 +2133,23 @@
                     "Port11/3",
                     "Port11/4"
                 ],
+                "4x400G": [
+                    "Port11/1",
+                    "Port11/2",
+                    "Port11/3",
+                    "Port11/4"
+                ],
                 "8x100G": [
+                    "Port11/1",
+                    "Port11/2",
+                    "Port11/3",
+                    "Port11/4",
+                    "Port11/5",
+                    "Port11/6",
+                    "Port11/7",
+                    "Port11/8"
+                ],
+                "8x200G": [
                     "Port11/1",
                     "Port11/2",
                     "Port11/3",
@@ -1428,10 +2171,13 @@
                 ]
             },
             "index": "11,11,11,11,11,11,11,11",
-            "lanes": "89,90,91,92,93,94,95,96"
+            "lanes": "65,66,67,68,69,70,71,72"
         },
         "Ethernet88": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port12"
+                ],
                 "1x400G": [
                     "Port12"
                 ],
@@ -1443,6 +2189,10 @@
                     "Port12/2"
                 ],
                 "2x400G": [
+                    "Port12/1",
+                    "Port12/2"
+                ],
+                "2x800G": [
                     "Port12/1",
                     "Port12/2"
                 ],
@@ -1458,7 +2208,23 @@
                     "Port12/3",
                     "Port12/4"
                 ],
+                "4x400G": [
+                    "Port12/1",
+                    "Port12/2",
+                    "Port12/3",
+                    "Port12/4"
+                ],
                 "8x100G": [
+                    "Port12/1",
+                    "Port12/2",
+                    "Port12/3",
+                    "Port12/4",
+                    "Port12/5",
+                    "Port12/6",
+                    "Port12/7",
+                    "Port12/8"
+                ],
+                "8x200G": [
                     "Port12/1",
                     "Port12/2",
                     "Port12/3",
@@ -1480,10 +2246,13 @@
                 ]
             },
             "index": "12,12,12,12,12,12,12,12",
-            "lanes": "81,82,83,84,85,86,87,88"
+            "lanes": "73,74,75,76,77,78,79,80"
         },
         "Ethernet96": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port13"
+                ],
                 "1x400G": [
                     "Port13"
                 ],
@@ -1495,6 +2264,10 @@
                     "Port13/2"
                 ],
                 "2x400G": [
+                    "Port13/1",
+                    "Port13/2"
+                ],
+                "2x800G": [
                     "Port13/1",
                     "Port13/2"
                 ],
@@ -1510,7 +2283,23 @@
                     "Port13/3",
                     "Port13/4"
                 ],
+                "4x400G": [
+                    "Port13/1",
+                    "Port13/2",
+                    "Port13/3",
+                    "Port13/4"
+                ],
                 "8x100G": [
+                    "Port13/1",
+                    "Port13/2",
+                    "Port13/3",
+                    "Port13/4",
+                    "Port13/5",
+                    "Port13/6",
+                    "Port13/7",
+                    "Port13/8"
+                ],
+                "8x200G": [
                     "Port13/1",
                     "Port13/2",
                     "Port13/3",
@@ -1536,6 +2325,9 @@
         },
         "Ethernet104": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port14"
+                ],
                 "1x400G": [
                     "Port14"
                 ],
@@ -1547,6 +2339,10 @@
                     "Port14/2"
                 ],
                 "2x400G": [
+                    "Port14/1",
+                    "Port14/2"
+                ],
+                "2x800G": [
                     "Port14/1",
                     "Port14/2"
                 ],
@@ -1562,7 +2358,23 @@
                     "Port14/3",
                     "Port14/4"
                 ],
+                "4x400G": [
+                    "Port14/1",
+                    "Port14/2",
+                    "Port14/3",
+                    "Port14/4"
+                ],
                 "8x100G": [
+                    "Port14/1",
+                    "Port14/2",
+                    "Port14/3",
+                    "Port14/4",
+                    "Port14/5",
+                    "Port14/6",
+                    "Port14/7",
+                    "Port14/8"
+                ],
+                "8x200G": [
                     "Port14/1",
                     "Port14/2",
                     "Port14/3",
@@ -1588,6 +2400,9 @@
         },
         "Ethernet112": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port15"
+                ],
                 "1x400G": [
                     "Port15"
                 ],
@@ -1599,6 +2414,10 @@
                     "Port15/2"
                 ],
                 "2x400G": [
+                    "Port15/1",
+                    "Port15/2"
+                ],
+                "2x800G": [
                     "Port15/1",
                     "Port15/2"
                 ],
@@ -1614,7 +2433,23 @@
                     "Port15/3",
                     "Port15/4"
                 ],
+                "4x400G": [
+                    "Port15/1",
+                    "Port15/2",
+                    "Port15/3",
+                    "Port15/4"
+                ],
                 "8x100G": [
+                    "Port15/1",
+                    "Port15/2",
+                    "Port15/3",
+                    "Port15/4",
+                    "Port15/5",
+                    "Port15/6",
+                    "Port15/7",
+                    "Port15/8"
+                ],
+                "8x200G": [
                     "Port15/1",
                     "Port15/2",
                     "Port15/3",
@@ -1640,6 +2475,9 @@
         },
         "Ethernet120": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port16"
+                ],
                 "1x400G": [
                     "Port16"
                 ],
@@ -1651,6 +2489,10 @@
                     "Port16/2"
                 ],
                 "2x400G": [
+                    "Port16/1",
+                    "Port16/2"
+                ],
+                "2x800G": [
                     "Port16/1",
                     "Port16/2"
                 ],
@@ -1666,7 +2508,23 @@
                     "Port16/3",
                     "Port16/4"
                 ],
+                "4x400G": [
+                    "Port16/1",
+                    "Port16/2",
+                    "Port16/3",
+                    "Port16/4"
+                ],
                 "8x100G": [
+                    "Port16/1",
+                    "Port16/2",
+                    "Port16/3",
+                    "Port16/4",
+                    "Port16/5",
+                    "Port16/6",
+                    "Port16/7",
+                    "Port16/8"
+                ],
+                "8x200G": [
                     "Port16/1",
                     "Port16/2",
                     "Port16/3",
@@ -1692,6 +2550,9 @@
         },
         "Ethernet128": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port17"
+                ],
                 "1x400G": [
                     "Port17"
                 ],
@@ -1703,6 +2564,10 @@
                     "Port17/2"
                 ],
                 "2x400G": [
+                    "Port17/1",
+                    "Port17/2"
+                ],
+                "2x800G": [
                     "Port17/1",
                     "Port17/2"
                 ],
@@ -1718,7 +2583,23 @@
                     "Port17/3",
                     "Port17/4"
                 ],
+                "4x400G": [
+                    "Port17/1",
+                    "Port17/2",
+                    "Port17/3",
+                    "Port17/4"
+                ],
                 "8x100G": [
+                    "Port17/1",
+                    "Port17/2",
+                    "Port17/3",
+                    "Port17/4",
+                    "Port17/5",
+                    "Port17/6",
+                    "Port17/7",
+                    "Port17/8"
+                ],
+                "8x200G": [
                     "Port17/1",
                     "Port17/2",
                     "Port17/3",
@@ -1740,10 +2621,13 @@
                 ]
             },
             "index": "17,17,17,17,17,17,17,17",
-            "lanes": "137,138,139,140,141,142,143,144"
+            "lanes": "145,146,147,148,149,150,151,152"
         },
         "Ethernet136": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port18"
+                ],
                 "1x400G": [
                     "Port18"
                 ],
@@ -1755,6 +2639,10 @@
                     "Port18/2"
                 ],
                 "2x400G": [
+                    "Port18/1",
+                    "Port18/2"
+                ],
+                "2x800G": [
                     "Port18/1",
                     "Port18/2"
                 ],
@@ -1770,7 +2658,23 @@
                     "Port18/3",
                     "Port18/4"
                 ],
+                "4x400G": [
+                    "Port18/1",
+                    "Port18/2",
+                    "Port18/3",
+                    "Port18/4"
+                ],
                 "8x100G": [
+                    "Port18/1",
+                    "Port18/2",
+                    "Port18/3",
+                    "Port18/4",
+                    "Port18/5",
+                    "Port18/6",
+                    "Port18/7",
+                    "Port18/8"
+                ],
+                "8x200G": [
                     "Port18/1",
                     "Port18/2",
                     "Port18/3",
@@ -1792,10 +2696,13 @@
                 ]
             },
             "index": "18,18,18,18,18,18,18,18",
-            "lanes": "129,130,131,132,133,134,135,136"
+            "lanes": "153,154,155,156,157,158,159,160"
         },
         "Ethernet144": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port19"
+                ],
                 "1x400G": [
                     "Port19"
                 ],
@@ -1807,6 +2714,10 @@
                     "Port19/2"
                 ],
                 "2x400G": [
+                    "Port19/1",
+                    "Port19/2"
+                ],
+                "2x800G": [
                     "Port19/1",
                     "Port19/2"
                 ],
@@ -1822,7 +2733,23 @@
                     "Port19/3",
                     "Port19/4"
                 ],
+                "4x400G": [
+                    "Port19/1",
+                    "Port19/2",
+                    "Port19/3",
+                    "Port19/4"
+                ],
                 "8x100G": [
+                    "Port19/1",
+                    "Port19/2",
+                    "Port19/3",
+                    "Port19/4",
+                    "Port19/5",
+                    "Port19/6",
+                    "Port19/7",
+                    "Port19/8"
+                ],
+                "8x200G": [
                     "Port19/1",
                     "Port19/2",
                     "Port19/3",
@@ -1844,10 +2771,13 @@
                 ]
             },
             "index": "19,19,19,19,19,19,19,19",
-            "lanes": "153,154,155,156,157,158,159,160"
+            "lanes": "129,130,131,132,133,134,135,136"
         },
         "Ethernet152": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port20"
+                ],
                 "1x400G": [
                     "Port20"
                 ],
@@ -1859,6 +2789,10 @@
                     "Port20/2"
                 ],
                 "2x400G": [
+                    "Port20/1",
+                    "Port20/2"
+                ],
+                "2x800G": [
                     "Port20/1",
                     "Port20/2"
                 ],
@@ -1874,7 +2808,23 @@
                     "Port20/3",
                     "Port20/4"
                 ],
+                "4x400G": [
+                    "Port20/1",
+                    "Port20/2",
+                    "Port20/3",
+                    "Port20/4"
+                ],
                 "8x100G": [
+                    "Port20/1",
+                    "Port20/2",
+                    "Port20/3",
+                    "Port20/4",
+                    "Port20/5",
+                    "Port20/6",
+                    "Port20/7",
+                    "Port20/8"
+                ],
+                "8x200G": [
                     "Port20/1",
                     "Port20/2",
                     "Port20/3",
@@ -1896,10 +2846,13 @@
                 ]
             },
             "index": "20,20,20,20,20,20,20,20",
-            "lanes": "145,146,147,148,149,150,151,152"
+            "lanes": "137,138,139,140,141,142,143,144"
         },
         "Ethernet160": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port21"
+                ],
                 "1x400G": [
                     "Port21"
                 ],
@@ -1911,6 +2864,10 @@
                     "Port21/2"
                 ],
                 "2x400G": [
+                    "Port21/1",
+                    "Port21/2"
+                ],
+                "2x800G": [
                     "Port21/1",
                     "Port21/2"
                 ],
@@ -1926,7 +2883,23 @@
                     "Port21/3",
                     "Port21/4"
                 ],
+                "4x400G": [
+                    "Port21/1",
+                    "Port21/2",
+                    "Port21/3",
+                    "Port21/4"
+                ],
                 "8x100G": [
+                    "Port21/1",
+                    "Port21/2",
+                    "Port21/3",
+                    "Port21/4",
+                    "Port21/5",
+                    "Port21/6",
+                    "Port21/7",
+                    "Port21/8"
+                ],
+                "8x200G": [
                     "Port21/1",
                     "Port21/2",
                     "Port21/3",
@@ -1952,6 +2925,9 @@
         },
         "Ethernet168": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port22"
+                ],
                 "1x400G": [
                     "Port22"
                 ],
@@ -1963,6 +2939,10 @@
                     "Port22/2"
                 ],
                 "2x400G": [
+                    "Port22/1",
+                    "Port22/2"
+                ],
+                "2x800G": [
                     "Port22/1",
                     "Port22/2"
                 ],
@@ -1978,7 +2958,23 @@
                     "Port22/3",
                     "Port22/4"
                 ],
+                "4x400G": [
+                    "Port22/1",
+                    "Port22/2",
+                    "Port22/3",
+                    "Port22/4"
+                ],
                 "8x100G": [
+                    "Port22/1",
+                    "Port22/2",
+                    "Port22/3",
+                    "Port22/4",
+                    "Port22/5",
+                    "Port22/6",
+                    "Port22/7",
+                    "Port22/8"
+                ],
+                "8x200G": [
                     "Port22/1",
                     "Port22/2",
                     "Port22/3",
@@ -2004,6 +3000,9 @@
         },
         "Ethernet176": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port23"
+                ],
                 "1x400G": [
                     "Port23"
                 ],
@@ -2015,6 +3014,10 @@
                     "Port23/2"
                 ],
                 "2x400G": [
+                    "Port23/1",
+                    "Port23/2"
+                ],
+                "2x800G": [
                     "Port23/1",
                     "Port23/2"
                 ],
@@ -2030,7 +3033,23 @@
                     "Port23/3",
                     "Port23/4"
                 ],
+                "4x400G": [
+                    "Port23/1",
+                    "Port23/2",
+                    "Port23/3",
+                    "Port23/4"
+                ],
                 "8x100G": [
+                    "Port23/1",
+                    "Port23/2",
+                    "Port23/3",
+                    "Port23/4",
+                    "Port23/5",
+                    "Port23/6",
+                    "Port23/7",
+                    "Port23/8"
+                ],
+                "8x200G": [
                     "Port23/1",
                     "Port23/2",
                     "Port23/3",
@@ -2056,6 +3075,9 @@
         },
         "Ethernet184": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port24"
+                ],
                 "1x400G": [
                     "Port24"
                 ],
@@ -2067,6 +3089,10 @@
                     "Port24/2"
                 ],
                 "2x400G": [
+                    "Port24/1",
+                    "Port24/2"
+                ],
+                "2x800G": [
                     "Port24/1",
                     "Port24/2"
                 ],
@@ -2082,7 +3108,23 @@
                     "Port24/3",
                     "Port24/4"
                 ],
+                "4x400G": [
+                    "Port24/1",
+                    "Port24/2",
+                    "Port24/3",
+                    "Port24/4"
+                ],
                 "8x100G": [
+                    "Port24/1",
+                    "Port24/2",
+                    "Port24/3",
+                    "Port24/4",
+                    "Port24/5",
+                    "Port24/6",
+                    "Port24/7",
+                    "Port24/8"
+                ],
+                "8x200G": [
                     "Port24/1",
                     "Port24/2",
                     "Port24/3",
@@ -2108,6 +3150,9 @@
         },
         "Ethernet192": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port25"
+                ],
                 "1x400G": [
                     "Port25"
                 ],
@@ -2119,6 +3164,10 @@
                     "Port25/2"
                 ],
                 "2x400G": [
+                    "Port25/1",
+                    "Port25/2"
+                ],
+                "2x800G": [
                     "Port25/1",
                     "Port25/2"
                 ],
@@ -2134,7 +3183,23 @@
                     "Port25/3",
                     "Port25/4"
                 ],
+                "4x400G": [
+                    "Port25/1",
+                    "Port25/2",
+                    "Port25/3",
+                    "Port25/4"
+                ],
                 "8x100G": [
+                    "Port25/1",
+                    "Port25/2",
+                    "Port25/3",
+                    "Port25/4",
+                    "Port25/5",
+                    "Port25/6",
+                    "Port25/7",
+                    "Port25/8"
+                ],
+                "8x200G": [
                     "Port25/1",
                     "Port25/2",
                     "Port25/3",
@@ -2156,10 +3221,13 @@
                 ]
             },
             "index": "25,25,25,25,25,25,25,25",
-            "lanes": "201,202,203,204,205,206,207,208"
+            "lanes": "209,210,211,212,213,214,215,216"
         },
         "Ethernet200": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port26"
+                ],
                 "1x400G": [
                     "Port26"
                 ],
@@ -2171,6 +3239,10 @@
                     "Port26/2"
                 ],
                 "2x400G": [
+                    "Port26/1",
+                    "Port26/2"
+                ],
+                "2x800G": [
                     "Port26/1",
                     "Port26/2"
                 ],
@@ -2186,7 +3258,23 @@
                     "Port26/3",
                     "Port26/4"
                 ],
+                "4x400G": [
+                    "Port26/1",
+                    "Port26/2",
+                    "Port26/3",
+                    "Port26/4"
+                ],
                 "8x100G": [
+                    "Port26/1",
+                    "Port26/2",
+                    "Port26/3",
+                    "Port26/4",
+                    "Port26/5",
+                    "Port26/6",
+                    "Port26/7",
+                    "Port26/8"
+                ],
+                "8x200G": [
                     "Port26/1",
                     "Port26/2",
                     "Port26/3",
@@ -2208,10 +3296,13 @@
                 ]
             },
             "index": "26,26,26,26,26,26,26,26",
-            "lanes": "193,194,195,196,197,198,199,200"
+            "lanes": "217,218,219,220,221,222,223,224"
         },
         "Ethernet208": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port27"
+                ],
                 "1x400G": [
                     "Port27"
                 ],
@@ -2223,6 +3314,10 @@
                     "Port27/2"
                 ],
                 "2x400G": [
+                    "Port27/1",
+                    "Port27/2"
+                ],
+                "2x800G": [
                     "Port27/1",
                     "Port27/2"
                 ],
@@ -2238,7 +3333,23 @@
                     "Port27/3",
                     "Port27/4"
                 ],
+                "4x400G": [
+                    "Port27/1",
+                    "Port27/2",
+                    "Port27/3",
+                    "Port27/4"
+                ],
                 "8x100G": [
+                    "Port27/1",
+                    "Port27/2",
+                    "Port27/3",
+                    "Port27/4",
+                    "Port27/5",
+                    "Port27/6",
+                    "Port27/7",
+                    "Port27/8"
+                ],
+                "8x200G": [
                     "Port27/1",
                     "Port27/2",
                     "Port27/3",
@@ -2260,10 +3371,13 @@
                 ]
             },
             "index": "27,27,27,27,27,27,27,27",
-            "lanes": "217,218,219,220,221,222,223,224"
+            "lanes": "193,194,195,196,197,198,199,200"
         },
         "Ethernet216": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port28"
+                ],
                 "1x400G": [
                     "Port28"
                 ],
@@ -2275,6 +3389,10 @@
                     "Port28/2"
                 ],
                 "2x400G": [
+                    "Port28/1",
+                    "Port28/2"
+                ],
+                "2x800G": [
                     "Port28/1",
                     "Port28/2"
                 ],
@@ -2290,7 +3408,23 @@
                     "Port28/3",
                     "Port28/4"
                 ],
+                "4x400G": [
+                    "Port28/1",
+                    "Port28/2",
+                    "Port28/3",
+                    "Port28/4"
+                ],
                 "8x100G": [
+                    "Port28/1",
+                    "Port28/2",
+                    "Port28/3",
+                    "Port28/4",
+                    "Port28/5",
+                    "Port28/6",
+                    "Port28/7",
+                    "Port28/8"
+                ],
+                "8x200G": [
                     "Port28/1",
                     "Port28/2",
                     "Port28/3",
@@ -2312,10 +3446,13 @@
                 ]
             },
             "index": "28,28,28,28,28,28,28,28",
-            "lanes": "209,210,211,212,213,214,215,216"
+            "lanes": "201,202,203,204,205,206,207,208"
         },
         "Ethernet224": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port29"
+                ],
                 "1x400G": [
                     "Port29"
                 ],
@@ -2327,6 +3464,10 @@
                     "Port29/2"
                 ],
                 "2x400G": [
+                    "Port29/1",
+                    "Port29/2"
+                ],
+                "2x800G": [
                     "Port29/1",
                     "Port29/2"
                 ],
@@ -2342,7 +3483,23 @@
                     "Port29/3",
                     "Port29/4"
                 ],
+                "4x400G": [
+                    "Port29/1",
+                    "Port29/2",
+                    "Port29/3",
+                    "Port29/4"
+                ],
                 "8x100G": [
+                    "Port29/1",
+                    "Port29/2",
+                    "Port29/3",
+                    "Port29/4",
+                    "Port29/5",
+                    "Port29/6",
+                    "Port29/7",
+                    "Port29/8"
+                ],
+                "8x200G": [
                     "Port29/1",
                     "Port29/2",
                     "Port29/3",
@@ -2368,6 +3525,9 @@
         },
         "Ethernet232": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port30"
+                ],
                 "1x400G": [
                     "Port30"
                 ],
@@ -2379,6 +3539,10 @@
                     "Port30/2"
                 ],
                 "2x400G": [
+                    "Port30/1",
+                    "Port30/2"
+                ],
+                "2x800G": [
                     "Port30/1",
                     "Port30/2"
                 ],
@@ -2394,7 +3558,23 @@
                     "Port30/3",
                     "Port30/4"
                 ],
+                "4x400G": [
+                    "Port30/1",
+                    "Port30/2",
+                    "Port30/3",
+                    "Port30/4"
+                ],
                 "8x100G": [
+                    "Port30/1",
+                    "Port30/2",
+                    "Port30/3",
+                    "Port30/4",
+                    "Port30/5",
+                    "Port30/6",
+                    "Port30/7",
+                    "Port30/8"
+                ],
+                "8x200G": [
                     "Port30/1",
                     "Port30/2",
                     "Port30/3",
@@ -2420,6 +3600,9 @@
         },
         "Ethernet240": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port31"
+                ],
                 "1x400G": [
                     "Port31"
                 ],
@@ -2431,6 +3614,10 @@
                     "Port31/2"
                 ],
                 "2x400G": [
+                    "Port31/1",
+                    "Port31/2"
+                ],
+                "2x800G": [
                     "Port31/1",
                     "Port31/2"
                 ],
@@ -2446,7 +3633,23 @@
                     "Port31/3",
                     "Port31/4"
                 ],
+                "4x400G": [
+                    "Port31/1",
+                    "Port31/2",
+                    "Port31/3",
+                    "Port31/4"
+                ],
                 "8x100G": [
+                    "Port31/1",
+                    "Port31/2",
+                    "Port31/3",
+                    "Port31/4",
+                    "Port31/5",
+                    "Port31/6",
+                    "Port31/7",
+                    "Port31/8"
+                ],
+                "8x200G": [
                     "Port31/1",
                     "Port31/2",
                     "Port31/3",
@@ -2472,6 +3675,9 @@
         },
         "Ethernet248": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port32"
+                ],
                 "1x400G": [
                     "Port32"
                 ],
@@ -2483,6 +3689,10 @@
                     "Port32/2"
                 ],
                 "2x400G": [
+                    "Port32/1",
+                    "Port32/2"
+                ],
+                "2x800G": [
                     "Port32/1",
                     "Port32/2"
                 ],
@@ -2498,7 +3708,23 @@
                     "Port32/3",
                     "Port32/4"
                 ],
+                "4x400G": [
+                    "Port32/1",
+                    "Port32/2",
+                    "Port32/3",
+                    "Port32/4"
+                ],
                 "8x100G": [
+                    "Port32/1",
+                    "Port32/2",
+                    "Port32/3",
+                    "Port32/4",
+                    "Port32/5",
+                    "Port32/6",
+                    "Port32/7",
+                    "Port32/8"
+                ],
+                "8x200G": [
                     "Port32/1",
                     "Port32/2",
                     "Port32/3",
@@ -2524,6 +3750,9 @@
         },
         "Ethernet256": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port33"
+                ],
                 "1x400G": [
                     "Port33"
                 ],
@@ -2535,6 +3764,10 @@
                     "Port33/2"
                 ],
                 "2x400G": [
+                    "Port33/1",
+                    "Port33/2"
+                ],
+                "2x800G": [
                     "Port33/1",
                     "Port33/2"
                 ],
@@ -2550,7 +3783,23 @@
                     "Port33/3",
                     "Port33/4"
                 ],
+                "4x400G": [
+                    "Port33/1",
+                    "Port33/2",
+                    "Port33/3",
+                    "Port33/4"
+                ],
                 "8x100G": [
+                    "Port33/1",
+                    "Port33/2",
+                    "Port33/3",
+                    "Port33/4",
+                    "Port33/5",
+                    "Port33/6",
+                    "Port33/7",
+                    "Port33/8"
+                ],
+                "8x200G": [
                     "Port33/1",
                     "Port33/2",
                     "Port33/3",
@@ -2572,10 +3821,13 @@
                 ]
             },
             "index": "33,33,33,33,33,33,33,33",
-            "lanes": "265,266,267,268,269,270,271,272"
+            "lanes": "273,274,275,276,277,278,279,280"
         },
         "Ethernet264": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port34"
+                ],
                 "1x400G": [
                     "Port34"
                 ],
@@ -2587,6 +3839,10 @@
                     "Port34/2"
                 ],
                 "2x400G": [
+                    "Port34/1",
+                    "Port34/2"
+                ],
+                "2x800G": [
                     "Port34/1",
                     "Port34/2"
                 ],
@@ -2602,7 +3858,23 @@
                     "Port34/3",
                     "Port34/4"
                 ],
+                "4x400G": [
+                    "Port34/1",
+                    "Port34/2",
+                    "Port34/3",
+                    "Port34/4"
+                ],
                 "8x100G": [
+                    "Port34/1",
+                    "Port34/2",
+                    "Port34/3",
+                    "Port34/4",
+                    "Port34/5",
+                    "Port34/6",
+                    "Port34/7",
+                    "Port34/8"
+                ],
+                "8x200G": [
                     "Port34/1",
                     "Port34/2",
                     "Port34/3",
@@ -2624,10 +3896,13 @@
                 ]
             },
             "index": "34,34,34,34,34,34,34,34",
-            "lanes": "257,258,259,260,261,262,263,264"
+            "lanes": "281,282,283,284,285,286,287,288"
         },
         "Ethernet272": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port35"
+                ],
                 "1x400G": [
                     "Port35"
                 ],
@@ -2639,6 +3914,10 @@
                     "Port35/2"
                 ],
                 "2x400G": [
+                    "Port35/1",
+                    "Port35/2"
+                ],
+                "2x800G": [
                     "Port35/1",
                     "Port35/2"
                 ],
@@ -2654,7 +3933,23 @@
                     "Port35/3",
                     "Port35/4"
                 ],
+                "4x400G": [
+                    "Port35/1",
+                    "Port35/2",
+                    "Port35/3",
+                    "Port35/4"
+                ],
                 "8x100G": [
+                    "Port35/1",
+                    "Port35/2",
+                    "Port35/3",
+                    "Port35/4",
+                    "Port35/5",
+                    "Port35/6",
+                    "Port35/7",
+                    "Port35/8"
+                ],
+                "8x200G": [
                     "Port35/1",
                     "Port35/2",
                     "Port35/3",
@@ -2676,10 +3971,13 @@
                 ]
             },
             "index": "35,35,35,35,35,35,35,35",
-            "lanes": "281,282,283,284,285,286,287,288"
+            "lanes": "257,258,259,260,261,262,263,264"
         },
         "Ethernet280": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port36"
+                ],
                 "1x400G": [
                     "Port36"
                 ],
@@ -2691,6 +3989,10 @@
                     "Port36/2"
                 ],
                 "2x400G": [
+                    "Port36/1",
+                    "Port36/2"
+                ],
+                "2x800G": [
                     "Port36/1",
                     "Port36/2"
                 ],
@@ -2706,7 +4008,23 @@
                     "Port36/3",
                     "Port36/4"
                 ],
+                "4x400G": [
+                    "Port36/1",
+                    "Port36/2",
+                    "Port36/3",
+                    "Port36/4"
+                ],
                 "8x100G": [
+                    "Port36/1",
+                    "Port36/2",
+                    "Port36/3",
+                    "Port36/4",
+                    "Port36/5",
+                    "Port36/6",
+                    "Port36/7",
+                    "Port36/8"
+                ],
+                "8x200G": [
                     "Port36/1",
                     "Port36/2",
                     "Port36/3",
@@ -2728,10 +4046,13 @@
                 ]
             },
             "index": "36,36,36,36,36,36,36,36",
-            "lanes": "273,274,275,276,277,278,279,280"
+            "lanes": "265,266,267,268,269,270,271,272"
         },
         "Ethernet288": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port37"
+                ],
                 "1x400G": [
                     "Port37"
                 ],
@@ -2743,6 +4064,10 @@
                     "Port37/2"
                 ],
                 "2x400G": [
+                    "Port37/1",
+                    "Port37/2"
+                ],
+                "2x800G": [
                     "Port37/1",
                     "Port37/2"
                 ],
@@ -2758,7 +4083,23 @@
                     "Port37/3",
                     "Port37/4"
                 ],
+                "4x400G": [
+                    "Port37/1",
+                    "Port37/2",
+                    "Port37/3",
+                    "Port37/4"
+                ],
                 "8x100G": [
+                    "Port37/1",
+                    "Port37/2",
+                    "Port37/3",
+                    "Port37/4",
+                    "Port37/5",
+                    "Port37/6",
+                    "Port37/7",
+                    "Port37/8"
+                ],
+                "8x200G": [
                     "Port37/1",
                     "Port37/2",
                     "Port37/3",
@@ -2784,6 +4125,9 @@
         },
         "Ethernet296": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port38"
+                ],
                 "1x400G": [
                     "Port38"
                 ],
@@ -2795,6 +4139,10 @@
                     "Port38/2"
                 ],
                 "2x400G": [
+                    "Port38/1",
+                    "Port38/2"
+                ],
+                "2x800G": [
                     "Port38/1",
                     "Port38/2"
                 ],
@@ -2810,7 +4158,23 @@
                     "Port38/3",
                     "Port38/4"
                 ],
+                "4x400G": [
+                    "Port38/1",
+                    "Port38/2",
+                    "Port38/3",
+                    "Port38/4"
+                ],
                 "8x100G": [
+                    "Port38/1",
+                    "Port38/2",
+                    "Port38/3",
+                    "Port38/4",
+                    "Port38/5",
+                    "Port38/6",
+                    "Port38/7",
+                    "Port38/8"
+                ],
+                "8x200G": [
                     "Port38/1",
                     "Port38/2",
                     "Port38/3",
@@ -2836,6 +4200,9 @@
         },
         "Ethernet304": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port39"
+                ],
                 "1x400G": [
                     "Port39"
                 ],
@@ -2847,6 +4214,10 @@
                     "Port39/2"
                 ],
                 "2x400G": [
+                    "Port39/1",
+                    "Port39/2"
+                ],
+                "2x800G": [
                     "Port39/1",
                     "Port39/2"
                 ],
@@ -2862,7 +4233,23 @@
                     "Port39/3",
                     "Port39/4"
                 ],
+                "4x400G": [
+                    "Port39/1",
+                    "Port39/2",
+                    "Port39/3",
+                    "Port39/4"
+                ],
                 "8x100G": [
+                    "Port39/1",
+                    "Port39/2",
+                    "Port39/3",
+                    "Port39/4",
+                    "Port39/5",
+                    "Port39/6",
+                    "Port39/7",
+                    "Port39/8"
+                ],
+                "8x200G": [
                     "Port39/1",
                     "Port39/2",
                     "Port39/3",
@@ -2888,6 +4275,9 @@
         },
         "Ethernet312": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port40"
+                ],
                 "1x400G": [
                     "Port40"
                 ],
@@ -2899,6 +4289,10 @@
                     "Port40/2"
                 ],
                 "2x400G": [
+                    "Port40/1",
+                    "Port40/2"
+                ],
+                "2x800G": [
                     "Port40/1",
                     "Port40/2"
                 ],
@@ -2914,7 +4308,23 @@
                     "Port40/3",
                     "Port40/4"
                 ],
+                "4x400G": [
+                    "Port40/1",
+                    "Port40/2",
+                    "Port40/3",
+                    "Port40/4"
+                ],
                 "8x100G": [
+                    "Port40/1",
+                    "Port40/2",
+                    "Port40/3",
+                    "Port40/4",
+                    "Port40/5",
+                    "Port40/6",
+                    "Port40/7",
+                    "Port40/8"
+                ],
+                "8x200G": [
                     "Port40/1",
                     "Port40/2",
                     "Port40/3",
@@ -2940,6 +4350,9 @@
         },
         "Ethernet320": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port41"
+                ],
                 "1x400G": [
                     "Port41"
                 ],
@@ -2951,6 +4364,10 @@
                     "Port41/2"
                 ],
                 "2x400G": [
+                    "Port41/1",
+                    "Port41/2"
+                ],
+                "2x800G": [
                     "Port41/1",
                     "Port41/2"
                 ],
@@ -2966,7 +4383,23 @@
                     "Port41/3",
                     "Port41/4"
                 ],
+                "4x400G": [
+                    "Port41/1",
+                    "Port41/2",
+                    "Port41/3",
+                    "Port41/4"
+                ],
                 "8x100G": [
+                    "Port41/1",
+                    "Port41/2",
+                    "Port41/3",
+                    "Port41/4",
+                    "Port41/5",
+                    "Port41/6",
+                    "Port41/7",
+                    "Port41/8"
+                ],
+                "8x200G": [
                     "Port41/1",
                     "Port41/2",
                     "Port41/3",
@@ -2988,10 +4421,13 @@
                 ]
             },
             "index": "41,41,41,41,41,41,41,41",
-            "lanes": "329,330,331,332,333,334,335,336"
+            "lanes": "337,338,339,340,341,342,343,344"
         },
         "Ethernet328": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port42"
+                ],
                 "1x400G": [
                     "Port42"
                 ],
@@ -3003,6 +4439,10 @@
                     "Port42/2"
                 ],
                 "2x400G": [
+                    "Port42/1",
+                    "Port42/2"
+                ],
+                "2x800G": [
                     "Port42/1",
                     "Port42/2"
                 ],
@@ -3018,7 +4458,23 @@
                     "Port42/3",
                     "Port42/4"
                 ],
+                "4x400G": [
+                    "Port42/1",
+                    "Port42/2",
+                    "Port42/3",
+                    "Port42/4"
+                ],
                 "8x100G": [
+                    "Port42/1",
+                    "Port42/2",
+                    "Port42/3",
+                    "Port42/4",
+                    "Port42/5",
+                    "Port42/6",
+                    "Port42/7",
+                    "Port42/8"
+                ],
+                "8x200G": [
                     "Port42/1",
                     "Port42/2",
                     "Port42/3",
@@ -3040,10 +4496,13 @@
                 ]
             },
             "index": "42,42,42,42,42,42,42,42",
-            "lanes": "321,322,323,324,325,326,327,328"
+            "lanes": "345,346,347,348,349,350,351,352"
         },
         "Ethernet336": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port43"
+                ],
                 "1x400G": [
                     "Port43"
                 ],
@@ -3055,6 +4514,10 @@
                     "Port43/2"
                 ],
                 "2x400G": [
+                    "Port43/1",
+                    "Port43/2"
+                ],
+                "2x800G": [
                     "Port43/1",
                     "Port43/2"
                 ],
@@ -3070,7 +4533,23 @@
                     "Port43/3",
                     "Port43/4"
                 ],
+                "4x400G": [
+                    "Port43/1",
+                    "Port43/2",
+                    "Port43/3",
+                    "Port43/4"
+                ],
                 "8x100G": [
+                    "Port43/1",
+                    "Port43/2",
+                    "Port43/3",
+                    "Port43/4",
+                    "Port43/5",
+                    "Port43/6",
+                    "Port43/7",
+                    "Port43/8"
+                ],
+                "8x200G": [
                     "Port43/1",
                     "Port43/2",
                     "Port43/3",
@@ -3092,10 +4571,13 @@
                 ]
             },
             "index": "43,43,43,43,43,43,43,43",
-            "lanes": "345,346,347,348,349,350,351,352"
+            "lanes": "321,322,323,324,325,326,327,328"
         },
         "Ethernet344": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port44"
+                ],
                 "1x400G": [
                     "Port44"
                 ],
@@ -3107,6 +4589,10 @@
                     "Port44/2"
                 ],
                 "2x400G": [
+                    "Port44/1",
+                    "Port44/2"
+                ],
+                "2x800G": [
                     "Port44/1",
                     "Port44/2"
                 ],
@@ -3122,7 +4608,23 @@
                     "Port44/3",
                     "Port44/4"
                 ],
+                "4x400G": [
+                    "Port44/1",
+                    "Port44/2",
+                    "Port44/3",
+                    "Port44/4"
+                ],
                 "8x100G": [
+                    "Port44/1",
+                    "Port44/2",
+                    "Port44/3",
+                    "Port44/4",
+                    "Port44/5",
+                    "Port44/6",
+                    "Port44/7",
+                    "Port44/8"
+                ],
+                "8x200G": [
                     "Port44/1",
                     "Port44/2",
                     "Port44/3",
@@ -3144,10 +4646,13 @@
                 ]
             },
             "index": "44,44,44,44,44,44,44,44",
-            "lanes": "337,338,339,340,341,342,343,344"
+            "lanes": "329,330,331,332,333,334,335,336"
         },
         "Ethernet352": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port45"
+                ],
                 "1x400G": [
                     "Port45"
                 ],
@@ -3159,6 +4664,10 @@
                     "Port45/2"
                 ],
                 "2x400G": [
+                    "Port45/1",
+                    "Port45/2"
+                ],
+                "2x800G": [
                     "Port45/1",
                     "Port45/2"
                 ],
@@ -3174,7 +4683,23 @@
                     "Port45/3",
                     "Port45/4"
                 ],
+                "4x400G": [
+                    "Port45/1",
+                    "Port45/2",
+                    "Port45/3",
+                    "Port45/4"
+                ],
                 "8x100G": [
+                    "Port45/1",
+                    "Port45/2",
+                    "Port45/3",
+                    "Port45/4",
+                    "Port45/5",
+                    "Port45/6",
+                    "Port45/7",
+                    "Port45/8"
+                ],
+                "8x200G": [
                     "Port45/1",
                     "Port45/2",
                     "Port45/3",
@@ -3200,6 +4725,9 @@
         },
         "Ethernet360": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port46"
+                ],
                 "1x400G": [
                     "Port46"
                 ],
@@ -3211,6 +4739,10 @@
                     "Port46/2"
                 ],
                 "2x400G": [
+                    "Port46/1",
+                    "Port46/2"
+                ],
+                "2x800G": [
                     "Port46/1",
                     "Port46/2"
                 ],
@@ -3226,7 +4758,23 @@
                     "Port46/3",
                     "Port46/4"
                 ],
+                "4x400G": [
+                    "Port46/1",
+                    "Port46/2",
+                    "Port46/3",
+                    "Port46/4"
+                ],
                 "8x100G": [
+                    "Port46/1",
+                    "Port46/2",
+                    "Port46/3",
+                    "Port46/4",
+                    "Port46/5",
+                    "Port46/6",
+                    "Port46/7",
+                    "Port46/8"
+                ],
+                "8x200G": [
                     "Port46/1",
                     "Port46/2",
                     "Port46/3",
@@ -3252,6 +4800,9 @@
         },
         "Ethernet368": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port47"
+                ],
                 "1x400G": [
                     "Port47"
                 ],
@@ -3263,6 +4814,10 @@
                     "Port47/2"
                 ],
                 "2x400G": [
+                    "Port47/1",
+                    "Port47/2"
+                ],
+                "2x800G": [
                     "Port47/1",
                     "Port47/2"
                 ],
@@ -3278,7 +4833,23 @@
                     "Port47/3",
                     "Port47/4"
                 ],
+                "4x400G": [
+                    "Port47/1",
+                    "Port47/2",
+                    "Port47/3",
+                    "Port47/4"
+                ],
                 "8x100G": [
+                    "Port47/1",
+                    "Port47/2",
+                    "Port47/3",
+                    "Port47/4",
+                    "Port47/5",
+                    "Port47/6",
+                    "Port47/7",
+                    "Port47/8"
+                ],
+                "8x200G": [
                     "Port47/1",
                     "Port47/2",
                     "Port47/3",
@@ -3304,6 +4875,9 @@
         },
         "Ethernet376": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port48"
+                ],
                 "1x400G": [
                     "Port48"
                 ],
@@ -3315,6 +4889,10 @@
                     "Port48/2"
                 ],
                 "2x400G": [
+                    "Port48/1",
+                    "Port48/2"
+                ],
+                "2x800G": [
                     "Port48/1",
                     "Port48/2"
                 ],
@@ -3330,7 +4908,23 @@
                     "Port48/3",
                     "Port48/4"
                 ],
+                "4x400G": [
+                    "Port48/1",
+                    "Port48/2",
+                    "Port48/3",
+                    "Port48/4"
+                ],
                 "8x100G": [
+                    "Port48/1",
+                    "Port48/2",
+                    "Port48/3",
+                    "Port48/4",
+                    "Port48/5",
+                    "Port48/6",
+                    "Port48/7",
+                    "Port48/8"
+                ],
+                "8x200G": [
                     "Port48/1",
                     "Port48/2",
                     "Port48/3",
@@ -3356,6 +4950,9 @@
         },
         "Ethernet384": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port49"
+                ],
                 "1x400G": [
                     "Port49"
                 ],
@@ -3367,6 +4964,10 @@
                     "Port49/2"
                 ],
                 "2x400G": [
+                    "Port49/1",
+                    "Port49/2"
+                ],
+                "2x800G": [
                     "Port49/1",
                     "Port49/2"
                 ],
@@ -3382,7 +4983,23 @@
                     "Port49/3",
                     "Port49/4"
                 ],
+                "4x400G": [
+                    "Port49/1",
+                    "Port49/2",
+                    "Port49/3",
+                    "Port49/4"
+                ],
                 "8x100G": [
+                    "Port49/1",
+                    "Port49/2",
+                    "Port49/3",
+                    "Port49/4",
+                    "Port49/5",
+                    "Port49/6",
+                    "Port49/7",
+                    "Port49/8"
+                ],
+                "8x200G": [
                     "Port49/1",
                     "Port49/2",
                     "Port49/3",
@@ -3404,10 +5021,13 @@
                 ]
             },
             "index": "49,49,49,49,49,49,49,49",
-            "lanes": "393,394,395,396,397,398,399,400"
+            "lanes": "401,402,403,404,405,406,407,408"
         },
         "Ethernet392": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port50"
+                ],
                 "1x400G": [
                     "Port50"
                 ],
@@ -3419,6 +5039,10 @@
                     "Port50/2"
                 ],
                 "2x400G": [
+                    "Port50/1",
+                    "Port50/2"
+                ],
+                "2x800G": [
                     "Port50/1",
                     "Port50/2"
                 ],
@@ -3434,7 +5058,23 @@
                     "Port50/3",
                     "Port50/4"
                 ],
+                "4x400G": [
+                    "Port50/1",
+                    "Port50/2",
+                    "Port50/3",
+                    "Port50/4"
+                ],
                 "8x100G": [
+                    "Port50/1",
+                    "Port50/2",
+                    "Port50/3",
+                    "Port50/4",
+                    "Port50/5",
+                    "Port50/6",
+                    "Port50/7",
+                    "Port50/8"
+                ],
+                "8x200G": [
                     "Port50/1",
                     "Port50/2",
                     "Port50/3",
@@ -3456,10 +5096,13 @@
                 ]
             },
             "index": "50,50,50,50,50,50,50,50",
-            "lanes": "385,386,387,388,389,390,391,392"
+            "lanes": "409,410,411,412,413,414,415,416"
         },
         "Ethernet400": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port51"
+                ],
                 "1x400G": [
                     "Port51"
                 ],
@@ -3471,6 +5114,10 @@
                     "Port51/2"
                 ],
                 "2x400G": [
+                    "Port51/1",
+                    "Port51/2"
+                ],
+                "2x800G": [
                     "Port51/1",
                     "Port51/2"
                 ],
@@ -3486,7 +5133,23 @@
                     "Port51/3",
                     "Port51/4"
                 ],
+                "4x400G": [
+                    "Port51/1",
+                    "Port51/2",
+                    "Port51/3",
+                    "Port51/4"
+                ],
                 "8x100G": [
+                    "Port51/1",
+                    "Port51/2",
+                    "Port51/3",
+                    "Port51/4",
+                    "Port51/5",
+                    "Port51/6",
+                    "Port51/7",
+                    "Port51/8"
+                ],
+                "8x200G": [
                     "Port51/1",
                     "Port51/2",
                     "Port51/3",
@@ -3508,10 +5171,13 @@
                 ]
             },
             "index": "51,51,51,51,51,51,51,51",
-            "lanes": "409,410,411,412,413,414,415,416"
+            "lanes": "385,386,387,388,389,390,391,392"
         },
         "Ethernet408": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port52"
+                ],
                 "1x400G": [
                     "Port52"
                 ],
@@ -3523,6 +5189,10 @@
                     "Port52/2"
                 ],
                 "2x400G": [
+                    "Port52/1",
+                    "Port52/2"
+                ],
+                "2x800G": [
                     "Port52/1",
                     "Port52/2"
                 ],
@@ -3538,7 +5208,23 @@
                     "Port52/3",
                     "Port52/4"
                 ],
+                "4x400G": [
+                    "Port52/1",
+                    "Port52/2",
+                    "Port52/3",
+                    "Port52/4"
+                ],
                 "8x100G": [
+                    "Port52/1",
+                    "Port52/2",
+                    "Port52/3",
+                    "Port52/4",
+                    "Port52/5",
+                    "Port52/6",
+                    "Port52/7",
+                    "Port52/8"
+                ],
+                "8x200G": [
                     "Port52/1",
                     "Port52/2",
                     "Port52/3",
@@ -3560,10 +5246,13 @@
                 ]
             },
             "index": "52,52,52,52,52,52,52,52",
-            "lanes": "401,402,403,404,405,406,407,408"
+            "lanes": "393,394,395,396,397,398,399,400"
         },
         "Ethernet416": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port53"
+                ],
                 "1x400G": [
                     "Port53"
                 ],
@@ -3575,6 +5264,10 @@
                     "Port53/2"
                 ],
                 "2x400G": [
+                    "Port53/1",
+                    "Port53/2"
+                ],
+                "2x800G": [
                     "Port53/1",
                     "Port53/2"
                 ],
@@ -3590,7 +5283,23 @@
                     "Port53/3",
                     "Port53/4"
                 ],
+                "4x400G": [
+                    "Port53/1",
+                    "Port53/2",
+                    "Port53/3",
+                    "Port53/4"
+                ],
                 "8x100G": [
+                    "Port53/1",
+                    "Port53/2",
+                    "Port53/3",
+                    "Port53/4",
+                    "Port53/5",
+                    "Port53/6",
+                    "Port53/7",
+                    "Port53/8"
+                ],
+                "8x200G": [
                     "Port53/1",
                     "Port53/2",
                     "Port53/3",
@@ -3616,6 +5325,9 @@
         },
         "Ethernet424": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port54"
+                ],
                 "1x400G": [
                     "Port54"
                 ],
@@ -3627,6 +5339,10 @@
                     "Port54/2"
                 ],
                 "2x400G": [
+                    "Port54/1",
+                    "Port54/2"
+                ],
+                "2x800G": [
                     "Port54/1",
                     "Port54/2"
                 ],
@@ -3642,7 +5358,23 @@
                     "Port54/3",
                     "Port54/4"
                 ],
+                "4x400G": [
+                    "Port54/1",
+                    "Port54/2",
+                    "Port54/3",
+                    "Port54/4"
+                ],
                 "8x100G": [
+                    "Port54/1",
+                    "Port54/2",
+                    "Port54/3",
+                    "Port54/4",
+                    "Port54/5",
+                    "Port54/6",
+                    "Port54/7",
+                    "Port54/8"
+                ],
+                "8x200G": [
                     "Port54/1",
                     "Port54/2",
                     "Port54/3",
@@ -3668,6 +5400,9 @@
         },
         "Ethernet432": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port55"
+                ],
                 "1x400G": [
                     "Port55"
                 ],
@@ -3679,6 +5414,10 @@
                     "Port55/2"
                 ],
                 "2x400G": [
+                    "Port55/1",
+                    "Port55/2"
+                ],
+                "2x800G": [
                     "Port55/1",
                     "Port55/2"
                 ],
@@ -3694,7 +5433,23 @@
                     "Port55/3",
                     "Port55/4"
                 ],
+                "4x400G": [
+                    "Port55/1",
+                    "Port55/2",
+                    "Port55/3",
+                    "Port55/4"
+                ],
                 "8x100G": [
+                    "Port55/1",
+                    "Port55/2",
+                    "Port55/3",
+                    "Port55/4",
+                    "Port55/5",
+                    "Port55/6",
+                    "Port55/7",
+                    "Port55/8"
+                ],
+                "8x200G": [
                     "Port55/1",
                     "Port55/2",
                     "Port55/3",
@@ -3720,6 +5475,9 @@
         },
         "Ethernet440": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port56"
+                ],
                 "1x400G": [
                     "Port56"
                 ],
@@ -3731,6 +5489,10 @@
                     "Port56/2"
                 ],
                 "2x400G": [
+                    "Port56/1",
+                    "Port56/2"
+                ],
+                "2x800G": [
                     "Port56/1",
                     "Port56/2"
                 ],
@@ -3746,7 +5508,23 @@
                     "Port56/3",
                     "Port56/4"
                 ],
+                "4x400G": [
+                    "Port56/1",
+                    "Port56/2",
+                    "Port56/3",
+                    "Port56/4"
+                ],
                 "8x100G": [
+                    "Port56/1",
+                    "Port56/2",
+                    "Port56/3",
+                    "Port56/4",
+                    "Port56/5",
+                    "Port56/6",
+                    "Port56/7",
+                    "Port56/8"
+                ],
+                "8x200G": [
                     "Port56/1",
                     "Port56/2",
                     "Port56/3",
@@ -3772,6 +5550,9 @@
         },
         "Ethernet448": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port57"
+                ],
                 "1x400G": [
                     "Port57"
                 ],
@@ -3783,6 +5564,10 @@
                     "Port57/2"
                 ],
                 "2x400G": [
+                    "Port57/1",
+                    "Port57/2"
+                ],
+                "2x800G": [
                     "Port57/1",
                     "Port57/2"
                 ],
@@ -3798,7 +5583,23 @@
                     "Port57/3",
                     "Port57/4"
                 ],
+                "4x400G": [
+                    "Port57/1",
+                    "Port57/2",
+                    "Port57/3",
+                    "Port57/4"
+                ],
                 "8x100G": [
+                    "Port57/1",
+                    "Port57/2",
+                    "Port57/3",
+                    "Port57/4",
+                    "Port57/5",
+                    "Port57/6",
+                    "Port57/7",
+                    "Port57/8"
+                ],
+                "8x200G": [
                     "Port57/1",
                     "Port57/2",
                     "Port57/3",
@@ -3820,10 +5621,13 @@
                 ]
             },
             "index": "57,57,57,57,57,57,57,57",
-            "lanes": "457,458,459,460,461,462,463,464"
+            "lanes": "465,466,467,468,469,470,471,472"
         },
         "Ethernet456": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port58"
+                ],
                 "1x400G": [
                     "Port58"
                 ],
@@ -3835,6 +5639,10 @@
                     "Port58/2"
                 ],
                 "2x400G": [
+                    "Port58/1",
+                    "Port58/2"
+                ],
+                "2x800G": [
                     "Port58/1",
                     "Port58/2"
                 ],
@@ -3850,7 +5658,23 @@
                     "Port58/3",
                     "Port58/4"
                 ],
+                "4x400G": [
+                    "Port58/1",
+                    "Port58/2",
+                    "Port58/3",
+                    "Port58/4"
+                ],
                 "8x100G": [
+                    "Port58/1",
+                    "Port58/2",
+                    "Port58/3",
+                    "Port58/4",
+                    "Port58/5",
+                    "Port58/6",
+                    "Port58/7",
+                    "Port58/8"
+                ],
+                "8x200G": [
                     "Port58/1",
                     "Port58/2",
                     "Port58/3",
@@ -3872,10 +5696,13 @@
                 ]
             },
             "index": "58,58,58,58,58,58,58,58",
-            "lanes": "449,450,451,452,453,454,455,456"
+            "lanes": "473,474,475,476,477,478,479,480"
         },
         "Ethernet464": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port59"
+                ],
                 "1x400G": [
                     "Port59"
                 ],
@@ -3887,6 +5714,10 @@
                     "Port59/2"
                 ],
                 "2x400G": [
+                    "Port59/1",
+                    "Port59/2"
+                ],
+                "2x800G": [
                     "Port59/1",
                     "Port59/2"
                 ],
@@ -3902,7 +5733,23 @@
                     "Port59/3",
                     "Port59/4"
                 ],
+                "4x400G": [
+                    "Port59/1",
+                    "Port59/2",
+                    "Port59/3",
+                    "Port59/4"
+                ],
                 "8x100G": [
+                    "Port59/1",
+                    "Port59/2",
+                    "Port59/3",
+                    "Port59/4",
+                    "Port59/5",
+                    "Port59/6",
+                    "Port59/7",
+                    "Port59/8"
+                ],
+                "8x200G": [
                     "Port59/1",
                     "Port59/2",
                     "Port59/3",
@@ -3924,10 +5771,13 @@
                 ]
             },
             "index": "59,59,59,59,59,59,59,59",
-            "lanes": "473,474,475,476,477,478,479,480"
+            "lanes": "449,450,451,452,453,454,455,456"
         },
         "Ethernet472": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port60"
+                ],
                 "1x400G": [
                     "Port60"
                 ],
@@ -3939,6 +5789,10 @@
                     "Port60/2"
                 ],
                 "2x400G": [
+                    "Port60/1",
+                    "Port60/2"
+                ],
+                "2x800G": [
                     "Port60/1",
                     "Port60/2"
                 ],
@@ -3954,7 +5808,23 @@
                     "Port60/3",
                     "Port60/4"
                 ],
+                "4x400G": [
+                    "Port60/1",
+                    "Port60/2",
+                    "Port60/3",
+                    "Port60/4"
+                ],
                 "8x100G": [
+                    "Port60/1",
+                    "Port60/2",
+                    "Port60/3",
+                    "Port60/4",
+                    "Port60/5",
+                    "Port60/6",
+                    "Port60/7",
+                    "Port60/8"
+                ],
+                "8x200G": [
                     "Port60/1",
                     "Port60/2",
                     "Port60/3",
@@ -3976,10 +5846,13 @@
                 ]
             },
             "index": "60,60,60,60,60,60,60,60",
-            "lanes": "465,466,467,468,469,470,471,472"
+            "lanes": "457,458,459,460,461,462,463,464"
         },
         "Ethernet480": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port61"
+                ],
                 "1x400G": [
                     "Port61"
                 ],
@@ -3991,6 +5864,10 @@
                     "Port61/2"
                 ],
                 "2x400G": [
+                    "Port61/1",
+                    "Port61/2"
+                ],
+                "2x800G": [
                     "Port61/1",
                     "Port61/2"
                 ],
@@ -4006,7 +5883,23 @@
                     "Port61/3",
                     "Port61/4"
                 ],
+                "4x400G": [
+                    "Port61/1",
+                    "Port61/2",
+                    "Port61/3",
+                    "Port61/4"
+                ],
                 "8x100G": [
+                    "Port61/1",
+                    "Port61/2",
+                    "Port61/3",
+                    "Port61/4",
+                    "Port61/5",
+                    "Port61/6",
+                    "Port61/7",
+                    "Port61/8"
+                ],
+                "8x200G": [
                     "Port61/1",
                     "Port61/2",
                     "Port61/3",
@@ -4032,6 +5925,9 @@
         },
         "Ethernet488": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port62"
+                ],
                 "1x400G": [
                     "Port62"
                 ],
@@ -4043,6 +5939,10 @@
                     "Port62/2"
                 ],
                 "2x400G": [
+                    "Port62/1",
+                    "Port62/2"
+                ],
+                "2x800G": [
                     "Port62/1",
                     "Port62/2"
                 ],
@@ -4058,7 +5958,23 @@
                     "Port62/3",
                     "Port62/4"
                 ],
+                "4x400G": [
+                    "Port62/1",
+                    "Port62/2",
+                    "Port62/3",
+                    "Port62/4"
+                ],
                 "8x100G": [
+                    "Port62/1",
+                    "Port62/2",
+                    "Port62/3",
+                    "Port62/4",
+                    "Port62/5",
+                    "Port62/6",
+                    "Port62/7",
+                    "Port62/8"
+                ],
+                "8x200G": [
                     "Port62/1",
                     "Port62/2",
                     "Port62/3",
@@ -4084,6 +6000,9 @@
         },
         "Ethernet496": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port63"
+                ],
                 "1x400G": [
                     "Port63"
                 ],
@@ -4095,6 +6014,10 @@
                     "Port63/2"
                 ],
                 "2x400G": [
+                    "Port63/1",
+                    "Port63/2"
+                ],
+                "2x800G": [
                     "Port63/1",
                     "Port63/2"
                 ],
@@ -4110,7 +6033,23 @@
                     "Port63/3",
                     "Port63/4"
                 ],
+                "4x400G": [
+                    "Port63/1",
+                    "Port63/2",
+                    "Port63/3",
+                    "Port63/4"
+                ],
                 "8x100G": [
+                    "Port63/1",
+                    "Port63/2",
+                    "Port63/3",
+                    "Port63/4",
+                    "Port63/5",
+                    "Port63/6",
+                    "Port63/7",
+                    "Port63/8"
+                ],
+                "8x200G": [
                     "Port63/1",
                     "Port63/2",
                     "Port63/3",
@@ -4136,6 +6075,9 @@
         },
         "Ethernet504": {
             "breakout_modes": {
+                "1x1600G": [
+                    "Port64"
+                ],
                 "1x400G": [
                     "Port64"
                 ],
@@ -4147,6 +6089,10 @@
                     "Port64/2"
                 ],
                 "2x400G": [
+                    "Port64/1",
+                    "Port64/2"
+                ],
+                "2x800G": [
                     "Port64/1",
                     "Port64/2"
                 ],
@@ -4162,7 +6108,23 @@
                     "Port64/3",
                     "Port64/4"
                 ],
+                "4x400G": [
+                    "Port64/1",
+                    "Port64/2",
+                    "Port64/3",
+                    "Port64/4"
+                ],
                 "8x100G": [
+                    "Port64/1",
+                    "Port64/2",
+                    "Port64/3",
+                    "Port64/4",
+                    "Port64/5",
+                    "Port64/6",
+                    "Port64/7",
+                    "Port64/8"
+                ],
+                "8x200G": [
                     "Port64/1",
                     "Port64/2",
                     "Port64/3",
@@ -4193,7 +6155,7 @@
                 ]
             },
             "index": "65",
-            "lanes": "515"
+            "lanes": "516"
         },
         "Ethernet513": {
             "breakout_modes": {
@@ -4202,7 +6164,7 @@
                 ]
             },
             "index": "66",
-            "lanes": "516"
+            "lanes": "517"
         }
     }
 }

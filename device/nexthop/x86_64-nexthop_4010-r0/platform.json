@@ -39,6 +39,12 @@
                 "controllable": false
             },
             {
+                "name": "NVMe",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
                 "name": "DCDC0",
                 "low-threshold": false,
                 "low-crit-threshold": false

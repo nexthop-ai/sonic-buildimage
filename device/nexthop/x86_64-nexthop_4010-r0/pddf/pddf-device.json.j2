@@ -4,8 +4,13 @@
     "num_fantrays": 4,
     "num_fans_pertray": 2,
     "num_ports": 66,
+<<<<<<< HEAD
     "num_temps": 12,
     "num_asic_temps": 56,
+=======
+    "num_temps": 13,
+    "num_asic_temps": 83,
+>>>>>>> 11a9afb8b (NOS-8820: Monitor NVMe Temperatures, use for fan PID (#5872))
     "num_voltage_sensors" : 24,
     "num_current_sensors" : 8,
     "num_nexthop_fpga_asic_temp_sensors": 2,
@@ -656,6 +661,41 @@
         {
           "attr_name": "temp1_high_crit_threshold",
           "drv_attr_name": "temp1_crit"
+        }
+      ]
+    }
+  },
+  "HWMON1": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON1",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_nvme_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP13": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "HWMON_NVME",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON1",
+      "high_threshold": 85.0,
+      "high_crit_threshold": 90.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "NVMe"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
         }
       ]
     }
