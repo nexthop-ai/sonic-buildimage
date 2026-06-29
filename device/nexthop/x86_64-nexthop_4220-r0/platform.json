@@ -93,6 +93,36 @@
                 "low-crit-threshold": false
             },
             {
+<<<<<<< HEAD
+=======
+                "name": "IBV_DCDC0",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "IBV_DCDC1",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "IBV_DCDC2",
+                "low-threshold": false,
+                "low-crit-threshold": false
+            },
+            {
+                "name": "CPU",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "NVMe",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+>>>>>>> 11a9afb8b (NOS-8820: Monitor NVMe Temperatures, use for fan PID (#5872))
                 "name": "ASIC core.pvtmon0",
                 "low-threshold": false,
                 "low-crit-threshold": false,

@@ -1,7 +1,7 @@
 {
   "PLATFORM": {
     "num_psus": 4,
-    "num_temps": 19,
+    "num_temps": 20,
     "num_nexthop_fpga_asic_temp_sensors": 2,
     "num_voltage_sensors": 40,
     "num_current_sensors": 23,
@@ -93,41 +93,6 @@
         },
         {
           "dev": "MULTIFPGAPCIE2"
-        }
-      ]
-    }
-  },
-  "HWMON0": {
-    "dev_info": {
-      "device_type": "HWMON",
-      "device_name": "HWMON_CPU",
-      "device_parent": "PCIE0"
-    },
-    "i2c": {
-      "path_info": {
-        "sysfs_base_path": "{{hwmon_cpu_sysfs_path}}"
-      }
-    }
-  },
-  "TEMP1": {
-    "dev_info": {
-      "device_type": "TEMP_SENSOR",
-      "device_name": "CPU_TEMP",
-      "device_parent": "PCIE0",
-      "virt_parent": "HWMON0",
-      "high_threshold": 95,
-      "high_crit_threshold": 125,
-      "nexthop_thermal_setpoint_margin": 10,
-      "nexthop_thermal_pid_domain": "main"
-    },
-    "dev_attr": {
-      "display_name": "CPU"
-    },
-    "i2c": {
-      "attr_list": [
-        {
-          "attr_name": "temp1_input",
-          "drv_attr_name": "temp1_input"
         }
       ]
     }
@@ -22050,7 +22015,7 @@
       ]
     }
   },
-  "TEMP2": {
+  "TEMP1": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH1",
@@ -22078,7 +22043,7 @@
       ]
     }
   },
-  "TEMP3": {
+  "TEMP2": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH2",
@@ -22106,7 +22071,7 @@
       ]
     }
   },
-  "TEMP4": {
+  "TEMP3": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH3",
@@ -22134,7 +22099,7 @@
       ]
     }
   },
-  "TEMP5": {
+  "TEMP4": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH4",
@@ -22162,7 +22127,7 @@
       ]
     }
   },
-  "TEMP6": {
+  "TEMP5": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH5",
@@ -22993,7 +22958,7 @@
       ]
     }
   },
-  "TEMP7": {
+  "TEMP6": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC0-RAIL1-CH1",
@@ -23190,7 +23155,7 @@
       ]
     }
   },
-  "TEMP8": {
+  "TEMP7": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC1-RAIL1",
@@ -23387,7 +23352,7 @@
       ]
     }
   },
-  "TEMP9": {
+  "TEMP8": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC2-RAIL1",
@@ -23584,7 +23549,7 @@
       ]
     }
   },
-  "TEMP10": {
+  "TEMP9": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC3-RAIL1",
@@ -23781,7 +23746,7 @@
       ]
     }
   },
-  "TEMP11": {
+  "TEMP10": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC4-RAIL1",
@@ -23978,7 +23943,7 @@
       ]
     }
   },
-  "TEMP12": {
+  "TEMP11": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC5-RAIL1",
@@ -24175,7 +24140,7 @@
       ]
     }
   },
-  "TEMP13": {
+  "TEMP12": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC6-RAIL1",
@@ -24372,7 +24337,7 @@
       ]
     }
   },
-  "TEMP14": {
+  "TEMP13": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC7-RAIL1",
@@ -24569,7 +24534,7 @@
       ]
     }
   },
-  "TEMP15": {
+  "TEMP14": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC8-RAIL1",
@@ -24704,7 +24669,7 @@
       ]
     }
   },
-  "TEMP16": {
+  "TEMP15": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC9-RAIL1",
@@ -24839,7 +24804,7 @@
       ]
     }
   },
-  "TEMP17": {
+  "TEMP16": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC10-RAIL1",
@@ -25036,7 +25001,7 @@
       ]
     }
   },
-  "TEMP18": {
+  "TEMP17": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC11-RAIL1",
@@ -25233,7 +25198,7 @@
       ]
     }
   },
-  "TEMP19": {
+  "TEMP18": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC12-RAIL1",
@@ -25391,6 +25356,76 @@
       "spi_device_driver": "spi-nor",
       "max_speed_hz": 0,
       "chip_select": 0
+    }
+  },
+  "HWMON0": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON0",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_cpu_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP19": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "CPU_TEMP",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON0",
+      "high_threshold": 95.0,
+      "high_crit_threshold": 125.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "CPU"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        }
+      ]
+    }
+  },
+  "HWMON1": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON1",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_nvme_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP20": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "HWMON_NVME",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON1",
+      "high_threshold": 85.0,
+      "high_crit_threshold": 90.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "NVMe"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        }
+      ]
     }
   },
   "MGMT_LINK_CHECK": {}
