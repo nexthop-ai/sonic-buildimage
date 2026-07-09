@@ -14,6 +14,12 @@ MODULE_DIRS :=
 MODULE_DIRS += common
 # CPU Card
 MODULE_DIRS += komodo
+<<<<<<< HEAD
+=======
+# CF2 shared utils (no kernel modules; utils/ only)
+MODULE_DIRS += cf2
+
+>>>>>>> 786bf69cb (NOS-10970: Expose blackmamba mgmt version (#6209))
 # SKU
 MODULE_DIRS += nh-4010
 MODULE_DIRS += nh-4210

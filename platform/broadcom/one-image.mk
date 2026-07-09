@@ -116,6 +116,14 @@ $(SONIC_ONE_IMAGE)_LAZY_INSTALLS += \
                                $(UFISPACE_S9321_64EO_PLATFORM_MODULE) \
                                $(NEXTHOP_COMMON_PLATFORM_MODULE) \
                                $(NEXTHOP_KOMODO_PLATFORM_MODULE) \
+<<<<<<< HEAD
+=======
+                               $(NEXTHOP_CF2_PLATFORM_MODULE) \
+                               $(NEXTHOP_4005_PLATFORM_MODULE) \
+                               $(NEXTHOP_4005_R0011_PLATFORM_MODULE) \
+                               $(NEXTHOP_4005_R0020_PLATFORM_MODULE) \
+                               $(NEXTHOP_4005_R0021_PLATFORM_MODULE) \
+>>>>>>> 786bf69cb (NOS-10970: Expose blackmamba mgmt version (#6209))
                                $(NEXTHOP_4010_PLATFORM_MODULE) \
                                $(NEXTHOP_4010_R0_PLATFORM_MODULE) \
                                $(NEXTHOP_4010_R1_PLATFORM_MODULE) \
