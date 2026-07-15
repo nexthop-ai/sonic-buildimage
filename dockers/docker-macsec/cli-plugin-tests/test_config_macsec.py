@@ -2,9 +2,20 @@ import sys
 
 from unittest import mock
 from click.testing import CliRunner
+from click.shell_completion import ShellComplete
 
 sys.path.append('../cli/config/plugins/')
 import macsec
+
+
+class _TestShellComplete(ShellComplete):
+    name = 'test'
+    source_template = ''
+
+
+def _get_completions(cli, args, incomplete):
+    comp = _TestShellComplete(cli, {}, cli.name or 'macsec', '_COMPLETE')
+    return [c.value for c in comp.get_completions(args, incomplete)]
 
 
 profile_name = "test"
@@ -150,3 +161,55 @@ class TestConfigMACsec(object):
         # Repeat add profile
         result = runner.invoke(macsec.macsec, ["profile", "add", "test", "--primary_cak=2363647040534355560e000802065d574d400e000e030307075f0e5050000e5541","--primary_ckn=01234567890123456789012345678912"], obj=cfgdb)
         assert result.exit_code != 0
+
+
+class TestMacsecGroupErrorMessage(object):
+    """Invalid subcommands list available commands in the error message."""
+    def test_invalid_subcommand_error_messages(self):
+        runner = CliRunner()
+        # 'add' is not a subcommand of 'config macsec'
+        result = runner.invoke(macsec.macsec, ['add', 'profile'], obj=mock.Mock())
+        assert result.exit_code != 0
+        assert "No such command 'add'" in result.output
+        assert 'port' in result.output
+        assert 'profile' in result.output
+
+        # 'remove' is not a subcommand of 'config macsec port'
+        result = runner.invoke(macsec.macsec, ['port', 'remove'], obj=mock.Mock())
+        assert result.exit_code != 0
+        assert "No such command 'remove'" in result.output
+        assert 'add' in result.output
+        assert 'del' in result.output
+
+        # 'remove' is not a subcommand of 'config macsec profile'
+        result = runner.invoke(macsec.macsec, ['profile', 'remove'], obj=mock.Mock())
+        assert result.exit_code != 0
+        assert "No such command 'remove'" in result.output
+        assert 'add' in result.output
+        assert 'del' in result.output
+
+
+class TestMacsecGroupCompletion(object):
+    """Tab-completion stops suggesting subcommands after an invalid subcommand."""
+    def test_tab_completions(self):
+        # valid sequence of tokens + partial token
+        tokens_written = [([], 'p'), ([], '')]
+        for tokens, partial_token in tokens_written:
+            completions = _get_completions(macsec.macsec, tokens, partial_token)
+            assert 'port' in completions
+            assert 'profile' in completions
+
+        port_profile_completions = [(['port'], ''), (['profile'], '')]
+        for tokens, partial_token in port_profile_completions:
+            completions = _get_completions(macsec.macsec, tokens, partial_token)
+            assert 'add' in completions
+            assert 'del' in completions
+
+        invalid_token_sequences = [
+            (['add'], 'p'),             # macsec add p
+            (['del', 'profile'], 'p'),  # macsec del profile p
+            (['port', 'remove'], ''),   # macsec port remove 
+        ]
+        for tokens, partial_token in invalid_token_sequences:
+            completions = _get_completions(macsec.macsec, tokens, partial_token)
+            assert completions == []

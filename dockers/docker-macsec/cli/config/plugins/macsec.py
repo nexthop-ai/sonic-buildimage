@@ -5,10 +5,30 @@ from swsscommon.swsscommon import ConfigDBConnector
 from utilities_common.constants import DEFAULT_NAMESPACE
 from utilities_common.db import Db
 
+
+class MacsecGroup(clicommon.AbbreviationGroup):
+    """AbbreviationGroup subclass that stops tab-completion after an invalid
+    subcommand and shows available commands in the error message."""
+
+    def resolve_command(self, ctx, args):
+        cmd_name = args[0]
+        cmd = self.get_command(ctx, cmd_name)
+
+        if cmd is None:
+            if ctx.resilient_parsing:
+                # Return a sink command so the shell completer stops
+                # suggesting subcommands for every subsequent position.
+                return cmd_name, click.Command('_invalid'), args[1:]
+            available = ', '.join(sorted(self.list_commands(ctx)))
+            ctx.fail(f"No such command '{cmd_name}'. COMMAND must be one of {{{available}}}")
+
+        return cmd_name, cmd, args[1:]
+
+
 #
 # 'macsec' group ('config macsec ...')
 #
-@click.group(cls=clicommon.AbbreviationGroup, name='macsec')
+@click.group(cls=MacsecGroup, name='macsec')
 # TODO add "hidden=True if this is a single ASIC platform, once we have click 7.0 in all branches.
 @click.option('-n', '--namespace', help='Namespace name',
              required=True if multi_asic.is_multi_asic() else False, type=click.Choice(multi_asic.get_namespace_list()))
@@ -27,7 +47,7 @@ def macsec(ctx, namespace):
 #
 # 'port' group ('config macsec port ...')
 #
-@macsec.group(cls=clicommon.AbbreviationGroup, name='port')
+@macsec.group(cls=MacsecGroup, name='port')
 def macsec_port():
     """Enable MACsec or disable MACsec on the specified port"""
     pass
@@ -93,7 +113,7 @@ def del_port(port):
 #
 # 'profile' group ('config macsec profile ...')
 #
-@macsec.group(cls=clicommon.AbbreviationGroup, name='profile')
+@macsec.group(cls=MacsecGroup, name='profile')
 def macsec_profile():
     pass
 
