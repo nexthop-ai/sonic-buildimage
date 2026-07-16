@@ -122,12 +122,6 @@
                 "low-crit-threshold": false
             },
             {
-                "name": "NVMe",
-                "low-threshold": false,
-                "low-crit-threshold": false,
-                "controllable": false
-            },
-            {
                 "name": "Mezz Card Left Rear",
                 "low-threshold": false,
                 "low-crit-threshold": false
@@ -169,6 +163,12 @@
             },
             {
                 "name": "CPU",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "NVMe",
                 "low-threshold": false,
                 "low-crit-threshold": false,
                 "controllable": false
