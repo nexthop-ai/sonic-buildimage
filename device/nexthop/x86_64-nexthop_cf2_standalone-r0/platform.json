@@ -1,0 +1,47 @@
+{
+    "asic_sensors": {
+        "poll_interval": "5",
+        "poll_admin_status": "enable"
+    },
+    "chassis": {
+        "name": "NH-CF2",
+        "thermals": [
+            {
+                "name": "CPU",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            }
+        ],
+        "components": [
+            {
+                "name": "CPUCARD_FPGA"
+            },
+            {
+                "name": "BIOS"
+            },
+            {
+                "name": "ONIE"
+            },
+            {
+                "name": "TPM"
+            },
+            {
+                "name": "NVMe"
+            },
+            {
+                "name": "DPM1"
+            }
+        ],
+        "fans": [
+        ],
+        "fan_drawers":[
+        ],
+        "psus": [
+        ],
+        "sfps": [
+        ]
+    },
+    "interfaces": {
+    }
+}
