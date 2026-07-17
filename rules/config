@@ -194,6 +194,10 @@ INCLUDE_SFLOW = y
 # INCLUDE_MGMT_FRAMEWORK - build docker-sonic-mgmt-framework for CLI and REST server support
 INCLUDE_MGMT_FRAMEWORK = y
 
+# INCLUDE_REDFISH - build docker-sonic-redfish (bmcweb + sonic-dbus-bridge) for
+# Redfish support on BMC (aspeed) images
+INCLUDE_REDFISH ?= y
+
 # ENABLE_HOST_SERVICE_ON_START - enable sonic-host-server for mgmt-framework and/or
 # gnmi containers to access host functionality by default
 ENABLE_HOST_SERVICE_ON_START = y
