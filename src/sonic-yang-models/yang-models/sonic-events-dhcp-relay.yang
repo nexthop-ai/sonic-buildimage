@@ -92,5 +92,59 @@ module sonic-events-dhcp-relay {
 
             uses evtcmn:sonic-events-cmn;
         }
+
+        container dhcp-relay-send-failure {
+            evtcmn:ALARM_SEVERITY_MAJOR;
+
+            description "
+                Declares an event for DHCP relay send failure.
+                Params:
+                    protocol - DHCPv4 or DHCPv6
+                    downlink - client-side interface
+                    uplink - server-side interface
+                    dest_ip - destination IP of the failed send
+                    vrf - VRF context
+                    reason - send failure reason";
+
+            leaf protocol {
+                type string {
+                    pattern 'DHCPv[46]';
+                }
+                description "DHCP protocol version";
+            }
+
+            leaf downlink {
+                type string {
+                    pattern '[a-zA-Z0-9_.-]+';
+                }
+                description "Client-side interface";
+            }
+
+            leaf uplink {
+                type string {
+                    pattern '[a-zA-Z0-9_.-]+';
+                }
+                description "Server-side interface";
+            }
+
+            leaf dest_ip {
+                type string;
+                description "Destination IP address of the failed send (server, or client on reply paths)";
+            }
+
+            leaf vrf {
+                type string {
+                    pattern '[a-zA-Z0-9_-]+';
+                }
+                description "VRF context";
+            }
+
+            leaf reason {
+                type string;
+                description "Send failure reason";
+            }
+
+            uses evtcmn:sonic-events-cmn;
+        }
     }
 }

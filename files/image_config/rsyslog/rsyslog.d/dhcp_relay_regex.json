@@ -8,5 +8,10 @@
         "tag": "dhcp-relay-bind-failure",
         "regex": ".*Failed to bind socket to (link local|global) ipv6 address on interface ([a-zA-Z0-9]*).*",
         "params": [ "type:ret=(arg==\"link local\")and\"local\"or\"global\"", "vlan" ]
+    },
+    {
+        "tag": "dhcp-relay-send-failure",
+        "regex": "DHCP_RELAY_SEND_FAIL protocol=(DHCPv[46]) downlink=([a-zA-Z0-9_.-]+) uplink=([a-zA-Z0-9_.-]+) dest_ip=([a-zA-Z0-9.:]+) vrf=([a-zA-Z0-9_-]+) reason=\"([^\"]+)\"",
+        "params": [ "protocol", "downlink", "uplink", "dest_ip", "vrf", "reason" ]
     }
 ]

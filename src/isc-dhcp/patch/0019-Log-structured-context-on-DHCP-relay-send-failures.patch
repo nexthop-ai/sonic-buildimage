@@ -1,0 +1,99 @@
+From c9b04119246fe97ce204c320cdca79a93d1b5260 Mon Sep 17 00:00:00 2001
+From: SONiC DHCP Relay <sonic@microsoft.com>
+Date: Thu, 16 Jul 2026 18:35:07 +0000
+Subject: [PATCH] Log structured context on DHCP relay send failures
+
+When dhcrelay fails to send a relayed packet, emit a structured log line
+with protocol, downlink/uplink interfaces, destination IP and VRF, plus the
+failure reason (errno via %m). Demote the generic send_packet error to debug
+(preserving errno) so the relay layer owns the ERR log and we avoid
+duplicate, context-free messages.
+---
+ common/socket.c  |  7 ++++++-
+ relay/dhcrelay.c | 24 ++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/common/socket.c b/common/socket.c
+index 87c62a2..269271b 100644
+--- a/common/socket.c
++++ b/common/socket.c
+@@ -816,7 +816,12 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
+ 
+ 	result = sendmsg(interface->wfdesc, &m, 0);
+ 	if (result < 0) {
+-		log_error("send_packet: %m");
++		/* Demote to debug: the relay layer emits a structured,
++		   context-rich error. Preserve errno so the caller can
++		   still report an accurate failure reason. */
++		int send_errno = errno;
++		log_debug("send_packet: %m");
++		errno = send_errno;
+ 	}
+ 
+ 	return result;
+diff --git a/relay/dhcrelay.c b/relay/dhcrelay.c
+index e0e5fd6..054db8b 100644
+--- a/relay/dhcrelay.c
++++ b/relay/dhcrelay.c
+@@ -957,6 +957,19 @@ main(int argc, char **argv) {
+ 	return (0);
+ }
+ 
++/* Structured send-failure context for triage. Call right after the failed send
++   so errno (%m) is valid; v4 relay only runs in the default VRF. */
++static void
++log_dhcp_relay_send_failure(const char *protocol, const char *downlink,
++			    const char *uplink, const char *dest_ip) {
++	log_error("DHCP_RELAY_SEND_FAIL protocol=%s downlink=%s uplink=%s "
++		  "dest_ip=%s vrf=default reason=\"%m\"",
++		  protocol,
++		  downlink ? downlink : "unknown",
++		  uplink ? uplink : "unknown",
++		  dest_ip ? dest_ip : "unknown");
++}
++
+ static void
+ do_relay4(struct interface_info *ip, struct dhcp_packet *packet,
+ 	  unsigned int length, unsigned int from_port, struct iaddr from,
+@@ -1083,6 +1096,8 @@ do_relay4(struct interface_info *ip, struct dhcp_packet *packet,
+ 
+ 		if (send_packet(out, NULL, packet, length, out->addresses[0],
+ 				&to, htop) < 0) {
++			log_dhcp_relay_send_failure("DHCPv4", out->name, ip->name,
++						    inet_ntoa(to.sin_addr));
+ 			++server_packet_errors;
+ 		} else {
+ 			log_debug("Forwarded BOOTREPLY for %s to %s",
+@@ -1160,6 +1175,9 @@ do_relay4(struct interface_info *ip, struct dhcp_packet *packet,
+ 					log_debug("Packet destined for broadcast IP of %s", out->name);
+ 					if (send_packet(out, NULL, packet,
+ 							length, ip->addresses[0],&sp->to, NULL) < 0) {
++						log_dhcp_relay_send_failure("DHCPv4", ip->name,
++									    out->name,
++									    inet_ntoa(sp->to.sin_addr));
+ 			++client_packet_errors;
+ 		} else {
+ 			log_debug("Forwarded BOOTREQUEST for %s to %s on interface %s",
+@@ -1188,6 +1206,9 @@ do_relay4(struct interface_info *ip, struct dhcp_packet *packet,
+ 		if (fallback_interface) {
+ 			if (send_packet(fallback_interface, NULL, packet,
+ 					length, ip->addresses[0],&sp->to, NULL) < 0) {
++				log_dhcp_relay_send_failure("DHCPv4", ip->name,
++						    fallback_interface->name,
++						    inet_ntoa(sp->to.sin_addr));
+ 				++client_packet_errors;
+ 			} else {
+ 				log_debug("Forwarded BOOTREQUEST for %s to %s on fallback interface",
+@@ -1205,6 +1226,9 @@ do_relay4(struct interface_info *ip, struct dhcp_packet *packet,
+ 
+ 				if (send_packet(out, NULL, packet,
+ 						length, ip->addresses[0],&sp->to, NULL) < 0) {
++					log_dhcp_relay_send_failure("DHCPv4", ip->name,
++							    out->name,
++							    inet_ntoa(sp->to.sin_addr));
+ 					++client_packet_errors;
+ 				} else {
+ 					log_debug("Forwarded BOOTREQUEST for %s to %s on interface %s",
+-- 
+2.43.0
+

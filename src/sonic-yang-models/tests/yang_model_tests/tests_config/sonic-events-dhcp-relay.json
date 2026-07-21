@@ -94,5 +94,44 @@
                 "timestamp": "1985-04-12T23:20:50.52Z"
             }
         }
+    },
+    "SONIC_EVENTS_DHCP_RELAY_DHCP_RELAY_SEND_FAILURE_VALID": {
+        "sonic-events-dhcp-relay:sonic-events-dhcp-relay": {
+            "sonic-events-dhcp-relay:dhcp-relay-send-failure": {
+                "protocol": "DHCPv4",
+                "downlink": "Ethernet6",
+                "uplink": "Vlan501",
+                "dest_ip": "172.16.157.7",
+                "vrf": "default",
+                "reason": "Network is unreachable",
+                "timestamp": "1985-04-12T23:20:50.52Z"
+            }
+        }
+    },
+    "SONIC_EVENTS_DHCP_RELAY_DHCP_RELAY_SEND_FAILURE_INCORRECT_PROTOCOL": {
+        "sonic-events-dhcp-relay:sonic-events-dhcp-relay": {
+            "sonic-events-dhcp-relay:dhcp-relay-send-failure": {
+                "protocol": "DHCPv9",
+                "downlink": "Ethernet6",
+                "uplink": "Vlan501",
+                "dest_ip": "172.16.157.7",
+                "vrf": "default",
+                "reason": "Network is unreachable",
+                "timestamp": "1985-04-12T23:20:50.52Z"
+            }
+        }
+    },
+    "SONIC_EVENTS_DHCP_RELAY_DHCP_RELAY_SEND_FAILURE_INCORRECT_TIMESTAMP": {
+        "sonic-events-dhcp-relay:sonic-events-dhcp-relay": {
+            "sonic-events-dhcp-relay:dhcp-relay-send-failure": {
+                "protocol": "DHCPv6",
+                "downlink": "Ethernet6",
+                "uplink": "Vlan501",
+                "dest_ip": "2000:172:16:157::7",
+                "vrf": "default",
+                "reason": "No route to host",
+                "timestamp": "1985-04-12T23:20:50"
+            }
+        }
     }
 }
