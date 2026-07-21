@@ -1,8 +1,14 @@
 # Agera2 PAI Library Package - URL-based download similar to broncos
-LIBSAI_AGERA2_VERSION = 3.14.0-4
-LIBSAI_AGERA2_BRANCH_NAME = REL_3.14
+LIBSAI_AGERA2_VERSION = 4.1.0-1
+LIBSAI_AGERA2_BRANCH_NAME = REL_4.1
 
+<<<<<<< HEAD
 LIBSAI_AGERA2_URL_PREFIX = "$(BUILD_PUBLIC_URL)/sai/bcmpai/$(LIBSAI_AGERA2_BRANCH_NAME)/$(LIBSAI_AGERA2_VERSION)"
+=======
+LIBSAI_AGERA2_URL_PREFIX = "https://nh-custom-sai.s3.us-east-2.amazonaws.com/pai_v1"
+# LIBSAI_AGERA2_URL_PREFIX = "https://packages.trafficmanager.net/public/sai/bcmpai/$(LIBSAI_AGERA2_BRANCH_NAME)/$(LIBSAI_AGERA2_VERSION)"
+
+>>>>>>> c2adedad2 (NOS-10859: Bump PAI version to 4.1 (#6355))
 
 # Runtime package`
 LIBSAI_AGERA2 = libsaiagera2_$(LIBSAI_AGERA2_VERSION)_amd64.deb
