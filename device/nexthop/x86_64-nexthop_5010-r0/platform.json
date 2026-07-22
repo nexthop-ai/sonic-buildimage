@@ -168,6 +168,27 @@
                 "controllable": false
             },
             {
+<<<<<<< HEAD
+=======
+                "name": "NVMe",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "DIMM 0",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+                "name": "DIMM 1",
+                "low-threshold": false,
+                "low-crit-threshold": false,
+                "controllable": false
+            },
+            {
+>>>>>>> e93f112b3 (NOS-11338: Support DDR temperature monitoring on Komodo based systems -- Auto Gen'd changes (#6731))
                 "name": "ASIC D0_VTMON_CORE",
                 "low-threshold": false,
                 "low-crit-threshold": false,

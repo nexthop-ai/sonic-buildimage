@@ -1,6 +1,15 @@
 {
   "PLATFORM": {
     "num_psus": 2,
+<<<<<<< HEAD
+=======
+    "num_temps": 24,
+    "num_asic_temps": 121,
+    "num_nexthop_fpga_asic_temp_sensors": 2,
+    "num_voltage_sensors": 40,
+    "num_current_sensors": 24,
+    "num_components": 23,
+>>>>>>> e93f112b3 (NOS-11338: Support DDR temperature monitoring on Komodo based systems -- Auto Gen'd changes (#6731))
     "num_fantrays": 4,
     "num_fans_pertray": 2,
     "num_ports": 66,
@@ -4975,8 +4984,172 @@
       "chip_select": 0
     }
   },
+<<<<<<< HEAD
   "WATCHDOG": {
     "dev_info": {"device_type": "WATCHDOG", "device_parent": "MULTIFPGAPCIE1"},
      "dev_attr": {"event_driven_power_cycle_control_reg_offset": "0x28", "watchdog_counter_reg_offset": "0x1E0"}
+=======
+  "HWMON0": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON0",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_cpu_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP21": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "CPU_TEMP",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON0",
+      "high_threshold": 95.0,
+      "high_crit_threshold": 125.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "CPU"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        }
+      ]
+    }
+  },
+  "HWMON1": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON1",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "/sys/bus/i2c/drivers/spd5118/*-0050/hwmon/hwmon*"
+      }
+    }
+  },
+  "TEMP22": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "DIMM0_TEMP",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON1",
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "DIMM 0"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        },
+        {
+          "attr_name": "temp1_high_threshold",
+          "drv_attr_name": "temp1_max"
+        },
+        {
+          "attr_name": "temp1_high_crit_threshold",
+          "drv_attr_name": "temp1_crit"
+        }
+      ]
+    }
+  },
+  "HWMON2": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON2",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "/sys/bus/i2c/drivers/spd5118/*-0051/hwmon/hwmon*"
+      }
+    }
+  },
+  "TEMP23": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "DIMM1_TEMP",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON2",
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "DIMM 1"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        },
+        {
+          "attr_name": "temp1_high_threshold",
+          "drv_attr_name": "temp1_max"
+        },
+        {
+          "attr_name": "temp1_high_crit_threshold",
+          "drv_attr_name": "temp1_crit"
+        }
+      ]
+    }
+  },
+  "HWMON3": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON3",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_nvme_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP24": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "HWMON_NVME",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON3",
+      "high_threshold": 90.0,
+      "high_crit_threshold": 95.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_override": 81.0
+    },
+    "dev_attr": {
+      "display_name": "NVMe"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        }
+      ]
+    }
+  },
+  "MGMT_LINK_CHECK": {
+    "eth0": {
+      "oob_mgmt_port_0": {
+        "fpga": "CPUCARD_FPGA",
+        "reg_offset": "0x48",
+        "bit_range": "21:21",
+        "up_value": "0x1"
+      }
+    }
+>>>>>>> e93f112b3 (NOS-11338: Support DDR temperature monitoring on Komodo based systems -- Auto Gen'd changes (#6731))
   }
 }
