@@ -11,4 +11,6 @@ systemctl enable adm1266-rtc-sync.timer
 systemctl start adm1266-rtc-sync.timer
 systemctl enable watchdog.timer
 systemctl start watchdog.timer
+systemctl enable spd5118-dimm-init.service
+systemctl start spd5118-dimm-init.service
 

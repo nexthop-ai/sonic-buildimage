@@ -1,0 +1,14 @@
+[Unit]
+Description=Instantiate DDR5 DIMM temperature sensors (spd5118) on the SoC I2C bus
+After=pddf-platform-init.service
+Requires=pddf-platform-init.service
+Before=pmon.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/spd5118_dimm_init.py
+
+[Install]
+WantedBy=multi-user.target
