@@ -425,21 +425,37 @@ def hdl_set_extcomm(daemon, cmd_str, op, st_idx, args, is_inline):
             syslog.syslog(syslog.LOG_ERR, 'extended community set %s not found or configured' % args[0])
             return None
         com_list = com_set.mbr_list
+<<<<<<< HEAD
     rt_cnt = soo_cnt = 0
+=======
+
+    # Special handling for 'none' keyword
+    if len(com_list) == 1 and com_list[0] == 'none':
+        if op == CachedDataWithOp.OP_DELETE:
+            return []
+        return ['set extcommunity none']
+
+    rt_cnt = soo_cnt = color_cnt = 0
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
     for comm in com_list:
         if comm.startswith(CommunityList.RT_TYPE_MARK):
             rt_cnt += 1
         elif comm.startswith(CommunityList.SOO_TYPE_MARK):
             soo_cnt += 1
+        elif comm.startswith(CommunityList.COLOR_TYPE_MARK):
+            color_cnt += 1
     cmd_list = []
     if op != CachedDataWithOp.OP_DELETE:
-        for comm_type in ['rt', 'soo']:
+        for comm_type in ['rt', 'soo', 'color']:
             cmd_list.append(('no set extcommunity %s' % comm_type, True))
     if rt_cnt > 0:
-        new_args = ((args[0], True),) + args[1:]
+        new_args = ((args[0], 'rt'),) + args[1:]
         cmd_list += get_command_cmn(daemon, cmd_str, op, st_idx, new_args, None)
     if soo_cnt > 0:
-        new_args = ((args[0], False),) + args[1:]
+        new_args = ((args[0], 'soo'),) + args[1:]
+        cmd_list += get_command_cmn(daemon, cmd_str, op, st_idx, new_args, None)
+    if color_cnt > 0:
+        new_args = ((args[0], 'color'),) + args[1:]
         cmd_list += get_command_cmn(daemon, cmd_str, op, st_idx, new_args, None)
     return cmd_list
 
@@ -507,6 +523,106 @@ def handle_rmap_set_metric(daemon, cmd_str, op, st_idx, args, data):
                                    CommandArgument(daemon, True, metric_param)))
     return cmd_list
 
+<<<<<<< HEAD
+=======
+def handle_rmap_match_extcommunity(daemon, cmd_str, op, st_idx, args, data):
+    """
+    Handler for route-map 'match extcommunity NAME [exact-match|any]'.
+
+    match_ext_community_mode is an optional companion to match_ext_community:
+    removing just the mode (list stays) must fall back to the bare
+    'match extcommunity NAME' form, not clear the whole match condition.
+    """
+    no_op = 'no ' if op == CachedDataWithOp.OP_DELETE else ''
+
+    arg_len = len(args)
+    list_name = args[0] if arg_len >= 1 else ''
+    mode = args[1] if arg_len >= 2 else ''
+
+    mode_str = ''
+    if mode == 'EXACT_MATCH':
+        mode_str = ' exact-match'
+    elif mode == 'ANY':
+        mode_str = ' any'
+
+    if op == CachedDataWithOp.OP_DELETE:
+        list_name = ''
+        mode_str = ''
+    elif list_name == '':
+        syslog.syslog(syslog.LOG_ERR, 'handle_rmap_match_extcommunity: match_ext_community not set for {}'.format(args))
+        return None
+
+    return [cmd_str.format(CommandArgument(daemon, True, no_op),
+                           CommandArgument(daemon, True, list_name),
+                           CommandArgument(daemon, True, mode_str))]
+
+def handle_rmap_set_extcomm_bandwidth(daemon, cmd_str, op, st_idx, args, data):
+    """
+    Handler for route-map set extcommunity bandwidth command.
+
+    Translates CONFIG_DB bandwidth settings to FRR commands:
+    - VALUE: set extcommunity bandwidth <value>
+    - CUMULATIVE: set extcommunity bandwidth cumulative
+    - NUM_MULTIPATHS: set extcommunity bandwidth num-multipaths
+    - AUTO_LOCAL: set extcommunity bandwidth auto local
+    - AUTO_RECEIVED_OVER_LOCAL: set extcommunity bandwidth auto received-over-local
+    - AUTO_MIN_RECEIVED_LOCAL: set extcommunity bandwidth auto min-received-local
+
+    Supports optional non-transitive flag.
+    """
+    cmd_list = []
+
+    syslog.syslog(syslog.LOG_INFO,
+                  'handle_rmap_set_extcomm_bandwidth cmd_str {} op {} st_idx {} args {} data {}'.format(
+                      cmd_str, op, st_idx, args, data))
+
+    no_op = 'no ' if op == CachedDataWithOp.OP_DELETE else ''
+
+    arg_len = len(args)
+    bandwidth_type = args[0] if arg_len >= 1 else ''
+    bandwidth_value = args[1] if arg_len >= 2 else ''
+    non_transitive = args[2] if arg_len >= 3 else 'false'
+
+    bandwidth_param = ''
+
+    if op == CachedDataWithOp.OP_DELETE:
+        # For delete, just use "no set extcommunity bandwidth"
+        bandwidth_param = ''
+    else:
+        # Build the bandwidth parameter based on type
+        if bandwidth_type == 'VALUE':
+            if bandwidth_value != '':
+                bandwidth_param = bandwidth_value
+            else:
+                syslog.syslog(syslog.LOG_ERR,
+                              'handle_rmap_set_extcomm_bandwidth: VALUE type requires bandwidth_value')
+                return None
+        elif bandwidth_type == 'CUMULATIVE':
+            bandwidth_param = 'cumulative'
+        elif bandwidth_type == 'NUM_MULTIPATHS':
+            bandwidth_param = 'num-multipaths'
+        elif bandwidth_type == 'AUTO_LOCAL':
+            bandwidth_param = 'auto local'
+        elif bandwidth_type == 'AUTO_RECEIVED_OVER_LOCAL':
+            bandwidth_param = 'auto received-over-local'
+        elif bandwidth_type == 'AUTO_MIN_RECEIVED_LOCAL':
+            bandwidth_param = 'auto min-received-local'
+        else:
+            syslog.syslog(syslog.LOG_ERR,
+                          'handle_rmap_set_extcomm_bandwidth: unknown bandwidth_type {}'.format(bandwidth_type))
+            return None
+
+        # Add non-transitive flag if set
+        if non_transitive == 'true':
+            bandwidth_param += ' non-transitive'
+
+    # Generate the command
+    cmd_list.append(cmd_str.format(CommandArgument(daemon, True, no_op),
+                                   CommandArgument(daemon, True, bandwidth_param)))
+
+    return cmd_list
+
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
 class BGPKeyMapInfo:
     def __init__(self, cmd_str, hdlr, data):
         self.daemons, self.run_cmd = extract_cmd_daemons(cmd_str)
@@ -794,19 +910,25 @@ class CommandArgument(object):
             ret_val = ret_val.lower()
         return ret_val
     @staticmethod
-    def parse_ext_community(com_str, is_rt = None):
+    def parse_ext_community(com_str, comm_type = None):
         if com_str.startswith(CommunityList.RT_TYPE_MARK):
             com_str = com_str[len(CommunityList.RT_TYPE_MARK):]
-            if is_rt is None:
+            if comm_type is None:
                 return 'rt %s' % com_str
             else:
-                return (com_str if is_rt else None)
+                return (com_str if comm_type == 'rt' else None)
         elif com_str.startswith(CommunityList.SOO_TYPE_MARK):
             com_str = com_str[len(CommunityList.SOO_TYPE_MARK):]
-            if is_rt is None:
+            if comm_type is None:
                 return 'soo %s' % com_str
             else:
-                return (None if is_rt else com_str)
+                return (com_str if comm_type == 'soo' else None)
+        elif com_str.startswith(CommunityList.COLOR_TYPE_MARK):
+            com_str = com_str[len(CommunityList.COLOR_TYPE_MARK):]
+            if comm_type is None:
+                return 'color %s' % com_str
+            else:
+                return (com_str if comm_type == 'color' else None)
         return None
     def __format__(self, format):
         bool_format = {'allow-as-in': 'origin',
@@ -834,33 +956,33 @@ class CommandArgument(object):
                 return ' '.join(com_set.mbr_list)
         elif format == 'ext-com-list':
             if type(self.value) is tuple:
-                com_val, is_rt = self.value
+                com_val, comm_type = self.value
             else:
                 com_val = self.value
-                is_rt = None
+                comm_type = None
             if type(com_val) is list:
                 com_list = com_val
             else:
                 com_list = [com_val]
             frr_com_list = []
             for comm in com_list:
-                frr_comm = self.parse_ext_community(comm, is_rt)
+                frr_comm = self.parse_ext_community(comm, comm_type)
                 if frr_comm is not None:
                     frr_com_list.append(frr_comm)
-            if is_rt is None:
+            if comm_type is None:
                 return ' '.join(frr_com_list)
             else:
-                return ('rt ' if is_rt else 'soo ') + ' '.join(frr_com_list)
+                return comm_type + ' ' + ' '.join(frr_com_list)
         elif format == 'ext-com-ref':
-            com_set_name, is_rt = self.value
+            com_set_name, comm_type = self.value
             com_set = self.daemon.extcomm_set_list.get(com_set_name, None)
             if com_set is not None and com_set.is_configurable():
                 frr_com_list = []
                 for comm in com_set.mbr_list:
-                    frr_comm = self.parse_ext_community(comm, is_rt)
+                    frr_comm = self.parse_ext_community(comm, comm_type)
                     if frr_comm is not None:
                         frr_com_list.append(frr_comm)
-                return ('rt ' if is_rt else 'soo ') + ' '.join(frr_com_list)
+                return comm_type + ' ' + ' '.join(frr_com_list)
         elif format == 'repeat' and type(self.value) is dict:
             if 1 in self.value:
                 rep_cnt = int(self.value[1][0])
@@ -1571,7 +1693,12 @@ class CommunityList:
     MATCH_ANY = 1
     RT_TYPE_MARK = 'route-target:'
     SOO_TYPE_MARK = 'route-origin:'
+<<<<<<< HEAD
     def __init__(self, name, extended):
+=======
+    COLOR_TYPE_MARK = 'color:'
+    def __init__(self, name, extended, large=False):
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
         self.name = name
         self.is_ext = extended
         self.match_action = None
@@ -1936,7 +2063,8 @@ class BGPConfigDaemon:
                          ('match_origin',                   '[bgpd]{no:no-prefix}match origin {:tolower}'),
                          ('match_local_pref',               '[bgpd]{no:no-prefix}match local-preference {}'),
                          ('match_community',                '[bgpd]{no:no-prefix}match community {}'),
-                         ('match_ext_community',            '[bgpd]{no:no-prefix}match extcommunity {}'),
+                         (['match_ext_community', '++match_ext_community_mode'], '[bgpd]{}match extcommunity {}{}', handle_rmap_match_extcommunity),
+                         ('match_ext_community_limit',      '[bgpd]{no:no-prefix}match extcommunity-limit {}'),
                          ('match_as_path',                  '[bgpd]{no:no-prefix}match as-path {}'),
                          ('match_src_vrf',                  '[bgpd]{no:no-prefix}match source-vrf {}'),
                          ('call_route_map',                 '{no:no-prefix}call {:enable-only}'),
@@ -1952,7 +2080,18 @@ class BGPConfigDaemon:
                          ('set_community_inline',           '[bgpd]{no:no-prefix}set community {}'),
                          ('set_community_ref',              '[bgpd]{no:no-prefix}set community {:com-ref}'),
                          ('set_ext_community_inline',       '[bgpd]{no:no-prefix}set extcommunity {:ext-com-list}', hdl_set_extcomm, True),
+<<<<<<< HEAD
                          ('set_ext_community_ref',          '[bgpd]{no:no-prefix}set extcommunity {:ext-com-ref}', hdl_set_extcomm, False)
+=======
+                         ('set_ext_community_ref',          '[bgpd]{no:no-prefix}set extcommunity {:ext-com-ref}', hdl_set_extcomm, False),
+                         ('set_ext_community_delete',       '[bgpd]{no:no-prefix}set extended-comm-list {} delete'),
+                         (('set_large_community_inline', '+set_community_additive'), '[bgpd]{no:no-prefix}set large-community {}', hdl_set_community_additive),
+                         (('set_large_community_ref', '+set_community_additive'), '[bgpd]{no:no-prefix}set large-community {}', hdl_set_community_additive),
+                         # Link Bandwidth Extended Community (UCMP support)
+                         (['set_extcommunity_bandwidth_type', '++set_extcommunity_bandwidth_value',
+                           '+set_extcommunity_bandwidth_non_transitive'],
+                          '[bgpd]{}set extcommunity bandwidth {}', handle_rmap_set_extcomm_bandwidth)
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
     ]
 
     bfd_peer_shop_key_map = [('enabled',                        '{no:no-prefix}shutdown', ['false', 'true']),

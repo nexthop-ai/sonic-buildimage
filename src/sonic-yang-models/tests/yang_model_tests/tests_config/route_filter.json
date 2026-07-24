@@ -187,7 +187,7 @@
                     "set_asn_list": "1,2,3",
                     "set_community_inline": ["5:6"],
                     "set_community_ref": "target_comm",
-                    "set_ext_community_inline": ["soo:10:20", "rt:100:27"],
+                    "set_ext_community_inline": ["route-origin:10:20", "route-target:100:27"],
                     "set_ext_community_ref": "target_extcomm",
                     "set_tag": 300
                 }
@@ -381,6 +381,142 @@
                     "name": "map14",
                     "stmt_name": 14,
                     "set_ext_community_ref": "null"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_VALID_SET_EXT_COMMUNITY_COLOR": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map15",
+                    "stmt_name": 15,
+                    "set_ext_community_inline": ["route-target:65000:1", "color:00:100"]
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_COLOR_TYPO": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map16",
+                    "stmt_name": 16,
+                    "set_ext_community_inline": ["colour:00:100"]
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_COLOR_ZERO": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map17",
+                    "stmt_name": 17,
+                    "set_ext_community_inline": ["color:00:0"]
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_COLOR_BAD_CC": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map18",
+                    "stmt_name": 18,
+                    "set_ext_community_inline": ["color:99:100"]
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_VALID_MATCH_EXT_COMMUNITY_MODE": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:EXTENDED_COMMUNITY_SET": {
+                "EXTENDED_COMMUNITY_SET_LIST": [
+                {
+                    "name": "modeset"
+                }
+                ]
+            }
+        },
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map19",
+                    "stmt_name": 19,
+                    "match_ext_community": "modeset",
+                    "match_ext_community_mode": "EXACT_MATCH"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_INVALID_MATCH_EXT_COMMUNITY_MODE_WITHOUT_PARENT": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map20",
+                    "stmt_name": 20,
+                    "match_ext_community_mode": "ANY"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_VALID_MATCH_EXT_COMMUNITY_LIMIT": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map21",
+                    "stmt_name": 21,
+                    "match_ext_community_limit": 5
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_VALID_SET_EXT_COMMUNITY_DELETE": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:EXTENDED_COMMUNITY_SET": {
+                "EXTENDED_COMMUNITY_SET_LIST": [
+                {
+                    "name": "deleteset"
+                }
+                ]
+            }
+        },
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map22",
+                    "stmt_name": 22,
+                    "set_ext_community_delete": "deleteset"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_DELETE_NONEXISTENT": {
+        "sonic-route-map:sonic-route-map":{
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                {
+                    "name": "map23",
+                    "stmt_name": 23,
+                    "set_ext_community_delete": "nonexistent_set"
                 }
                 ]
             }
@@ -605,14 +741,14 @@
                     "set_type": "STANDARD",
                     "match_action": "ANY",
                     "action": "permit",
-                    "community_member": ["rt:1:1"]
+                    "community_member": ["route-target:1:1"]
                 },
                 {
                     "name": "extcom2",
                     "set_type": "STANDARD",
                     "match_action": "ALL",
                     "action": "permit",
-                    "community_member": ["rt:1:2"]
+                    "community_member": ["route-target:1:2"]
                 }
                 ]
             }

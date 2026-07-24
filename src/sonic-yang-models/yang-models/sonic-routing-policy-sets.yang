@@ -38,6 +38,43 @@ module sonic-routing-policy-sets {
             "Routing policy action type permit or deny";
     }
 
+    typedef ext-community-value-type {
+        type union {
+            type string {
+                pattern 'route-target:.+';
+            }
+            type string {
+                pattern 'route-origin:.+';
+            }
+            type string {
+                pattern 'color:(00|01|10|11):(429496729[0-5]|42949672[0-8][0-9]|'
+                +   '4294967[0-1][0-9]{2}|429496[0-6][0-9]{3}|'
+                +   '42949[0-5][0-9]{4}|4294[0-8][0-9]{5}|'
+                +   '429[0-3][0-9]{6}|42[0-8][0-9]{7}|'
+                +   '4[0-1][0-9]{8}|[1-3][0-9]{9}|'
+                +   '[1-9][0-9]{0,8})';
+            }
+            type string {
+                pattern 'none';
+            }
+        }
+        description
+            "Extended community value, one of:
+             - route-target:ASN_OR_IPADDR:VALUE (route-target)
+             - route-origin:ASN_OR_IPADDR:VALUE (route-origin / site-of-origin)
+             - color:CC:VALUE, where CC is a 2-bit binary color 00/01/10/11 and
+               VALUE is bounded to uint32 max, per RFC 9012
+             - 'none', only valid as the sole member of a set-side leaf-list, to
+               clear all previously-set extended communities.
+             ASN_OR_IPADDR may be a plain AS number, AS-dot notation, or an IPv4
+             address, matching FRR's 'ASN:NN_OR_IP-ADDRESS:NN' extended-community
+             grammar -- deliberately left format-unconstrained here (beyond the
+             keyword prefix) because FRR's own frr-bgp-route-map.yang types
+             extcommunity-rt/extcommunity-soo as plain string for the same
+             reason: no single regex cleanly covers ASN / AS-dot / IPv4-address
+             without risking false rejection of values FRR itself accepts.";
+    }
+
     grouping prefix-common-fields {
         leaf name {
             type leafref {
@@ -209,7 +246,12 @@ module sonic-routing-policy-sets {
                     type string;
                     ordered-by user;
                     description
-                        "members of the community set.";
+                        "members of the extended community set. For set_type STANDARD,
+                        must follow ext-community-value-type's format: 'route-target:ASN_OR_IPADDR:VALUE',
+                        'route-origin:ASN_OR_IPADDR:VALUE', or 'color:CC:VALUE' (CC is a 2-bit
+                        binary color 00/01/10/11). For set_type EXPANDED, members are instead
+                        raw POSIX-regex FRR CLI syntax (e.g. '_65000:1_', 'color 00:100') passed
+                        through unparsed -- no format is enforced for EXPANDED members.";
                 }
             }
         }

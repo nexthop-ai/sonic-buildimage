@@ -13,7 +13,11 @@ route-map {{rm_key[0]}} {{rm_val['route_operation']}} {{rm_key[1]}}
  match community {{rm_val['match_community']}}
 {% endif %}
 {% if 'match_ext_community' in rm_val %}
- match extcommunity {{rm_val['match_ext_community']}}
+ match extcommunity {{rm_val['match_ext_community']}}{% if 'match_ext_community_mode' in rm_val and rm_val['match_ext_community_mode'] == 'EXACT_MATCH' %} exact-match{% elif 'match_ext_community_mode' in rm_val and rm_val['match_ext_community_mode'] == 'ANY' %} any{% endif %}
+
+{% endif %}
+{% if 'match_ext_community_limit' in rm_val %}
+ match extcommunity-limit {{rm_val['match_ext_community_limit']}}
 {% endif %}
 {% if 'match_interface' in rm_val %}
  match interface {{rm_val['match_interface']}}
@@ -84,9 +88,21 @@ route-map {{rm_key[0]}} {{rm_val['route_operation']}} {{rm_key[1]}}
  set community {{rm_val['set_community_ref']}}
 {% endif %}
 {# ---------------set extcommunity - Start--------------------- #}
+<<<<<<< HEAD
 {% if 'set_ext_community_inline' in rm_val %}
 {% set ec_ns = namespace(rt_str='', soo_str='') %}
 {% for ext_comm in rm_val['set_ext_community_inline'] %}
+=======
+{# Note: FRR always assumes additive for extended community #}
+{# Special handling: if first element is 'none', render 'set extcommunity none' #}
+{% if 'set_ext_community_inline' in rm_val %}
+{% set ext_comm_list = rm_val['set_ext_community_inline'] %}
+{% if ext_comm_list[0] == 'none' %}
+ set extcommunity none
+{% else %}
+{% set ec_ns = namespace(rt_str='', soo_str='', color_str='') %}
+{% for ext_comm in ext_comm_list %}
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
 {% set comm  = ext_comm.split(':') %}
 {% if comm[0] == 'route-target' %}
 {% set ec_ns.rt_str = ec_ns.rt_str+' '+comm[1]+':'+comm[2] %}
@@ -94,18 +110,77 @@ route-map {{rm_key[0]}} {{rm_val['route_operation']}} {{rm_key[1]}}
 {% if comm[0] == 'route-origin' %}
 {% set ec_ns.soo_str = ec_ns.soo_str+' '+comm[1]+':'+comm[2] %}
 {% endif %}
+{% if comm[0] == 'color' %}
+{% set ec_ns.color_str = ec_ns.color_str+' '+comm[1]+':'+comm[2] %}
+{% endif %}
 {% endfor %}
 {% if ec_ns.rt_str != '' %}
  set extcommunity rt{{ec_ns.rt_str}}
 {% endif %}
 {% if ec_ns.soo_str != '' %}
+<<<<<<< HEAD
  set extcommunity soo{{ec_ns.rt_str}}
+=======
+ set extcommunity soo{{ec_ns.soo_str}}
+{% endif %}
+{% if ec_ns.color_str != '' %}
+ set extcommunity color{{ec_ns.color_str}}
+{% endif %}
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
 {% endif %}
 {% endif %}
 {# ---------------set extcommunity - End----------------------- #}
 {% if 'set_ext_community_ref' in rm_val %}
  set extcommunity {{rm_val['set_ext_community_ref']}}
 {% endif %}
+<<<<<<< HEAD
+=======
+{% if 'set_ext_community_delete' in rm_val %}
+ set extended-comm-list {{rm_val['set_ext_community_delete']}} delete
+{% endif %}
+{# ---------------set extcommunity - End----------------------- #}
+{# ---------------set extcommunity bandwidth - Start----------- #}
+{% if 'set_extcommunity_bandwidth_type' in rm_val %}
+{% if rm_val['set_extcommunity_bandwidth_type'] == 'VALUE' and 'set_extcommunity_bandwidth_value' in rm_val %}
+ set extcommunity bandwidth {{ rm_val['set_extcommunity_bandwidth_value'] }}{% if 'set_extcommunity_bandwidth_non_transitive' in rm_val and rm_val['set_extcommunity_bandwidth_non_transitive'] == 'true' %} non-transitive{% endif %}
+
+{% elif rm_val['set_extcommunity_bandwidth_type'] == 'CUMULATIVE' %}
+ set extcommunity bandwidth cumulative{% if 'set_extcommunity_bandwidth_non_transitive' in rm_val and rm_val['set_extcommunity_bandwidth_non_transitive'] == 'true' %} non-transitive{% endif %}
+
+{% elif rm_val['set_extcommunity_bandwidth_type'] == 'NUM_MULTIPATHS' %}
+ set extcommunity bandwidth num-multipaths{% if 'set_extcommunity_bandwidth_non_transitive' in rm_val and rm_val['set_extcommunity_bandwidth_non_transitive'] == 'true' %} non-transitive{% endif %}
+
+{% elif rm_val['set_extcommunity_bandwidth_type'] == 'AUTO_LOCAL' %}
+ set extcommunity bandwidth auto local{% if 'set_extcommunity_bandwidth_non_transitive' in rm_val and rm_val['set_extcommunity_bandwidth_non_transitive'] == 'true' %} non-transitive{% endif %}
+
+{% elif rm_val['set_extcommunity_bandwidth_type'] == 'AUTO_RECEIVED_OVER_LOCAL' %}
+ set extcommunity bandwidth auto received-over-local{% if 'set_extcommunity_bandwidth_non_transitive' in rm_val and rm_val['set_extcommunity_bandwidth_non_transitive'] == 'true' %} non-transitive{% endif %}
+
+{% elif rm_val['set_extcommunity_bandwidth_type'] == 'AUTO_MIN_RECEIVED_LOCAL' %}
+ set extcommunity bandwidth auto min-received-local{% if 'set_extcommunity_bandwidth_non_transitive' in rm_val and rm_val['set_extcommunity_bandwidth_non_transitive'] == 'true' %} non-transitive{% endif %}
+
+{% endif %}
+{% endif %}
+{# ---------------set extcommunity bandwidth - End------------- #}
+{# ---------------set large-community - Start------------------ #}
+{% if 'set_large_community_inline' in rm_val %}
+{% set lc_ns = namespace(lcomms = '') %}
+{% for lc in rm_val['set_large_community_inline'] %}
+{% set lc_ns.lcomms = lc_ns.lcomms + ' ' + lc %}
+{% endfor %}
+ set large-community{{lc_ns.lcomms}}
+{%- if lc_ns.lcomms|trim != 'none' and 'set_community_additive' in rm_val and rm_val['set_community_additive'] == 'true' %} additive
+{%- endif %}
+
+{% endif %}
+{% if 'set_large_community_ref' in rm_val %}
+ set large-community {{rm_val['set_large_community_ref']}}
+{%- if 'set_community_additive' in rm_val and rm_val['set_community_additive'] == 'true' %} additive
+{%- endif %}
+
+{% endif %}
+{# ---------------set large-community - End-------------------- #}
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
 {% if 'set_next_hop' in rm_val %}
  set ip next-hop {{rm_val['set_next_hop']}}
 {% endif %}

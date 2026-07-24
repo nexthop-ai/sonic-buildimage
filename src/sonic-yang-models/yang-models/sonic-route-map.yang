@@ -260,6 +260,34 @@ module sonic-route-map {
                     description "Match based on extended community value";
                 }
 
+<<<<<<< HEAD
+=======
+                leaf match_ext_community_mode {
+                    type enumeration {
+                        enum EXACT_MATCH;
+                        enum ANY;
+                    }
+                    when "../match_ext_community";
+                    description "Optional match mode for match_ext_community: EXACT_MATCH requires
+                        the route's extended communities to exactly match the list, ANY requires
+                        at least one member of the list to be present. When absent, FRR performs
+                        its standard set-inclusion match (match extcommunity NAME).";
+                }
+
+                leaf match_ext_community_limit {
+                    type uint16;
+                    description "Match based on the number of extended communities present on
+                        the route (match extcommunity-limit N). Independent of match_ext_community.";
+                }
+
+                leaf match_large_community{
+                    type leafref {
+                        path "/rpolsets:sonic-routing-policy-sets/rpolsets:LARGE_COMMUNITY_SET/rpolsets:LARGE_COMMUNITY_SET_LIST/rpolsets:name";
+                    }
+                    description "Match based on large community value";
+                }
+
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
                 leaf match_as_path{
                     type leafref {
                         path "/rpolsets:sonic-routing-policy-sets/rpolsets:AS_PATH_SET/rpolsets:AS_PATH_SET_LIST/rpolsets:name";
@@ -347,9 +375,16 @@ module sonic-route-map {
                 }
 
                 leaf-list set_ext_community_inline {
-                    type string;
+                    type rpolsets:ext-community-value-type;
                     ordered-by user;
+<<<<<<< HEAD
                     description "Set extended community string";
+=======
+                    description "Set extended community. Format: 'route-target:ASN_OR_IPADDR:VALUE',
+                    'route-origin:ASN_OR_IPADDR:VALUE', 'color:CC:VALUE'. Use 'none' as the
+                    only value to clear all extended communities. Note: Extended community is
+                    always additive unless cleared first with 'none'.";
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
                 }
 
                 leaf set_ext_community_ref {
@@ -359,6 +394,40 @@ module sonic-route-map {
                     description "Refer extended community from extended community list";
                 }
 
+<<<<<<< HEAD
+=======
+                leaf set_ext_community_delete {
+                    type leafref {
+                        path "/rpolsets:sonic-routing-policy-sets/rpolsets:EXTENDED_COMMUNITY_SET/rpolsets:EXTENDED_COMMUNITY_SET_LIST/rpolsets:name";
+                    }
+                    description "Strip extended communities matching this named extended-community-list
+                        from the route (set extended-comm-list NAME delete).";
+                }
+
+                leaf-list set_large_community_inline {
+                    type string;
+                    ordered-by user;
+                    description "Set large community string. Use 'none' as the only value to clear all large-communities.";
+                }
+
+                leaf set_large_community_ref {
+                    type leafref {
+                        path "/rpolsets:sonic-routing-policy-sets/rpolsets:LARGE_COMMUNITY_SET/rpolsets:LARGE_COMMUNITY_SET_LIST/rpolsets:name";
+                    }
+                    description "Refer large community from large community list";
+                }
+
+                leaf set_community_additive {
+                    when "../set_community_inline or ../set_community_ref or ../set_large_community_inline or ../set_large_community_ref";
+                    type boolean;
+                    default false;
+                    description
+                        "When true, append to existing communities instead of replacing them.
+                         Applies to both standard community and large-community.
+                         Note: Extended community is always additive in FRR.";
+                }
+
+>>>>>>> ffb3eab7e (NOS-12246: [frrcfgd] Add BGP color extended-community support (#6909))
                 leaf set_tag {
                     type uint32;
                     description

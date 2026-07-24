@@ -71,6 +71,38 @@
         "desc": "Configure route map table with non-existent set extended community set name.",
         "eStrKey": "LeafRef"
     },
+    "ROUTE_MAP_VALID_SET_EXT_COMMUNITY_COLOR": {
+        "desc": "Configure route map set_ext_community_inline with a valid color extended community value."
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_COLOR_TYPO": {
+        "desc": "Configure route map set_ext_community_inline with a misspelled marker keyword ('colour:' instead of 'color:').",
+        "eStrKey": "InvalidValue"
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_COLOR_ZERO": {
+        "desc": "Configure route map set_ext_community_inline with color value 0, which is reserved as the 'no color' sentinel in SR-Policy and outside the pattern's accepted range.",
+        "eStrKey": "InvalidValue"
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_COLOR_BAD_CC": {
+        "desc": "Configure route map set_ext_community_inline with an out-of-range color CC segment (only 00/01/10/11 are valid).",
+        "eStrKey": "InvalidValue"
+    },
+    "ROUTE_MAP_VALID_MATCH_EXT_COMMUNITY_MODE": {
+        "desc": "Configure match_ext_community_mode alongside its required parent match_ext_community."
+    },
+    "ROUTE_MAP_INVALID_MATCH_EXT_COMMUNITY_MODE_WITHOUT_PARENT": {
+        "desc": "Configure match_ext_community_mode without match_ext_community -- when-clause violated.",
+        "eStrKey": "When"
+    },
+    "ROUTE_MAP_VALID_MATCH_EXT_COMMUNITY_LIMIT": {
+        "desc": "Configure match_ext_community_limit (independent leaf, no parent field required)."
+    },
+    "ROUTE_MAP_VALID_SET_EXT_COMMUNITY_DELETE": {
+        "desc": "Configure set_ext_community_delete referencing an existing EXTENDED_COMMUNITY_SET name."
+    },
+    "ROUTE_MAP_INVALID_SET_EXT_COMMUNITY_DELETE_NONEXISTENT": {
+        "desc": "Configure set_ext_community_delete referencing a non-existent extended community set name.",
+        "eStrKey": "LeafRef"
+    },
     "ROUTE_PREFIX_VALID": {
         "desc": "Configure prefix table."
     },

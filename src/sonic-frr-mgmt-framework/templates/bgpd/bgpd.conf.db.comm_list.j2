@@ -32,6 +32,8 @@ bgp community-list {{cm_val['set_type']|lower}} {{cm_key}} permit {{cm}}
 {% set ns.cm_list = ns.cm_list + 'rt ' + cm[13:] + ' ' %}
 {% elif 'route-origin' in cm %}
 {% set ns.cm_list = ns.cm_list + 'soo ' + cm[13:] + ' ' %}
+{% elif cm.startswith('color:') %}
+{% set ns.cm_list = ns.cm_list + 'color ' + cm[6:] + ' ' %}
 {% else %}
 {% set ns.cm_list = ns.cm_list + cm + ' ' %}
 {% endif %}
@@ -43,6 +45,8 @@ bgp extcommunity-list {{cm_val['set_type']|lower}} {{cm_key}} permit {{ns.cm_lis
 bgp extcommunity-list {{cm_val['set_type']|lower}} {{cm_key}} permit rt {{cm[13:]}}
 {% elif 'route-origin' in cm %}
 bgp extcommunity-list {{cm_val['set_type']|lower}} {{cm_key}} permit soo {{cm[13:]}}
+{% elif cm.startswith('color:') %}
+bgp extcommunity-list {{cm_val['set_type']|lower}} {{cm_key}} permit color {{cm[6:]}}
 {% else %}
 bgp extcommunity-list {{cm_val['set_type']|lower}} {{cm_key}} permit {{cm}}
 {% endif %}
