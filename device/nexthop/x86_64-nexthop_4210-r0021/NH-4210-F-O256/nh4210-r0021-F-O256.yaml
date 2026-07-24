@@ -4654,6 +4654,7 @@ device:
     0:
         PC_TX_TAPS:
 ...
+<<<<<<< HEAD:device/nexthop/x86_64-nexthop_4210-r0021/NH-4210-F-O256/nh4210-r0021-F-O256.yaml
 ---
 bcm_device:
     0:
@@ -4733,6 +4734,8 @@ device:
             COS_ENABLE: 0
 
 ...
+=======
+>>>>>>> 59185a650 (NOS-12294: [seag] Update P2 profiles to reflect P1 MMU/QOS settings (#6902)):device/nexthop/x86_64-nexthop_4210-r1032/NH-4210-F-O256/port_configuration.yaml
 # Initialize the various thresholds to zero
 ---
 # Ingress service pool level initialization
