@@ -287,5 +287,27 @@
                 }
             }
         }
+    },
+
+    "SFLOW_TEST_WITH_STATS_COLLECTION": {
+        "sonic-sflow:sonic-sflow": {
+            "sonic-sflow:SFLOW": {
+                "global": {
+                    "admin_state": "up",
+                    "stats_collection": "down"
+                }
+            }
+        }
+    },
+
+    "SFLOW_TEST_WITH_INVALID_STATS_COLLECTION": {
+        "sonic-sflow:sonic-sflow": {
+            "sonic-sflow:SFLOW": {
+                "global": {
+                    "admin_state": "up",
+                    "stats_collection": "invalid"
+                }
+            }
+        }
     }
 }

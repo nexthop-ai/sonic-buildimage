@@ -2312,6 +2312,7 @@ SFLOW
 | sample_direction | Global sflow sample direction                                                           |             | rx        |                                        |
 | polling_interval | The interval within which sFlow data is collected and sent to the configured collectors |             | 20        |                                           |
 | agent_id         | Interface name                                                                          |             |           | PORT:name,PORTCHANNEL:name,MGMT_PORT:name, VLAN:name |
+| stats_collection | Enable or disable sFlow statistics collection to STATE_DB                               |             | up        |                                           |
 
 SFLOW_SESSION
 

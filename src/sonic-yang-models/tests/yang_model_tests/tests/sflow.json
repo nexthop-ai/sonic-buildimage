@@ -58,5 +58,12 @@
     "SFLOW_TEST_WITH_INCORRECT_POLLING_INTERVAL": {
         "desc": "Configure SFLOW table with an out of range polling interval.",
         "eStr": ["sFlow polling interval must be [0, 5-300]"]
+    },
+    "SFLOW_TEST_WITH_STATS_COLLECTION": {
+        "desc": "Configure sflow global entry in SFLOW table with stats_collection disabled."
+    },
+    "SFLOW_TEST_WITH_INVALID_STATS_COLLECTION": {
+        "desc": "Configure SFLOW table with an invalid stats_collection value.",
+        "eStrKey": "InvalidValue"
     }
 }

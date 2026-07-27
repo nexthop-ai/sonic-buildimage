@@ -1,0 +1,622 @@
+From e1d420e98f3a8815fed3a7f86901ee1bd018ba85 Mon Sep 17 00:00:00 2001
+From: Donggyu Kim <donggyu@nexthop.ai>
+Date: Wed, 24 Jun 2026 04:36:42 +0000
+Subject: [PATCH] mod_sonic: write sflow telemetry stats to STATE_DB
+
+Expose hsflowd runtime telemetry to Redis STATE_DB so that other
+SONiC components can observe sflow operational data. Writes global
+stats (flow/counter samples, datagrams, drops, suppressed) and
+per-port stats (sample pool, flow samples, sampling rate) to
+SFLOW_STATS|global and SFLOW_STATS|<portName> keys.
+
+The stats collection frequency is controlled by statsCountdown,
+which ticks independently of the sFlow polling interval used for
+counter datagrams. The two cadences serve different purposes:
+statsCountdown governs how often STATE_DB is refreshed, while
+sflow_polling controls how frequently sFlow counter datagrams are
+sent to the collector.
+
+Stats are written periodically and only when sflow is globally
+enabled and stats_collection is set to "up" in CONFIG_DB
+SFLOW|global. Per-port stats are cleaned up (DEL'd from STATE_DB)
+when sflow is explicitly disabled on a port via CONFIG_DB
+SFLOW_SESSION.
+
+On startup, before port state has been discovered, does a full
+SCAN+DEL pattern wipe of SFLOW_STATS|* (the same script evt_final
+uses on shutdown) so entries left behind by a prior crash or
+unclean shutdown are actually removed. A targeted per-entity DEL
+can't reach those at this point, since portsByName is still empty
+this early. At runtime, once sflow is disabled via CONFIG_DB
+SFLOW|global admin_state or stats_collection is set to "down", the
+targeted per-entity clear is used instead, since portsByName is
+known correctly by then.
+
+On shutdown, synchronously clears all SFLOW_STATS entries via a
+temporary Redis connection so stale data does not persist across
+hsflowd restarts.
+
+A port that disappears entirely (breakout, interface removal) is a
+third case neither of the above reaches: deleteMarkedPorts() frees
+the HSPSonicPort and removes it from portsByName, so once that
+happens db_clearSflowStats()'s targeted walk can never find it again.
+deleteMarkedPorts() now queues a copy of the port's name onto
+removedPortStats before freeing it (it runs inside the db_portNamesCB
+Redis callback, so it can't issue the DEL directly), and the new
+db_clearRemovedPortStats() drains that queue from evt_tick, issuing
+the DEL for each removed port's SFLOW_STATS|<portName> row.
+
+Between queueing and draining, the same port name can reappear (a
+fast breakout-mode toggle) before the queued DEL fires. If the
+re-created port has already had fresh stats written by
+db_writeSflowPortStats() by then, an unconditional DEL would wipe
+that live data out from under it. db_clearRemovedPortStats() now
+checks whether a port with that name exists again before issuing the
+DEL, and skips it if so, leaving that row to the re-created port's
+own stats-writing path.
+
+Re-enables the SFLOW_SESSION keyspace subscription so hsflowd can
+track per-port sflow enable/disable state and stop writing stale
+stats for disabled ports.
+
+Per-collector datagram counters (SFLOW_STATS|collector:<ip>) were
+dropped from this patch. The original attempt queried sp->agent's
+single shared SFLReceiver, which only tracks a datagram sequence
+number local to that receiver, not real per-collector delivery
+counts - the actual per-collector send loop lives in hsflowd.c's
+agentCB_sendPkt(), over sp->sFlowSettings->collectors, and wiring
+that back through to mod_sonic.c thread-safely is non-trivial. NOS-9621's
+scope was revised to exclude per-collector data; that work is now
+tracked separately in NOS-12242. The receiver loop in
+db_writeSflowGlobalStats() is kept only to roll up
+dgrams_attempted into the global stats HMSET.
+
+db_getSflowStatePerPort(), db_clearSflowStats(), and
+db_clearRemovedPortStats() each clear their mdata->reqXxx flag only
+after confirming db_selectClient() returned a live client, instead of
+the evt_tick call site clearing it upfront. Previously, if the DB
+client wasn't ready on a given tick, the flag was already cleared by
+the caller, so the deferred work silently never ran and never got
+retried - and for the two queue-backed cases
+(staleSflowSessions/removedPortStats), the queued names were never
+drained or freed either. Now an unready client leaves the flag (and
+any queued entries) intact for a retry on the next tick.
+---
+ src/Linux/mod_sonic.c | 401 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 396 insertions(+), 5 deletions(-)
+
+--- a/src/Linux/mod_sonic.c
++++ b/src/Linux/mod_sonic.c
+@@ -48,6 +48,7 @@ extern "C" {
+ #define HSP_SONIC_FIELD_SFLOW_ADMIN_STATE "admin_state"
+ #define HSP_SONIC_FIELD_SFLOW_POLLING "polling_interval"
+ #define HSP_SONIC_FIELD_SFLOW_AGENT "agent_id"
++#define HSP_SONIC_FIELD_SFLOW_STATS_COLLECTION "stats_collection"
+ #define HSP_SONIC_FIELD_COLLECTOR_IP "collector_ip"
+ #define HSP_SONIC_FIELD_COLLECTOR_PORT "collector_port"
+ #define HSP_SONIC_FIELD_COLLECTOR_VRF "collector_vrf"
+@@ -56,6 +57,26 @@ extern "C" {
+ #define HSP_SONIC_FIELD_SYSTEMREADY_STATUS "Status"
+ 
+ #define HSP_SONIC_DEFAULT_POLLING_INTERVAL 20
++
++// Shared with evt_final and the startup stale-entry wipe: SCAN+DEL via EVAL
++// so a single round trip clears every SFLOW_STATS|* entry, known or not.
++// SCAN is used instead of KEYS so the wipe doesn't block the Redis event
++// loop for the duration of the scan - the cursor loop runs incrementally,
++// still inside this one EVAL call.
++#define HSP_SONIC_LUA_CLEAR_SFLOW_STATS \
++  "local n = 0 " \
++  "local cursor = '0' " \
++  "repeat " \
++  "local res = redis.call('SCAN', cursor, 'MATCH', ARGV[1]) " \
++  "cursor = res[1] " \
++  "for _,k in ipairs(res[2]) do redis.call('DEL', k) n = n + 1 end " \
++  "until cursor == '0' " \
++  "return n"
++
++// Expands to "format, arg" so it drops straight into the redisCommand()/
++// redisAsyncCommand() varargs at both call sites.
++#define HSP_SONIC_EVAL_CLEAR_SFLOW_STATS_ARGS \
++  "EVAL %s 0 SFLOW_STATS|*", HSP_SONIC_LUA_CLEAR_SFLOW_STATS
+ #define HSP_SONIC_MIN_POLLING_INTERVAL 5
+ 
+ #define ISEVEN(i) (((i) & 1) == 0)
+@@ -88,6 +109,8 @@ extern "C" {
+     bool adminUp:1;
+     bool newPort:1;
+     bool unmappedPort:1;
++    bool sflowEnabled:1;
++    bool statsWritten:1;
+     uint32_t ifIndex;
+     uint32_t osIndex;
+     uint64_t ifSpeed;
+@@ -150,9 +173,18 @@ extern "C" {
+     bool reqSflowRefresh:1;
+     bool reqCollectorRefresh:1;
+     bool collectorsNeedSync:1;
++    bool reqSflowSessionRefresh:1;
++    bool reqStatsClear:1;
++    bool statsEnable:1;
++    bool sflowAllEnabled:1;
+     EVEvent *configStartEvent;
+     EVEvent *configEvent;
+     EVEvent *configEndEvent;
++    bool statsCleared:1;
++    uint32_t statsCountdown;
++    UTArray *staleSflowSessions;
++    bool reqRemovedPortStatsClear:1;
++    UTArray *removedPortStats;
+   } HSP_mod_SONIC;
+ 
+   static void db_ping(EVMod *mod, HSPSonicDBClient *db);
+@@ -163,6 +195,11 @@ extern "C" {
+   static bool discoverNewCollectors(EVMod *mod);
+   static void syncConfig(EVMod *mod);
+   static void dbEvt_subscribe(EVMod *mod);
++  static void db_writeSflowGlobalStats(EVMod *mod);
++  static void db_writeSflowPortStats(EVMod *mod);
++  static void db_clearSflowStats(EVMod *mod);
++  static void db_clearAllSflowStatsPattern(EVMod *mod);
++  static void db_clearRemovedPortStats(EVMod *mod);
+ 
+   /*_________________---------------------------__________________
+     _________________      db_replyStr          __________________
+@@ -256,6 +293,7 @@ extern "C" {
+       prt->portName = my_strdup(portName);
+       prt->ifIndex = HSP_SONIC_IFINDEX_UNDEFINED;
+       prt->osIndex = HSP_SONIC_IFINDEX_UNDEFINED;
++      prt->sflowEnabled = YES;
+       UTHashAdd(mdata->portsByName, prt);
+     }
+     return prt;
+@@ -379,6 +417,14 @@ extern "C" {
+       }
+       if(prt->mark) {
+ 	myDebug(1, "sonic port removed %s", prt->portName);
++	if(prt->statsWritten) {
++	  // This runs inside the db_portNamesCB Redis callback, so we can't
++	  // issue the SFLOW_STATS|<portName> DEL here (redisAsyncCommand()
++	  // is not safe from within a callback). Queue a copy of the name
++	  // and let db_clearRemovedPortStats() drain it from evt_tick.
++	  UTArrayPush(mdata->removedPortStats, my_strdup(prt->portName));
++	  mdata->reqRemovedPortStatsClear = YES;
++	}
+ 	UTHashDel(mdata->portsByName, prt);
+ 	UTHashDel(mdata->portsByOsIndex, prt);
+ 	UTArrayDel(mdata->newPorts, prt);
+@@ -1413,6 +1459,7 @@ extern "C" {
+     bool sflow_enable = NO;
+     char *sflow_agent = NULL;
+     uint32_t sflow_polling = HSP_SONIC_DEFAULT_POLLING_INTERVAL;;
++    bool statsEnable = YES;
+     if(reply->type == REDIS_REPLY_ARRAY
+        && reply->elements > 0
+        && ISEVEN(reply->elements)) {
+@@ -1430,6 +1477,9 @@ extern "C" {
+ 
+ 	  if(my_strequal(f_name->str, HSP_SONIC_FIELD_SFLOW_POLLING))
+ 	    sflow_polling = db_getU32(f_val);
++
++	  if(my_strequal(f_name->str, HSP_SONIC_FIELD_SFLOW_STATS_COLLECTION))
++	    statsEnable = my_strequal(f_val->str, "up");
+ 	}
+       }
+     }
+@@ -1437,6 +1487,14 @@ extern "C" {
+     if(sflow_enable != mdata->sflow_enable) {
+       myDebug(1, "sonic sflow_enable %u -> %u", mdata->sflow_enable, sflow_enable);
+       mdata->sflow_enable = sflow_enable;
++      if(!sflow_enable)
++        mdata->reqStatsClear = YES;
++    }
++    if(statsEnable != mdata->statsEnable) {
++      myDebug(1, "sonic statsEnable %u -> %u", mdata->statsEnable, statsEnable);
++      mdata->statsEnable = statsEnable;
++      if(!statsEnable)
++        mdata->reqStatsClear = YES;
+     }
+     // The sflow_agent entry will disappear if it is deleted from the config, so sflow_agent
+     // may still be NULL here:
+@@ -1672,6 +1730,65 @@ extern "C" {
+     }
+   }
+   
++  /*_________________---------------------------__________________
++    _________________  db_getSflowStatePerPort  __________________
++    -----------------___________________________------------------
++  */
++
++  static void db_sflowAllCB(redisAsyncContext *ctx, void *magic, void *req_magic) {
++    HSPSonicDBClient *db = (HSPSonicDBClient *)ctx->ev.data;
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)db->mod->data;
++    redisReply *reply = (redisReply *)magic;
++    if(reply == NULL) return;
++    mdata->sflowAllEnabled = (reply->type == REDIS_REPLY_NIL) || my_strequal(reply->str, "up");
++  }
++
++  static void db_portSflowEnabledCB(redisAsyncContext *ctx, void *magic, void *req_magic) {
++    HSPSonicDBClient *db = (HSPSonicDBClient *)ctx->ev.data;
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)db->mod->data;
++    redisReply *reply = (redisReply *)magic;
++    char *portName = (char *)req_magic;
++    if(reply == NULL) {
++      my_free(portName);
++      return;
++    }
++    if(reply->type == REDIS_REPLY_ERROR) {
++      myDebug(1, "sonic db_portSflowEnabledCB error: %s", reply->str);
++      my_free(portName);
++      return;
++    }
++    HSPSonicPort *prt = getPort(db->mod, portName, NO);
++    if (prt == NULL) {
++      myDebug(1, "port '%s' not found", portName);
++      my_free(portName);
++      return;
++    }
++    if(reply->type == REDIS_REPLY_NIL)
++      prt->sflowEnabled = mdata->sflowAllEnabled;
++    else
++      prt->sflowEnabled = my_strequal(reply->str, "up");
++    my_free(portName);
++  }
++
++  static void db_getSflowStatePerPort(EVMod *mod) {
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_CONFIG_NAME);
++    if(!db) return; // retry next tick - staleSflowSessions stays queued
++    mdata->reqSflowSessionRefresh = NO;
++    redisAsyncCommand(db->ctx, db_sflowAllCB, NULL,
++	    "HGET SFLOW_SESSION|all admin_state");
++    char *prt;
++    UTARRAY_WALK(mdata->staleSflowSessions, prt) {
++      HSPSonicPort *port = getPort(mod, prt, NO);
++      if(port && port->portName) {
++        redisAsyncCommand(db->ctx, db_portSflowEnabledCB, my_strdup(port->portName),
++          "HGET SFLOW_SESSION|%s admin_state", port->portName);
++      }
++      my_free(prt);
++    }
++    UTArrayReset(mdata->staleSflowSessions);
++  }
++
+   /*_________________---------------------------__________________
+     _________________      dbEvt_subscribe      __________________
+     -----------------___________________________------------------
+@@ -1684,13 +1801,30 @@ extern "C" {
+     myDebug(1, "sonic dbEvt_counterOp: %s (%s)", portOID, op);
+   }
+ 
++#endif
+   static void dbEvt_sflowInterfaceOp(EVMod *mod, char *key, char *op) {
+     myDebug(1, "sonic dbEvt_sflowInterfaceOp: %s (%s)", key, op);
+-    // This is a no-op because we will still poll counters for all
+-    // interfaces and the sampling-rate settings are controlled
+-    // externally (and learned in mod_psample).
++
++    char *sep = strrchr(key, '|');
++    if(!sep) return;
++    char *parsed_key = sep + 1;
++
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
++    if(my_strequal(parsed_key, "all")) {
++      HSPSonicPort *prt;
++      UTHASH_WALK(mdata->portsByName, prt) {
++        // a copy of the name is passed to prevent use-after-frees.
++        // these strings must be freed when staleSflowSessions is consumed/drained
++        UTArrayPush(mdata->staleSflowSessions, my_strdup(prt->portName));
++      }
++    }
++    else {
++      HSPSonicPort *port = getPort(mod, parsed_key, NO);
++      if(!port || !port->portName) return;
++      UTArrayPush(mdata->staleSflowSessions, my_strdup(port->portName));
++    }
++    mdata->reqSflowSessionRefresh = YES;
+   }
+-#endif
+ 
+   static void dbEvt_lagOp(EVMod *mod, char *memberStr, char *op) {
+     HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
+@@ -1755,7 +1889,7 @@ extern "C" {
+ 	dbEvt_subscribePattern(mod,  "psubscribe __keyspace@4__:PORTCHANNEL_MEMBER*", dbEvt_lagOp, db);
+ 	dbEvt_subscribePattern(mod,  "psubscribe __keyspace@4__:SFLOW|global*", dbEvt_sflowOp, db);
+ 	dbEvt_subscribePattern(mod,  "psubscribe __keyspace@4__:SFLOW_COLLECTOR*", dbEvt_sflowCollectorOp, db);
+-	// dbEvt_subscribePattern(mod,  "psubscribe __keyspace@4__:SFLOW_SESSION*", dbEvt_sflowInterfaceOp, db);
++	dbEvt_subscribePattern(mod,  "psubscribe __keyspace@4__:SFLOW_SESSION*", dbEvt_sflowInterfaceOp, db);
+       }
+     }
+   }
+@@ -1922,6 +2056,9 @@ extern "C" {
+       break;
+     case HSP_SONIC_STATE_CONNECTED:
+       // connected and ready - learn config
++      if(!mdata->statsCleared) {
++        db_clearAllSflowStatsPattern(mod);
++      }
+       db_getMeta(mod);
+       dbEvt_subscribe(mod);
+       // the next step is to read the starting agent/polling/collector
+@@ -1965,6 +2102,27 @@ extern "C" {
+ 	mdata->reqCollectorRefresh = NO;
+ 	db_getCollectorNames(mod);
+       }
++      // reqXxx flags are cleared inside each callee, only once the DB
++      // client is confirmed ready - if it's not, the flag (and any
++      // queued work) stays intact for a retry on the next tick.
++      if(mdata->reqSflowSessionRefresh) {
++        db_getSflowStatePerPort(mod);
++      }
++      if(mdata->reqStatsClear) {
++        db_clearSflowStats(mod);
++      }
++      if(mdata->reqRemovedPortStatsClear) {
++        db_clearRemovedPortStats(mod);
++      }
++      if(mdata->statsCountdown == 0) {
++        mdata->statsCountdown = HSP_SONIC_DEFAULT_POLLING_INTERVAL;
++        if(mdata->sflow_enable && mdata->statsEnable) {
++          db_writeSflowGlobalStats(mod);
++          db_writeSflowPortStats(mod);
++        }
++      } else {
++        mdata->statsCountdown--;
++      }
+       break;
+     }
+ 
+@@ -1979,6 +2137,30 @@ extern "C" {
+     HSP *sp = (HSP *)EVROOTDATA(mod);
+     if(sp->sFlowSettings == NULL)
+       return;
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_STATE_NAME);
++    if(db) {
++      struct timeval tv = { .tv_sec = 5 };
++      redisContext *ctx = db->unixSocketPath
++        ? redisConnectUnixWithTimeout(db->unixSocketPath, tv)
++        : redisConnectWithTimeout(db->hostname, db->port, tv);
++      if(ctx && !ctx->err) {
++        if(db->passPath) {
++          char pwBuf[256];
++          FILE *fp = fopen(db->passPath, "r");
++          if(fp) {
++            char *pw = fgets(pwBuf, 256, fp);
++            fclose(fp);
++            if(pw) {
++              pw[strcspn(pw, "\n")] = '\0';
++              freeReplyObject(redisCommand(ctx, "AUTH %s", pw));
++            }
++          }
++        }
++        freeReplyObject(redisCommand(ctx, "SELECT %d", db->dbNo));
++        freeReplyObject(redisCommand(ctx, HSP_SONIC_EVAL_CLEAR_SFLOW_STATS_ARGS));
++        redisFree(ctx);
++      }
++    }
+   }
+ 
+   /*_________________---------------------------__________________
+@@ -2038,6 +2220,210 @@ extern "C" {
+     }
+   }
+ 
++  /*_________________---------------------------__________________
++    _________________       db_writeStatsCB     __________________
++    -----------------___________________________------------------
++  */
++
++  static void db_writeStatsCB(redisAsyncContext *ctx, void *magic, void *req_magic)
++  {
++    redisReply *reply = (redisReply *)magic;
++    if(reply && reply->type == REDIS_REPLY_ERROR) {
++      myDebug(1, "sonic db_writeStatsCB error: %s", reply->str);
++    }
++  }
++
++  /*_________________---------------------------__________________
++    _________________   db_clearSflowStats     __________________
++    -----------------___________________________------------------
++    Runtime disable-clear: called when sflow is turned off globally, or
++    stats_collection is set to "down" (mdata->reqStatsClear). Targeted
++    DEL-based, walking currently-live state (portsByName). Unlike the
++    startup case (db_clearAllSflowStatsPattern below), this is safe: by
++    the time a running hsflowd can process a runtime disable, port
++    discovery has already completed, so portsByName correctly reflects
++    every port currently being polled. What it does NOT reach is a port
++    that has since been removed from portsByName entirely (breakout,
++    interface removal) - see db_clearRemovedPortStats() for that case.
++  */
++
++  static void db_clearSflowStats(EVMod *mod) {
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_STATE_NAME);
++    if(!db) return; // retry next tick - reqStatsClear stays set
++    mdata->reqStatsClear = NO;
++    myDebug(1, "sonic clearing SFLOW_STATS entries");
++
++    // clear global stats
++    redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++	    "DEL SFLOW_STATS|global");
++
++    // clear per-port stats
++    HSPSonicPort *prt;
++    UTHASH_WALK(mdata->portsByName, prt) {
++      if(prt->statsWritten) {
++        redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++          "DEL SFLOW_STATS|%s", prt->portName);
++        prt->statsWritten = NO;
++      }
++    }
++  }
++
++  /*_________________---------------------------__________________
++    _________________ db_clearRemovedPortStats  __________________
++    -----------------___________________________------------------
++    Companion to db_clearSflowStats() above, for the case it can't
++    cover: a port that has been removed from portsByName entirely
++    (breakout, interface removal), so it can never again be reached
++    by a UTHASH_WALK over live state.
++
++    deleteMarkedPorts() queues a copy of the port name onto
++    mdata->removedPortStats and sets mdata->reqRemovedPortStatsClear
++    just before freeing a port that had statsWritten set. It can only
++    queue, not DEL directly, because it runs inside the db_portNamesCB
++    Redis callback, where redisAsyncCommand() is not safe to call. This
++    function does the actual DEL, from the evt_tick state machine
++    (a non-callback context), draining and freeing the queued names.
++
++    Between queueing and draining, a port can disappear and reappear
++    under the same name (e.g. a fast breakout-mode toggle) - the queue
++    only remembers the name, not which incarnation asked for the clear.
++    If that happens, the re-created port's own db_writeSflowPortStats()
++    may already have written a fresh row by the time we get here, so we
++    skip the DEL when a live port with that name exists again.
++  */
++
++  static void db_clearRemovedPortStats(EVMod *mod) {
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_STATE_NAME);
++    if(!db) return; // retry next tick - removedPortStats stays queued
++    mdata->reqRemovedPortStatsClear = NO;
++    char *portName;
++    UTARRAY_WALK(mdata->removedPortStats, portName) {
++      if(getPort(mod, portName, NO) == NULL) {
++        redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++          "DEL SFLOW_STATS|%s", portName);
++      }
++      my_free(portName);
++    }
++    UTArrayReset(mdata->removedPortStats);
++  }
++
++  /*_________________---------------------------__________________
++    _________________ db_clearAllSflowStatsPattern _________________
++    -----------------___________________________------------------
++    Startup-only: db_clearSflowStats() above is DEL-based and can only
++    target entries built from live state (portsByName), which is still
++    empty this early. Use a pattern wipe instead so SFLOW_STATS entries
++    left behind by a prior crash (stopped port) are actually removed.
++    Same SCAN+DEL script evt_final() uses on clean shutdown, just run
++    asynchronously since we're still connecting here.
++  */
++
++  static void db_clearAllSflowStatsPattern(EVMod *mod) {
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_STATE_NAME);
++    if(!db) return; // retry next tick - statsCleared stays NO
++    mdata->statsCleared = YES;
++    myDebug(1, "sonic startup: clearing all SFLOW_STATS entries (stale crash leftovers)");
++    redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++      HSP_SONIC_EVAL_CLEAR_SFLOW_STATS_ARGS);
++  }
++
++  /*_________________---------------------------__________________
++    _________________ db_writeSflowGlobalStats  __________________
++    -----------------___________________________------------------
++  */
++
++  static void db_writeSflowGlobalStats(EVMod *mod) {
++    HSP *sp = (HSP *)EVROOTDATA(mod);
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_STATE_NAME);
++    if(!db) return;
++
++    uint64_t dgrams_attempted = 0;
++    char agentIPBuf[64] = "";
++    uint32_t uptimeMS = 0;
++    time_t bootTime = 0;
++
++    if(sp->agent) {
++      for(SFLReceiver *rcv = sp->agent->receivers; rcv; rcv = rcv->nxt) {
++        dgrams_attempted += sfl_receiver_samplePacketsSent(rcv);
++      }
++      SFLAddress_print(&sp->agent->myIP, agentIPBuf, sizeof(agentIPBuf));
++      uptimeMS = sfl_agent_uptime_mS(sp->agent);
++      bootTime = sp->agent->bootTime;
++    }
++
++    redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++      "HMSET SFLOW_STATS|global"
++      " flow_samples %llu"
++      " counter_samples %llu"
++      " rtmetric_samples %llu"
++      " rtflow_samples %llu"
++      " datagrams_sent %llu"
++      " dropped_samples %llu"
++      " flow_samples_suppressed %llu"
++      " counter_samples_suppressed %llu"
++      " event_samples %llu"
++      " event_samples_suppressed %llu"
++      " datagrams_attempted %llu"
++      " agent_ip %s"
++      " agent_uptime_ms %u"
++      " agent_boot_time %lld",
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_FLOW_SAMPLES],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_COUNTER_SAMPLES],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_RTMETRIC_SAMPLES],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_RTFLOW_SAMPLES],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_DATAGRAMS],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_DROPPED_SAMPLES],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_FLOW_SAMPLES_SUPPRESSED],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_COUNTER_SAMPLES_SUPPRESSED],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_EVENT_SAMPLES],
++      (unsigned long long)sp->telemetry[HSP_TELEMETRY_EVENT_SAMPLES_SUPPRESSED],
++      (unsigned long long)dgrams_attempted,
++      agentIPBuf,
++      uptimeMS,
++      (long long)bootTime);
++  }
++
++  /*_________________---------------------------__________________
++    _________________   db_writeSflowPortStats  __________________
++    -----------------___________________________------------------
++  */
++
++  static void db_writeSflowPortStats(EVMod *mod) {
++    HSP *sp = (HSP *)EVROOTDATA(mod);
++    HSP_mod_SONIC *mdata = (HSP_mod_SONIC *)mod->data;
++    HSPSonicDBClient *db = db_selectClient(mod, HSP_SONIC_DB_STATE_NAME);
++    if(!db || !sp->agent) return;
++
++    for(SFLSampler *sm = sp->agent->samplers; sm; sm = sm->nxt) {
++      uint32_t osIndex = SFL_DS_INDEX(sm->dsi);
++      HSPSonicPort *prt = getPortByOsIndex(mod, osIndex);
++      if(!prt || !prt->portName) continue;
++
++      if(prt->sflowEnabled) {
++        redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++          "HMSET SFLOW_STATS|%s"
++          " sample_pool %u"
++          " flow_samples %u"
++          " samples_this_tick %u"
++          " samples_last_tick %u",
++          prt->portName,
++          sm->samplePool,
++          sm->flowSampleSeqNo,
++          sm->samplesThisTick,
++          sm->samplesLastTick);
++        prt->statsWritten = YES;
++      }
++      else {
++        redisAsyncCommand(db->ctx, db_writeStatsCB, NULL,
++          "DEL SFLOW_STATS|%s", prt->portName);
++        prt->statsWritten = NO;
++      }
++    }
++  }
++
+   /*_________________---------------------------__________________
+     _________________       evt_cntr_sample     __________________
+     -----------------___________________________------------------
+@@ -2104,6 +2490,11 @@ extern "C" {
+     mdata->newPorts = UTArrayNew(UTARRAY_PACK);
+     mdata->unmappedPorts = UTArrayNew(UTARRAY_PACK);
+     mdata->newCollectors = UTArrayNew(UTARRAY_PACK);
++    mdata->statsCountdown = HSP_SONIC_DEFAULT_POLLING_INTERVAL;
++    mdata->statsEnable = YES;
++    mdata->sflowAllEnabled = YES;
++    mdata->staleSflowSessions = UTArrayNew(UTARRAY_PACK);
++    mdata->removedPortStats = UTArrayNew(UTARRAY_PACK);
+     // retainRootRequest(mod, "Needed to call out to OPX scripts (PYTHONPATH)");
+     agentDeviceStrictRequest(mod, "may be SONiC CLI setting");
+ 

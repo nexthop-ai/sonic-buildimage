@@ -188,6 +188,12 @@ module sonic-sflow{
                     description "sflow sample direction";
                 }
 
+                leaf stats_collection {
+                    type stypes:admin_status;
+                    default up;
+                    description "Enable or disable sFlow statistics collection to STATE_DB";
+                }
+
             } /* end of container global */
        } /* end of container SFLOW */
 
