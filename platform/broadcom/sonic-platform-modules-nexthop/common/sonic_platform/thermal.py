@@ -142,6 +142,15 @@ class PidThermalMixin(abc.ABC):
         return val - self._pid_setpoint_margin
 
 
+class SwRebootThermalMixin(abc.ABC):
+    """Mixin class for thermal objects that have a software reboot threshold"""
+    def __init__(self, pddf_device_data, reboot_threshold=None):
+        self._pid_setpoint_override = reboot_threshold or pddf_device_data.get('nexthop_thermal_sw_reboot_threshold')
+
+    def get_sw_reboot_threshold(self):
+        return self._pid_setpoint_override
+
+
 class MinMaxTempMixin:
     """Mixin class for thermal objects that support min/max temperature recording"""
     def __init__(self):
@@ -163,7 +172,7 @@ class MinMaxTempMixin:
         return self._max_temperature
 
 
-class Thermal(PddfThermal, MinMaxTempMixin, PidThermalMixin):
+class Thermal(PddfThermal, MinMaxTempMixin, PidThermalMixin, SwRebootThermalMixin):
     """PDDF Platform-Specific Thermal class"""
 
     def __init__(
@@ -181,6 +190,7 @@ class Thermal(PddfThermal, MinMaxTempMixin, PidThermalMixin):
 
         dev_info = {} if is_psu_thermal else self.thermal_obj['dev_info']
         PidThermalMixin.__init__(self, dev_info)
+        SwRebootThermalMixin.__init__(self, dev_info)
 
     def get_model(self):
         return "N/A"
@@ -207,7 +217,7 @@ class Thermal(PddfThermal, MinMaxTempMixin, PidThermalMixin):
         return MinMaxTempMixin.get_maximum_recorded(self)
 
 
-class NexthopFpgaAsicThermal(ThermalBase, MinMaxTempMixin, PidThermalMixin):
+class NexthopFpgaAsicThermal(ThermalBase, MinMaxTempMixin, PidThermalMixin, SwRebootThermalMixin):
     """ASIC temperature sensor read from the FPGA register"""
 
     def __init__(
@@ -224,6 +234,7 @@ class NexthopFpgaAsicThermal(ThermalBase, MinMaxTempMixin, PidThermalMixin):
         dev_info = pddf_obj_data['dev_info']
 
         PidThermalMixin.__init__(self, dev_info)
+        SwRebootThermalMixin.__init__(self, dev_info)
 
         device_parent_name = dev_info['device_parent']
         self._fpga_pci_addr = pddf_data.data[device_parent_name]['dev_info']['device_bdf']

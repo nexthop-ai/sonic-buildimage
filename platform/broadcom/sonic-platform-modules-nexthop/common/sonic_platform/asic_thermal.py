@@ -8,13 +8,13 @@ from sonic_platform_pddf_base.pddf_asic_thermal import PddfAsicThermal
 from swsscommon import swsscommon
 from sonic_py_common import syslogger
 from nexthop.pddf_config_parser import load_platform_json
-from .thermal import PidThermalMixin, MinMaxTempMixin
+from .thermal import PidThermalMixin, MinMaxTempMixin, SwRebootThermalMixin
 
 SYSLOG_IDENTIFIER = "nh_asic_thermal"
 log = syslogger.SysLogger(SYSLOG_IDENTIFIER, log_level=logging.INFO, enable_runtime_config=False)
 
 
-class AsicThermal(PddfAsicThermal, MinMaxTempMixin, PidThermalMixin):
+class AsicThermal(PddfAsicThermal, MinMaxTempMixin, PidThermalMixin, SwRebootThermalMixin):
     """PDDF Platform-Specific ASIC Thermal class"""
 
     _polling_enabled_checked = False
@@ -34,6 +34,7 @@ class AsicThermal(PddfAsicThermal, MinMaxTempMixin, PidThermalMixin):
         dev_info = thermal_obj['dev_info']
 
         PidThermalMixin.__init__(self, dev_info)
+        SwRebootThermalMixin.__init__(self, dev_info)
 
     def _get_platform_asic_sensor_config(self):
         """

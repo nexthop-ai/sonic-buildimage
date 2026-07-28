@@ -309,6 +309,9 @@ class RebootCauseManager:
             elif match := re.search(r"(Kernel Panic.*) \[.*Time: (.*)\]", content):
                 cause = match.group(1)
                 timestamp = parse_timestamp(match.group(2))
+            elif match := re.search(r"(Over-Temperature Event.*) \[.*Time: (.*)\]", content):
+                cause = match.group(1)
+                timestamp = parse_timestamp(match.group(2))
             else:
                 cause = content
                 timestamp = UNKNOWN_TIMESTAMP

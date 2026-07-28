@@ -9,9 +9,16 @@
 #
 #############################################################################
 
+import os
 import sys
+import tempfile
 import time
 
+<<<<<<< HEAD
+=======
+from nexthop.mgmt_port_link_state import get_unmanaged_switch_mgmt_port_link_status
+from nexthop.powercycle import powercycle
+>>>>>>> dd8dc246b (NOS-3746: Software thermal powercycle (#6009))
 from sonic_platform.dpm_base import timestamp_as_string
 from sonic_platform.reboot_cause_manager import RebootCauseManager, RebootCause
 from sonic_platform.thermal import NexthopFpgaAsicThermal
@@ -260,6 +267,74 @@ class Chassis(PddfChassis):
         return self._watchdog
 
     ##############################################################
+<<<<<<< HEAD
+=======
+    ############ Management port link status override ############
+    ##############################################################
+
+    def get_management_port_link_status_override(self, intf: str) -> bool | None:
+        """
+        Override the kernel-reported management port link status.
+
+        On this platform, an unmanaged L2 switch sits between the front-panel
+        management port(s) and the CPU. The kernel always reports the interface
+        as UP even when nothing is plugged in. This method combines the kernel
+        operstate with the real FPGA link state: the interface is considered up
+        only if both the kernel reports up AND the FPGA reports at least one
+        front-panel management port has link.
+
+        Args:
+            intf: The management interface name (e.g., 'eth0').
+
+        Returns:
+            True if kernel operstate is up and FPGA reports link up,
+            False if either is down,
+            None for interfaces without an unmanaged switch (no override).
+        """
+        pddf_config = self._pddf_data.data if self._pddf_data else None
+        status = get_unmanaged_switch_mgmt_port_link_status(intf, pddf_config)
+        if not status:
+            return None  # no unmanaged switch for this interface, no override
+
+        fpga_up = any(status.values())
+        if not fpga_up:
+            return False
+
+        try:
+            with open("/sys/class/net/{}/operstate".format(intf), "r") as fh:
+                kernel_up = fh.readline().strip().lower() == "up"
+        except Exception:
+            kernel_up = False
+
+        return fpga_up and kernel_up
+    
+    def do_hard_reboot(self, message: str):
+        try:
+            filepath = self.plugin_data['REBOOT_CAUSE']['reboot_cause_file']
+            dir = os.path.dirname(filepath)
+            fd, tmp_path = tempfile.mkstemp(dir=dir)
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(message)
+                # ensure data is written to disk: https://docs.python.org/3/library/os.html#os.fsync
+                f.flush()
+                os.fsync(f)
+
+            # allow root to read/write, group/others to read.
+            os.chmod(tmp_path, 0o644)
+            os.rename(tmp_path, filepath)
+            # ensure rename is written to disk: https://lwn.net/Articles/457667
+            dir_fd = os.open(dir, os.O_RDONLY)
+            os.fsync(dir_fd)
+            os.close(dir_fd)
+        except Exception:
+            # best effort logging: our priority is still shutting down the system
+            pass
+
+        config = self._pddf_data.data
+        powercycle(config)
+
+    ##############################################################
+>>>>>>> dd8dc246b (NOS-3746: Software thermal powercycle (#6009))
     ################## ThermalManager methods ####################
     ##############################################################
 

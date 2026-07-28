@@ -3,6 +3,8 @@
 # Copyright 2025 Nexthop Systems Inc. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import NamedTuple
+
 from sonic_platform_base.sonic_thermal_control.thermal_info_base import ThermalPolicyInfoBase
 from sonic_platform_base.sonic_thermal_control.thermal_json_object import thermal_json_object
 
@@ -13,6 +15,15 @@ from .thermal_manager import ThermalManager
 from .fan import Fan
 from .fan_drawer import FanDrawer
 from .psu import Psu
+
+
+class OvertemperatureSensor(NamedTuple):
+    thermal: Thermal
+    temperature: float
+    """The current temperature of the sensor."""
+    threshold: float
+    """The threshold that the sensor has violated."""
+
 
 @thermal_json_object('fan_drawer_info')
 class FanDrawerInfo(ThermalPolicyInfoBase):
@@ -41,18 +52,47 @@ class ThermalInfo(ThermalPolicyInfoBase):
     def __init__(self):
         self._thermals = []
         self._thermal_manager = None
+        self._sw_overtemp_thermals = None
     
     def collect(self, chassis: Chassis):
         self._thermals = chassis.get_all_thermals()[:]
         for sfp in chassis.get_all_sfps():
             self._thermals.extend(sfp.get_all_thermals())
         self._thermal_manager = chassis.get_thermal_manager()
+        # when we call collect() at the start of the loop, refresh overtemperature sensors
+        self._sw_overtemp_thermals = None
     
     def get_thermals(self) -> list[Thermal]:
         return self._thermals
     
     def get_thermal_manager(self) -> ThermalManager:
         return self._thermal_manager
+
+    def get_sw_overtemperature_thermals(self) -> list[OvertemperatureSensor]:
+        """
+        Get a list of all thermals that are over their sw_reboot_threshold.
+        
+        Returns:
+            A list of sensors that are overtemperature, along with their current temperature and threshold.
+        """
+        # cache this list between calls in the same loop so that condition and action has the same list
+        if self._sw_overtemp_thermals is not None:
+            return self._sw_overtemp_thermals
+
+        overtemp: list[OvertemperatureSensor] = []
+        for thermal in self.get_thermals():
+            try:
+                threshold = thermal.get_sw_reboot_threshold()
+                if threshold is None:
+                    continue
+                temperature = thermal.get_temperature()
+                if temperature is not None and temperature > threshold:
+                    overtemp.append(OvertemperatureSensor(thermal, temperature, threshold))
+            except Exception:
+                pass
+
+        self._sw_overtemp_thermals = overtemp
+        return overtemp
 
 @thermal_json_object('psu_info')
 class PsuInfo(ThermalPolicyInfoBase):
@@ -75,5 +115,17 @@ class PsuInfo(ThermalPolicyInfoBase):
         for psu in self._psus:
             fans.extend(psu.get_all_fans())
         return fans
+
+@thermal_json_object('chassis_info')
+class ChassisInfo(ThermalPolicyInfoBase):
+    """Give raw access to the chassis"""
+    INFO_TYPE = 'chassis_info'
+    def __init__(self):
+        self._chassis = None
     
+    def collect(self, chassis: Chassis):
+        self._chassis = chassis
     
+    def get_chassis(self) -> Chassis:
+        assert self._chassis
+        return self._chassis

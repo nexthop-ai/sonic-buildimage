@@ -3,6 +3,7 @@
 # Copyright 2025 Nexthop Systems Inc. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+from datetime import datetime, timezone
 import traceback
 
 from typing import TYPE_CHECKING, Dict, List, Optional, Any, Union
@@ -13,8 +14,13 @@ from sonic_platform_base.sonic_thermal_control.thermal_json_object import therma
 if TYPE_CHECKING:
     from sonic_platform_base.fan_base import Fan
 
+<<<<<<< HEAD
 from sonic_platform.thermal_infos import FanDrawerInfo, ThermalInfo
 from sonic_platform.syslog import SYSLOG_IDENTIFIER_THERMAL, NhLoggerMixin
+=======
+from sonic_platform.syslog import SYSLOG_IDENTIFIER_THERMAL, NhLoggerMixin
+from sonic_platform.thermal_infos import ChassisInfo, FanDrawerInfo, ThermalInfo
+>>>>>>> dd8dc246b (NOS-3746: Software thermal powercycle (#6009))
 
 # Default range of fan speed (percentage) that PID controller can produce.
 FAN_MIN_SPEED: float = 30.0
@@ -567,4 +573,51 @@ class PIDController(NhLoggerMixin):
             log_str += f"   ({', '.join(debug_params_strings)})"
         self.log_debug(log_str)
 
+<<<<<<< HEAD
         return saturated_output
+=======
+        # Create computation details
+        return PidOutput(
+            P=proportional,
+            I=self._integral,
+            D=derivative,
+            raw_output=output,
+            saturated_output=saturated_output,
+            frozen_integral=not should_update_integral,
+        )
+
+@thermal_json_object('reboot.over_temperature')
+class RebootOverTemperatureAction(ThermalPolicyActionBase, NhLoggerMixin):
+    """Thermal action to reboot the system with due to overtemperature."""
+
+    def __init__(self) -> None:
+        """Initialize RebootOverTemperatureAction."""
+        ThermalPolicyActionBase.__init__(self)
+        NhLoggerMixin.__init__(self, SYSLOG_IDENTIFIER_THERMAL)
+
+    def execute(self, thermal_info_dict: Dict[str, Any]) -> None:
+        """
+        Reboot the system, logging the overtemperature sensors.
+        """
+        chassis_info: ChassisInfo = thermal_info_dict[ChassisInfo.INFO_TYPE]
+        chassis = chassis_info.get_chassis()
+        message = "Over-Temperature Event"
+
+        try:
+            thermal_info: ThermalInfo = thermal_info_dict[ThermalInfo.INFO_TYPE]
+            sensors_overtemp: list[str] = []
+            for thermal, temperature, threshold in thermal_info.get_sw_overtemperature_thermals():
+                sensors_overtemp.append(f"{thermal.get_name()} at {temperature}C, above threshold {threshold}C")
+
+            sensors_message = "; ".join(sensors_overtemp)
+            message = f"Over-Temperature Event ({sensors_message})"
+        except Exception:
+            # we *need* to shut down. If we can't gather a message, the less descriptive default message will have to do.
+            pass
+
+        now = datetime.now(timezone.utc)
+        date_str = now.strftime("%a %b %d %H:%M:%S %Z %Y")
+        message += f' [Time: {date_str}]'
+        self.log_error(message, True)
+        chassis.do_hard_reboot(message)
+>>>>>>> dd8dc246b (NOS-3746: Software thermal powercycle (#6009))

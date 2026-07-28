@@ -5,7 +5,7 @@
 
 from sonic_platform_base.sonic_thermal_control.thermal_condition_base import ThermalPolicyConditionBase
 from sonic_platform_base.sonic_thermal_control.thermal_json_object import thermal_json_object
-from .thermal_infos import FanDrawerInfo
+from .thermal_infos import FanDrawerInfo, ThermalInfo
 
 class FanDrawerCondition(ThermalPolicyConditionBase):
     def get_fan_drawer_info(self, thermal_info_dict) -> FanDrawerInfo | None:
@@ -82,4 +82,19 @@ class ThermalControlAlgorithmCondition(FanDrawerCondition):
     """
     def is_match(self, thermal_info_dict):
         fan_drawer_info = self.get_fan_drawer_info(thermal_info_dict)
+<<<<<<< HEAD
         return fan_drawer_info.get_num_present_fan_drawers() > 2
+=======
+        return fan_drawer_info.get_num_functional_fan_drawers() > 2
+
+
+@thermal_json_object('temperature.any_over_critical')
+class TemperatureOverCriticalCondition(ThermalPolicyConditionBase):
+    """
+    Case when a temperature sensor exceeds the software shutdown threshold.
+    """
+    def is_match(self, thermal_info_dict):
+        thermal_info: ThermalInfo = thermal_info_dict[ThermalInfo.INFO_TYPE]
+        overtemp = thermal_info.get_sw_overtemperature_thermals()
+        return len(overtemp) > 0
+>>>>>>> dd8dc246b (NOS-3746: Software thermal powercycle (#6009))
