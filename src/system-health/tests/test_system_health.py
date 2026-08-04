@@ -855,12 +855,13 @@ def test_hardware_checker():
     assert 'PDB 2' in checker._info
     assert checker._info['PDB 2'][HealthChecker.INFO_FIELD_OBJECT_TYPE] == 'PSU'
     assert checker._info['PDB 2'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
-    assert 'out of power' in checker._info['PDB 2'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+    # presence true, status false, no input_voltage evidence -> faulted (not assumed unpowered)
+    assert 'faulted' in checker._info['PDB 2'][HealthChecker.INFO_FIELD_OBJECT_MSG]
 
     assert 'PDB 3' in checker._info
     assert checker._info['PDB 3'][HealthChecker.INFO_FIELD_OBJECT_TYPE] == 'PSU'
     assert checker._info['PDB 3'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
-    assert 'missing' in checker._info['PDB 3'][HealthChecker.INFO_FIELD_OBJECT_MSG].lower()
+    assert 'not present' in checker._info['PDB 3'][HealthChecker.INFO_FIELD_OBJECT_MSG].lower()
 
 
 def test_hardware_checker_pdb_ignore():
@@ -905,6 +906,7 @@ def test_hardware_checker_psu_pdb_ignore_both_skips_psu_check():
     assert 'PSU 1' not in checker._info
 
 
+<<<<<<< HEAD
 def test_hardware_checker_psu_ignore_no_psu_info():
     """Ignoring 'psu' on a platform with no PSU_INFO (e.g. a DPU) must not report a PSU failure."""
     MockConnector.data.clear()
@@ -935,6 +937,106 @@ def test_hardware_checker_psu_ignore_skips_psu_but_checks_pdb():
     assert 'PSU 1' not in checker._info
     assert 'PDB 1' in checker._info
     assert checker._info['PDB 1'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+=======
+def test_hardware_checker_psu_states_and_fan_suppression():
+    """Distinguish empty slot / unpowered (no input) / faulted (input present, output
+    down) / healthy PSUs using input-side evidence, and suppress the false
+    'PSUx_FANy is broken' alarm only when the parent PSU genuinely has no power."""
+    MockConnector.data.clear()
+    MockConnector.data.update({
+        # Empty slot.
+        'PSU_INFO|PSU 1': {
+            'presence': 'False',
+            'status': 'False',
+        },
+        # Unpowered: no power-good, no output, AND no input voltage (positive evidence
+        # of no AC) -> 'present but not powered'.
+        'PSU_INFO|PSU 2': {
+            'presence': 'True',
+            'status': 'False',
+            'voltage': '0.0',
+            'input_voltage': '0.0',
+            'voltage_min_threshold': '11.589',
+            'voltage_max_threshold': '12.808',
+        },
+        # Faulted: no power-good / no output, but INPUT IS PRESENT -> the PSU is broken,
+        # must NOT be reported as 'not powered'.
+        'PSU_INFO|PSU 3': {
+            'presence': 'True',
+            'status': 'False',
+            'voltage': '0.0',
+            'input_voltage': '208.0',
+            'voltage_min_threshold': '11.589',
+            'voltage_max_threshold': '12.808',
+        },
+        # Healthy.
+        'PSU_INFO|PSU 4': {
+            'presence': 'True',
+            'status': 'True',
+            'temp': '25',
+            'temp_threshold': '100',
+            'voltage': '12.0',
+            'input_voltage': '208.0',
+            'voltage_min_threshold': '11.589',
+            'voltage_max_threshold': '12.808',
+        },
+        # Powered, but genuinely out-of-range (non-zero) output voltage -> voltage fault.
+        'PSU_INFO|PSU 5': {
+            'presence': 'True',
+            'status': 'True',
+            'temp': '25',
+            'temp_threshold': '100',
+            'voltage': '9.0',
+            'input_voltage': '208.0',
+            'voltage_min_threshold': '11.589',
+            'voltage_max_threshold': '12.808',
+        },
+    })
+    MockConnector.data.update({
+        # Fan of empty PSU 1 -> goes MISSING with the PSU: suppressed (not "is missing").
+        'FAN_INFO|PSU1_FAN1': {'presence': 'False', 'status': 'False'},
+        # Fan of unpowered PSU 2 -> stopped but expected: suppressed.
+        'FAN_INFO|PSU2_FAN1': {'presence': 'True', 'status': 'False'},
+        # Fan of FAULTED PSU 3 -> NOT suppressed (do not mask a real fault).
+        'FAN_INFO|PSU3_FAN1': {'presence': 'True', 'status': 'False'},
+        # Fan of healthy PSU 4 that is genuinely stopped -> still "broken".
+        'FAN_INFO|PSU4_FAN1': {'presence': 'True', 'status': 'False'},
+    })
+
+    config = Config()
+    # Mirror the Nexthop platform's system_health_monitoring_config: PSU fans report
+    # speed_target 'N/A', so their speed check is ignored. Without this the speed check
+    # short-circuits ("Failed to get actual speed data") before the status branch under test.
+    config.ignore_devices = ['PSU1_FAN1.speed', 'PSU2_FAN1.speed',
+                             'PSU3_FAN1.speed', 'PSU4_FAN1.speed']
+    checker = HardwareChecker()
+    checker.check(config)
+
+    assert checker._info['PSU 1'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'not present' in checker._info['PSU 1'][HealthChecker.INFO_FIELD_OBJECT_MSG].lower()
+
+    assert checker._info['PSU 2'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'not powered' in checker._info['PSU 2'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+    assert 'out of range' not in checker._info['PSU 2'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+    assert checker._info['PSU 3'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'faulted' in checker._info['PSU 3'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+    assert 'not powered' not in checker._info['PSU 3'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+    assert checker._info['PSU 4'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_OK
+
+    assert checker._info['PSU 5'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'out of range' in checker._info['PSU 5'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+    # Fans of the empty / unpowered PSUs are suppressed to OK (cause shown on the PSU line)...
+    assert checker._info['PSU1_FAN1'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_OK
+    assert checker._info['PSU2_FAN1'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_OK
+    # ...but a stopped fan on a FAULTED or healthy PSU still reports broken (no masking).
+    assert checker._info['PSU3_FAN1'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'broken' in checker._info['PSU3_FAN1'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+    assert checker._info['PSU4_FAN1'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'broken' in checker._info['PSU4_FAN1'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+>>>>>>> e24d02ee6 (NOS-7427: distinguish psu states sbi (#5825))
 
 
 def test_config():
