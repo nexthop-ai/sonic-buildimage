@@ -1,0 +1,93 @@
+module sonic-nexthop-tracking {
+    yang-version 1.1;
+    namespace "http://github.com/sonic-net/sonic-nexthop-tracking";
+    prefix nht;
+
+    import sonic-vrf {
+        prefix vrf;
+    }
+
+    organization
+        "SONiC";
+
+    contact
+        "SONiC";
+
+    description
+        "Nexthop tracking and route resolution settings per VRF and address family.
+
+         Provides neighbor_tracking (arp-tracking/nd-tracking) and
+         resolve_via_default. Future additions may include protocol route-maps.";
+
+    revision 2026-07-27 {
+        description
+            "Add resolve_via_default leaf.";
+    }
+
+    revision 2026-06-11 {
+        description
+            "Initial revision.";
+    }
+
+    container sonic-nexthop-tracking {
+        container NEXTHOP_TRACKING {
+            description
+                "Nexthop tracking and route resolution settings.
+
+                 Each entry configures nexthop tracking and resolution behavior
+                 for one (VRF, address-family) scope.";
+
+            list NEXTHOP_TRACKING_LIST {
+                description
+                    "Nexthop tracking and route resolution settings for one VRF and address family.";
+
+                key "vrf_name afi";
+
+                leaf vrf_name {
+                    type union {
+                        type string {
+                            pattern "default";
+                        }
+                        type leafref {
+                            path "/vrf:sonic-vrf/vrf:VRF/vrf:VRF_LIST/vrf:name";
+                        }
+                    }
+                    description
+                        "VRF name. Use 'default' for the default VRF, or a user-defined
+                         VRF name from the VRF table.";
+                }
+
+                leaf afi {
+                    type enumeration {
+                        enum ipv4;
+                        enum ipv6;
+                    }
+                    description
+                        "Address family (IPv4 or IPv6).";
+                }
+
+                leaf neighbor_tracking {
+                    type boolean;
+                    default false;
+                    description
+                        "Enable nexthop resolution gating by kernel neighbor state.
+
+                         When true, nexthops are considered resolved only while the
+                         kernel has an active ARP (IPv4) or ND (IPv6) entry for the
+                         nexthop address. If the nexthop stops responding, it is
+                         marked as unresolved.
+
+                         When false (default), nexthops are considered resolved as
+                         soon as they are routable, regardless of neighbor state.";
+                }
+
+                leaf resolve_via_default {
+                    type boolean;
+                    default true;
+                    description
+                        "Allow nexthop to resolve via the default route.";
+                }
+            } /* end list NEXTHOP_TRACKING_LIST */
+        } /* end container NEXTHOP_TRACKING */
+    } /* end container sonic-nexthop-tracking */
+}

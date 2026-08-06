@@ -1,0 +1,86 @@
+{
+    "NHT_VALID_DEFAULT_VRF": {
+        "desc": "Configure neighbor tracking for default VRF with IPv4."
+    },
+
+    "NHT_VALID_USER_VRF": {
+        "desc": "Configure neighbor tracking for a user-defined VRF (Vrf_blue)."
+    },
+
+    "NHT_VALID_IPV6": {
+        "desc": "Configure neighbor tracking for default VRF with IPv6."
+    },
+
+    "NHT_VALID_DISABLED": {
+        "desc": "Explicitly disable neighbor tracking (neighbor_tracking=false)."
+    },
+
+    "NHT_NON_EXIST_VRF": {
+        "desc": "Referring a non-existent VRF name.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["vrf_name"]
+    },
+
+    "NHT_INVALID_AFI": {
+        "desc": "Using an AFI value outside the ipv4/ipv6 enum.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi"]
+    },
+
+    "NHT_MISSING_AFI": {
+        "desc": "Omitting the mandatory afi key.",
+        "eStrKey": "ListKey",
+        "eStr": ["afi"]
+    },
+
+    "NHT_MISSING_VRF": {
+        "desc": "Omitting the mandatory vrf_name key.",
+        "eStrKey": "ListKey",
+        "eStr": ["vrf_name"]
+    },
+
+    "NHT_INVALID_TRACKING_VALUE": {
+        "desc": "Using a neighbor_tracking value outside the true/false boolean.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["neighbor_tracking"]
+    },
+
+    "NHT_VALID_MULTI_ROW": {
+        "desc": "Four NEXTHOP_TRACKING rows validate together (cartesian product of VRFs and AFIs)."
+    },
+
+    "NHT_VALID_TRACKING_OMITTED": {
+        "desc": "Omitting neighbor_tracking leaf uses the default value (false)."
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_ENABLED": {
+        "desc": "Explicitly enable resolve_via_default for default VRF with IPv4."
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_DISABLED": {
+        "desc": "Explicitly disable resolve_via_default (resolve_via_default=false)."
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_IPV6": {
+        "desc": "Configure resolve_via_default for default VRF with IPv6."
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_OMITTED": {
+        "desc": "Omitting resolve_via_default leaf uses the default value (true); only list keys are set."
+    },
+
+    "NHT_VALID_BOTH_FIELDS": {
+        "desc": "Configure neighbor_tracking and resolve_via_default together in the same row."
+    },
+
+    "NHT_INVALID_RESOLVE_VIA_DEFAULT_VALUE": {
+        "desc": "Using a resolve_via_default value outside the true/false boolean.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["resolve_via_default"]
+    },
+
+    "NHT_DUPLICATE_KEY": {
+        "desc": "Duplicate (vrf_name, afi) key violates list uniqueness.",
+        "eStr": ["Duplicate instance", "NEXTHOP_TRACKING_LIST"]
+    }
+}

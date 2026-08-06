@@ -1,0 +1,284 @@
+{
+    "NHT_VALID_DEFAULT_VRF": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_USER_VRF": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    { "name": "Vrf_blue" }
+                ]
+            }
+        },
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "Vrf_blue",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_IPV6": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv6",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_DISABLED": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "false"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_NON_EXIST_VRF": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "Vrf_does_not_exist",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_INVALID_AFI": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipvX",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_MISSING_AFI": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_MISSING_VRF": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_INVALID_TRACKING_VALUE": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "maybe"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_MULTI_ROW": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    { "name": "Vrf_blue" }
+                ]
+            }
+        },
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv6",
+                        "neighbor_tracking": "true"
+                    },
+                    {
+                        "vrf_name": "Vrf_blue",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    },
+                    {
+                        "vrf_name": "Vrf_blue",
+                        "afi": "ipv6",
+                        "neighbor_tracking": "false"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_TRACKING_OMITTED": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_ENABLED": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "resolve_via_default": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_DISABLED": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "resolve_via_default": "false"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_IPV6": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv6",
+                        "resolve_via_default": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_RESOLVE_VIA_DEFAULT_OMITTED": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv6"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_VALID_BOTH_FIELDS": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true",
+                        "resolve_via_default": "false"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_INVALID_RESOLVE_VIA_DEFAULT_VALUE": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "resolve_via_default": "maybe"
+                    }
+                ]
+            }
+        }
+    },
+
+    "NHT_DUPLICATE_KEY": {
+        "sonic-nexthop-tracking:sonic-nexthop-tracking": {
+            "sonic-nexthop-tracking:NEXTHOP_TRACKING": {
+                "NEXTHOP_TRACKING_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "true"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "afi": "ipv4",
+                        "neighbor_tracking": "false"
+                    }
+                ]
+            }
+        }
+    }
+}

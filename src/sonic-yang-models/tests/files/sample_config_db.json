@@ -5,6 +5,19 @@
                     "vni" : "100"
                 }
         },
+<<<<<<< HEAD
+=======
+        "NEXTHOP_TRACKING": {
+            "default|ipv4": {
+                "neighbor_tracking": "true",
+                "resolve_via_default": "true"
+            },
+            "Vrf_blue|ipv6": {
+                "neighbor_tracking": "false",
+                "resolve_via_default": "true"
+            }
+        },
+>>>>>>> 48b07cce1 (NOS-11250: Add resolve_via_default to NEXTHOP_TRACKING Config DB schema (#6381))
         "SUBNET_DECAP": {
             "AZURE": {
                 "status": "enable",
