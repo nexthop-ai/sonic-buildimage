@@ -11,9 +11,38 @@ exit
 {% endblock vrf %}
 !
 {% block interfaces %}
+{# Default-VRF resolve_via_default knob. resolve_via_default=false emits the
+   explicit "no" form. FRR's traditional profile defaults nht resolve-via-default on.
+   Keys are resolved by iterating NEXTHOP_TRACKING (not .get('default|ipv4'))
+   because sonic-cfggen deserializes composite keys to tuples. #}
+{% set rvd = namespace(ipv4='true', ipv6='true') %}
+{% if NEXTHOP_TRACKING is defined and NEXTHOP_TRACKING|length > 0 %}
+{% for nht_key, nht_val in NEXTHOP_TRACKING.items() %}
+{%   if nht_key is string %}
+{%     set parts = nht_key.split('|') %}
+{%   elif nht_key is iterable %}
+{%     set parts = nht_key %}
+{%   else %}
+{%     set parts = [] %}
+{%   endif %}
+{%   if parts|length == 2 and parts[0] == 'default' and parts[1] == 'ipv4' and nht_val is mapping %}
+{%     set rvd.ipv4 = nht_val.get('resolve_via_default', 'true') %}
+{%   elif parts|length == 2 and parts[0] == 'default' and parts[1] == 'ipv6' and nht_val is mapping %}
+{%     set rvd.ipv6 = nht_val.get('resolve_via_default', 'true') %}
+{%   endif %}
+{% endfor %}
+{% endif %}
 ! Enable nht through default route
+{% if rvd.ipv4 == 'false' %}
+no ip nht resolve-via-default
+{% else %}
 ip nht resolve-via-default
+{% endif %}
+{% if rvd.ipv6 == 'false' %}
+no ipv6 nht resolve-via-default
+{% else %}
 ipv6 nht resolve-via-default
+{% endif %}
 ! Enable link-detect (default disabled)
 {% for (name, prefix) in INTERFACE|pfx_filter %}
 interface {{ name }}

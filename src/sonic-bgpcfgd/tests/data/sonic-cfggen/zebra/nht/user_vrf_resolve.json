@@ -1,0 +1,25 @@
+{
+    "VNET": {
+        "vrf-red": {
+            "vni": "3000",
+            "vxlan_tunnel": "tunnel_v4",
+            "scope": "default"
+        },
+        "vrf-blue": {
+            "vni": "3001",
+            "vxlan_tunnel": "tunnel_v4",
+            "scope": "default"
+        }
+    },
+    "NEXTHOP_TRACKING": {
+        "vrf-red|ipv4": {
+            "resolve_via_default": "true"
+        },
+        "vrf-red|ipv6": {
+            "neighbor_tracking": "true"
+        },
+        "vrf-blue|ipv4": {
+            "resolve_via_default": "false"
+        }
+    }
+}

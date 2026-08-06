@@ -130,6 +130,18 @@ def test_zebra_interfaces():
              "zebra/interfaces.json",
              "zebra/interfaces.conf")
 
+def test_zebra_interfaces_resolve_disabled():
+    run_test("zebra.interfaces.conf.j2 resolve_via_default disabled",
+             "zebra/zebra.interfaces.conf.j2",
+             "zebra/interfaces_resolve_disabled.json",
+             "zebra/interfaces_resolve_disabled.conf")
+
+def test_zebra_interfaces_resolve_both_disabled():
+    run_test("zebra.interfaces.conf.j2 resolve_via_default both AFIs disabled",
+             "zebra/zebra.interfaces.conf.j2",
+             "zebra/interfaces_resolve_both_disabled.json",
+             "zebra/interfaces_resolve_both_disabled.conf")
+
 def test_zebra_set_src():
     run_test("zebra.set_src.conf.j2",
              "zebra/zebra.set_src.conf.j2",
@@ -142,6 +154,68 @@ def test_zebra():
              "zebra/zebra.conf.json",
              "zebra/zebra.conf")
 
+<<<<<<< HEAD
+=======
+def test_zebra_nht_default_vrf():
+    run_test("zebra NEXTHOP_TRACKING default VRF",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/default_vrf.json",
+             "zebra/nht/default_vrf.conf")
+
+def test_zebra_nht_user_vrf():
+    run_test("zebra NEXTHOP_TRACKING user VRF",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/user_vrf.json",
+             "zebra/nht/user_vrf.conf")
+
+def test_zebra_nht_comprehensive():
+    run_test("zebra NEXTHOP_TRACKING comprehensive",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/comprehensive.json",
+             "zebra/nht/comprehensive.conf")
+
+def test_zebra_nht_user_vrf_resolve():
+    # Per-VRF resolve_via_default (unified mode). Any user-VRF row defaults
+    # resolve-via-default to enabled, matching the default VRF: vrf-red|ipv4
+    # ('true') and vrf-red|ipv6 (absent -> default true) both emit the affirmative
+    # form, while vrf-blue|ipv4 ('false') emits the explicit "no" form. The
+    # default VRF is handled separately by zebra.interfaces.conf.j2.
+    run_test("zebra NEXTHOP_TRACKING user VRF resolve_via_default",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/user_vrf_resolve.json",
+             "zebra/nht/user_vrf_resolve.conf")
+
+def test_zebra_nht_disabled():
+    run_test("zebra NEXTHOP_TRACKING tracking disabled; user-VRF resolve-via-default defaults on",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/disabled.json",
+             "zebra/nht/disabled.conf")
+
+def test_zebra_nht_empty():
+    run_test("zebra NEXTHOP_TRACKING empty table",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/empty.json",
+             "zebra/nht/empty.conf")
+
+def test_zebra_nht_mixed_afi():
+    run_test("zebra NEXTHOP_TRACKING mixed AFI (ND in default, ARP in user VRF)",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/mixed_afi.json",
+             "zebra/nht/mixed_afi.conf")
+
+def test_zebra_nht_vrf_table():
+    run_test("zebra NEXTHOP_TRACKING with VRF table (not VNET)",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/vrf_table.json",
+             "zebra/nht/vrf_table.conf")
+
+def test_zebra_nht_vrf_no_config():
+    run_test("zebra NEXTHOP_TRACKING with VRF table entry without tracking or vni",
+             "zebra/zebra.nht.conf.j2",
+             "zebra/nht/vrf_no_config.json",
+             "zebra/nht/vrf_no_config.conf")
+
+>>>>>>> e49fc95c0 (NOS-11251: Add knob for resolve via default (#6393))
 def test_isolate():
     run_test("isolate.j2",
              "isolate.j2",

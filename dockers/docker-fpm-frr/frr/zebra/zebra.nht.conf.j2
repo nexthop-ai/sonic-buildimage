@@ -1,0 +1,69 @@
+{% if NEXTHOP_TRACKING is defined and NEXTHOP_TRACKING|length > 0 %}
+{# Single pass: collect per-VRF/AFI tracking and resolve-via-default data.
+   Default-VRF resolve-via-default is handled by zebra.interfaces.conf.j2;
+   only default-VRF entries with neighbor_tracking=true are collected here. #}
+{% set ns = namespace(by_vrf={}) %}
+{% for nht_key, nht_val in NEXTHOP_TRACKING.items() %}
+{%   if nht_key is string %}
+{%     set parts = nht_key.split('|') %}
+{%   elif nht_key is iterable %}
+{%     set parts = nht_key %}
+{%   else %}
+{%     set parts = [] %}
+{%   endif %}
+{%   if parts|length == 2 and nht_val is mapping %}
+{%     set vrf = parts[0] %}
+{%     set afi = parts[1] %}
+{%     if vrf and afi in ['ipv4', 'ipv6'] %}
+{%       set tracking = nht_val.get('neighbor_tracking', 'false') %}
+{%       if vrf == 'default' %}
+{%         if tracking == 'true' %}
+{%           set _ = ns.by_vrf.setdefault(vrf, {}).update({afi: {'tracking': 'true'}}) %}
+{%         endif %}
+{%       else %}
+{%         set resolve = nht_val.get('resolve_via_default', 'true') %}
+{%         set _ = ns.by_vrf.setdefault(vrf, {}).update({afi: {'tracking': tracking, 'resolve': resolve}}) %}
+{%       endif %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+{# Emit commands per VRF (sorted for deterministic output) #}
+{% for vrf, afis in ns.by_vrf.items()|sort %}
+{%   if vrf == 'default' %}
+{%     for afi in afis|sort %}
+{%       if afi == 'ipv4' %}
+ip nht arp-tracking
+{%       elif afi == 'ipv6' %}
+ipv6 nht nd-tracking
+{%       endif %}
+{%     endfor %}
+!
+{%   else %}
+vrf {{ vrf }}
+{%     for afi, vals in afis.items()|sort %}
+{%       if vals.tracking == 'true' %}
+{%         if afi == 'ipv4' %}
+ ip nht arp-tracking
+{%         elif afi == 'ipv6' %}
+ ipv6 nht nd-tracking
+{%         endif %}
+{%       endif %}
+{%       if afi == 'ipv4' %}
+{%         if vals.resolve == 'false' %}
+ no ip nht resolve-via-default
+{%         else %}
+ ip nht resolve-via-default
+{%         endif %}
+{%       elif afi == 'ipv6' %}
+{%         if vals.resolve == 'false' %}
+ no ipv6 nht resolve-via-default
+{%         else %}
+ ipv6 nht resolve-via-default
+{%         endif %}
+{%       endif %}
+{%     endfor %}
+exit-vrf
+!
+{%   endif %}
+{% endfor %}
+{% endif %}

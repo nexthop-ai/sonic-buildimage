@@ -1,0 +1,53 @@
+!
+! Nexthop tracking configuration (runtime template for separated mode)
+! Used by bgpcfgd NhtMgr for dynamic CONFIG_DB changes
+!
+{% if vrf_name != 'default' %}
+vrf {{ vrf_name }}
+{% if afi == 'ipv4' %}
+{% if neighbor_tracking == 'true' %}
+ ip nht arp-tracking
+{% else %}
+ no ip nht arp-tracking
+{% endif %}
+{% elif afi == 'ipv6' %}
+{% if neighbor_tracking == 'true' %}
+ ipv6 nht nd-tracking
+{% else %}
+ no ipv6 nht nd-tracking
+{% endif %}
+{% endif %}
+exit-vrf
+{% else %}
+{% if afi == 'ipv4' %}
+{% if neighbor_tracking == 'true' %}
+ip nht arp-tracking
+{% else %}
+no ip nht arp-tracking
+{% endif %}
+{% elif afi == 'ipv6' %}
+{% if neighbor_tracking == 'true' %}
+ipv6 nht nd-tracking
+{% else %}
+no ipv6 nht nd-tracking
+{% endif %}
+{% endif %}
+{# resolve-via-default is intentionally default-VRF-only in separated mode:
+   NhtMgr guards on vrf_name == 'default', so user-VRF resolve_via_default is
+   ignored here by design. Unified mode (frrcfgd) handles user VRFs; add the
+   user-VRF branch above if legacy support is ever needed. #}
+{% if afi == 'ipv4' %}
+{% if resolve_via_default == 'true' %}
+ip nht resolve-via-default
+{% elif resolve_via_default == 'false' %}
+no ip nht resolve-via-default
+{% endif %}
+{% elif afi == 'ipv6' %}
+{% if resolve_via_default == 'true' %}
+ipv6 nht resolve-via-default
+{% elif resolve_via_default == 'false' %}
+no ipv6 nht resolve-via-default
+{% endif %}
+{% endif %}
+{% endif %}
+!
