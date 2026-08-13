@@ -1,0 +1,1351 @@
+{
+    "SR_POLICY_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "srv6_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2::100"
+                    },
+                    {
+                        "name": "srv6_path",
+                        "index": 20,
+                        "ipv6_address": "2001:db8:3::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8:3::1",
+                        "name": "static_srv6_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8:3::1",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8:3::1",
+                        "preference": 100,
+                        "name": "srv6_path"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_SEGMENT_LIST_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "test_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_SEGMENT_LIST_INVALID_IPV6": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "bad_path",
+                        "index": 10,
+                        "ipv6_address": "invalid-ipv6"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_SEGMENT_LIST_INVALID_INDEX_ZERO": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "zero_index",
+                        "index": 0,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_SEGMENT_LIST_INVALID_INDEX_TOO_LARGE": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "large_index",
+                        "index": 65536,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_SEGMENT_LIST_MISSING_IPV6": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "missing_ipv6",
+                        "index": 10
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_INVALID_COLOR_ZERO": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 0,
+                        "endpoint": "2001:db8:1::1",
+                        "name": "bad_color"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_INVALID_ENDPOINT_IPV4": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "invalid.ip",
+                        "name": "bad_endpoint"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_INVALID_ENDPOINT_IPV6": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "gggg::1",
+                        "name": "bad_ipv6_endpoint"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CANDIDATE_PATH_VALID_EXPLICIT": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "path1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "test_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "path1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CANDIDATE_PATH_INVALID_SEGMENT_LIST_REF": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "test_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "non_existent_path"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CANDIDATE_PATH_INVALID_PREFERENCE_ZERO": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "path1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "test_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 0,
+                        "name": "cp1",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 0,
+                        "name": "path1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CANDIDATE_PATH_MISSING_NAME": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "path1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "test_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "path1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_MULTIPLE_SEGMENT_LISTS": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "path1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    },
+                    {
+                        "name": "path1",
+                        "index": 20,
+                        "ipv6_address": "2001:db8:2::2"
+                    },
+                    {
+                        "name": "path2",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:3::3"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "weighted_ecmp_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "path1",
+                        "weight": 10
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "path2",
+                        "weight": 20
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_MULTIPLE_CANDIDATE_PATHS": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "primary",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    },
+                    {
+                        "name": "backup",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2::2"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "multi_path_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 200,
+                        "name": "primary_cp",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "backup_cp",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 200,
+                        "name": "primary"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "backup"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CANDIDATE_PATH_NO_PARENT_POLICY": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 999,
+                        "endpoint": "10.0.0.99",
+                        "preference": 100,
+                        "name": "orphan_cp",
+                        "type": "explicit"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SEGMENT_LIST_NO_PARENT_CP": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "test_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "test_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 999,
+                        "name": "test_path"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SEGMENT_LIST_REUSE_SAME_POLICY": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "shared_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "same_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "primary",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 200,
+                        "name": "secondary",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "shared_path"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 200,
+                        "name": "shared_path"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SEGMENT_LIST_REUSE_ACROSS_POLICIES": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "shared_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "first_policy"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.2",
+                        "name": "second_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "first_cp",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.2",
+                        "preference": 100,
+                        "name": "second_cp",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "shared_path"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.2",
+                        "preference": 100,
+                        "name": "shared_path"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SEGMENT_LIST_REUSE_WEIGHTED_ECMP": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "path_a",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    },
+                    {
+                        "name": "path_b",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "weighted_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "weighted_cp",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 200,
+                        "name": "other_cp",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "path_a",
+                        "weight": 10
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "path_b",
+                        "weight": 20
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 200,
+                        "name": "path_a"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_DISTINCT_SEGMENT_LISTS_ACROSS_POLICIES": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "first_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:1::1"
+                    },
+                    {
+                        "name": "second_path",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2::1"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "name": "first_policy"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.2",
+                        "name": "second_policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "first_cp",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.2",
+                        "preference": 100,
+                        "name": "second_cp",
+                        "type": "explicit"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.1",
+                        "preference": 100,
+                        "name": "first_path"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.2",
+                        "preference": 100,
+                        "name": "second_path"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_GLOBAL_SBFD_ENABLE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_GLOBAL": {
+                "SR_TE_GLOBAL_LIST": [
+                    {
+                        "key": "global",
+                        "sbfd": "enable",
+                        "sbfd_profile": "sbfd-default"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "sbfd-default",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8:9::1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_GLOBAL_SBFD_DISABLE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_GLOBAL": {
+                "SR_TE_GLOBAL_LIST": [
+                    {
+                        "key": "global",
+                        "sbfd": "disable"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SBFD_ENABLE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-sbfd",
+                        "sbfd": "enable",
+                        "sbfd_profile": "sbfd-policy"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "sbfd-policy",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8:9::2"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SBFD_DISABLE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 200,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-no-sbfd",
+                        "sbfd": "disable"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CP_SBFD_ENABLE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "sl1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2:1::"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-cp-sbfd"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit",
+                        "sbfd": "enable",
+                        "sbfd_profile": "sbfd-cp"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "sl1"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "sbfd-cp",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8:9::3"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CP_SBFD_DISABLE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "sl1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2:1::"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-cp-sbfd-off"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit",
+                        "sbfd": "disable"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "sl1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_SBFD_THREE_LEVEL_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_GLOBAL": {
+                "SR_TE_GLOBAL_LIST": [
+                    {
+                        "key": "global",
+                        "sbfd": "enable",
+                        "sbfd_profile": "sbfd-global"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "sl-primary",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2:1::"
+                    },
+                    {
+                        "name": "sl-backup",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:3:1::"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-three-level",
+                        "sbfd": "enable",
+                        "sbfd_profile": "sbfd-policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 200,
+                        "name": "cp-primary",
+                        "type": "explicit",
+                        "sbfd": "enable",
+                        "sbfd_profile": "sbfd-cp-primary"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "cp-backup",
+                        "type": "explicit",
+                        "sbfd": "disable"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 200,
+                        "name": "sl-primary"
+                    },
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "sl-backup"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "sbfd-global",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8:9::4"
+                    },
+                    {
+                        "name": "sbfd-policy",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8:9::5"
+                    },
+                    {
+                        "name": "sbfd-cp-primary",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8:9::6"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_GLOBAL_SBFD_PROFILE_WRONG_MODE": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_GLOBAL": {
+                "SR_TE_GLOBAL_LIST": [
+                    {
+                        "key": "global",
+                        "sbfd": "enable",
+                        "sbfd_profile": "classic-bfd"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "classic-bfd",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_GLOBAL_SBFD_PROFILE_NOT_FOUND": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_GLOBAL": {
+                "SR_TE_GLOBAL_LIST": [
+                    {
+                        "key": "global",
+                        "sbfd": "enable",
+                        "sbfd_profile": "does-not-exist"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_TE_GLOBAL_SBFD_NONE_INVALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_GLOBAL": {
+                "SR_TE_GLOBAL_LIST": [
+                    {
+                        "key": "global",
+                        "sbfd": "none"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_SBFD_NONE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-sbfd-none",
+                        "sbfd": "none"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_CP_SBFD_NONE_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_TE_SEGMENT_LIST": {
+                "SR_TE_SEGMENT_LIST_LIST": [
+                    {
+                        "name": "sl1",
+                        "index": 10,
+                        "ipv6_address": "2001:db8:2:1::"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "name": "pol-cp-sbfd-none"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "cp1",
+                        "type": "explicit",
+                        "sbfd": "none"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "10.0.0.4",
+                        "preference": 100,
+                        "name": "sl1"
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_VALID": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_gold"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_silver"
+                    },
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_per_flow"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp_gold",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 200,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp_silver",
+                        "type": "explicit"
+                    },
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp_per_flow",
+                        "type": "per-flow"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 1,
+                        "next_color": 100
+                    },
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 2,
+                        "next_color": 200
+                    },
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 0,
+                        "action_best_effort": true
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_INVALID_FC_KEY_TOO_LARGE": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_per_flow"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp",
+                        "type": "per-flow"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 8,
+                        "next_color": 100
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_VALID_BEST_EFFORT_ON_NUMERIC_FC": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_per_flow"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp",
+                        "type": "per-flow"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 3,
+                        "action_best_effort": true
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_INVALID_BOTH_ACTIONS": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_per_flow"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp",
+                        "type": "per-flow"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 0,
+                        "next_color": 100,
+                        "action_best_effort": true
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_INVALID_SELF_REFERENCE": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy_per_flow"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp",
+                        "type": "per-flow"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 1,
+                        "next_color": 300
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_INVALID_PARENT_TYPE": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "policy"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "cp",
+                        "type": "explicit"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 1,
+                        "next_color": 100
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_INVALID_NO_PARENT_CP": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 999,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 1,
+                        "next_color": 100
+                    }
+                ]
+            }
+        }
+    },
+    "SR_POLICY_PER_FLOW_INVALID_CHILD_IS_PER_FLOW": {
+        "sonic-sr-te:sonic-sr-te": {
+            "sonic-sr-te:SR_POLICY": {
+                "SR_POLICY_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8::1",
+                        "name": "child_per_flow"
+                    },
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "name": "parent_per_flow"
+                    }
+                ],
+                "SR_POLICY_CANDIDATE_PATH_LIST": [
+                    {
+                        "color": 100,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "child_cp",
+                        "type": "per-flow"
+                    },
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "name": "parent_cp",
+                        "type": "per-flow"
+                    }
+                ]
+            },
+            "sonic-sr-te:SR_POLICY_CANDIDATE_PATH_PER_FLOW": {
+                "SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST": [
+                    {
+                        "color": 300,
+                        "endpoint": "2001:db8::1",
+                        "preference": 100,
+                        "fc_key": 1,
+                        "next_color": 100
+                    }
+                ]
+            }
+        }
+    }
+}

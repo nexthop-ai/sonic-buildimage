@@ -1,0 +1,420 @@
+module sonic-sr-te {
+    namespace "http://github.com/sonic-net/sonic-sr-te";
+    prefix srte;
+    yang-version 1.1;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    import sonic-bfd-profile {
+        prefix bfdprof;
+    }
+
+    organization
+        "SONiC";
+
+    contact
+        "SONiC";
+
+    description
+        "SR-TE configuration - Segment Routing Traffic Engineering Policy";
+
+    revision 2026-08-11 {
+        description
+            "Do not allow sharing of a segment list between candidate paths or policies.";
+    }
+
+    revision 2026-06-30 {
+        description
+            "Add S-BFD liveness monitoring configuration at global, policy,
+             and candidate-path levels. sbfd is tri-state (enable/disable/none,
+             default none); sbfd_profile is mandatory when sbfd is 'enable' and
+             must reference a BFD_PROFILE entry configured with mode
+             'sbfd_echo' and source_ipv6 set.";
+    }
+
+    revision 2026-03-19 {
+        description
+            "Initial revision for SR-TE support";
+    }
+
+    typedef sbfd-mode {
+        type enumeration {
+            enum enable {
+                description "Enable Seamless BFD (S-BFD)";
+            }
+            enum disable {
+                description "Disable Seamless BFD (S-BFD)";
+            }
+            enum none {
+                description "No override at this level; inherit from the parent level.";
+            }
+        }
+        default "none";
+        description "S-BFD operational mode";
+    }
+
+    grouping sr-te-sbfd {
+        description
+            "S-BFD configuration, inheritable across the global -> policy ->
+             candidate-path hierarchy; a more specific level overrides a less
+             specific one.";
+
+        leaf sbfd {
+            type sbfd-mode;
+            description
+                "S-BFD operational mode.
+                 'enable'  - S-BFD is enabled; sbfd_profile must also be set.
+                 'disable' - S-BFD is disabled at this level regardless of any
+                             less specific setting.
+                 'none'    - No override at this level (default); inherits
+                             from the parent level. Equivalent to omitting
+                             this field.";
+        }
+
+        leaf sbfd_profile {
+            type string {
+                length "1..255";
+            }
+            when "../sbfd = 'enable'";
+            mandatory true;
+            must "/bfdprof:sonic-bfd-profile/bfdprof:BFD_PROFILE/bfdprof:BFD_PROFILE_LIST[bfdprof:name=current()]/bfdprof:mode = 'sbfd_echo'" {
+                error-message "sbfd_profile must reference a BFD_PROFILE configured with mode 'sbfd_echo'";
+            }
+            must "/bfdprof:sonic-bfd-profile/bfdprof:BFD_PROFILE/bfdprof:BFD_PROFILE_LIST[bfdprof:name=current()]/bfdprof:source_ipv6" {
+                error-message "sbfd_profile must reference a BFD_PROFILE with source_ipv6 configured";
+            }
+            description
+                "BFD profile name for S-BFD sessions. Required when sbfd is
+                 'enable'.";
+        }
+    }
+
+    container sonic-sr-te {
+
+        container SR_TE_GLOBAL {
+            description
+                "Global SR-TE configuration (singleton table).
+                 Key 'global' holds system-wide S-BFD defaults applied to all
+                 policies unless overridden at the policy or candidate-path level.";
+
+            list SR_TE_GLOBAL_LIST {
+                key "key";
+
+                leaf key {
+                    type enumeration {
+                        enum global {
+                            description "Singleton key for global SR-TE configuration";
+                        }
+                    }
+                    description "Fixed singleton key";
+                }
+
+                uses sr-te-sbfd {
+                    refine "sbfd" {
+                        default "disable";
+                        must ". = 'enable' or . = 'disable'" {
+                            error-message "sbfd must be 'enable' or 'disable' at the global level (there is no parent level to inherit from)";
+                        }
+                        description
+                            "Global S-BFD operational mode; 'none' is not valid
+                             here since there is no parent level to inherit
+                             from. Default 'disable'.
+                             'enable'  - S-BFD is enabled by default for all
+                                         SR-TE candidate paths; sbfd_profile
+                                         must also be set.
+                             'disable' - S-BFD is disabled globally.";
+                    }
+                }
+            }
+        }
+        /* end of container SR_TE_GLOBAL */
+
+        container SR_TE_SEGMENT_LIST {
+            description
+                "Segment list configuration for SR policies";
+
+            list SR_TE_SEGMENT_LIST_LIST {
+                key "name index";
+
+                leaf name {
+                    type string {
+                        length "1..255";
+                    }
+                    description "Segment list name";
+                }
+
+                leaf index {
+                    type uint32 {
+                        range "1..65535";
+                    }
+                    description
+                        "Segment index - determines the order of segments in the path.
+                         Indices do not need to be consecutive, allowing insertion of
+                         segments between existing ones (e.g., 10, 20, 30 allows inserting 15).";
+                }
+
+                leaf segment_type {
+                    type enumeration {
+                        enum ipv6-address {
+                            description "SRv6 SID (Type B) - IPv6 address";
+                        }
+                        // Future segment types (not yet supported in backend):
+                        // enum mpls-label - SR-MPLS Label (Type A)
+                        // enum nai-prefix-v4 - IPv4 Prefix with optional SR Algorithm (Type C)
+                        // enum nai-prefix-v6 - IPv6 Prefix with optional SR Algorithm (Type D/I)
+                        // enum nai-adjacency-v4 - IPv4 Adjacency (Type F)
+                        // enum nai-adjacency-v6 - IPv6 Adjacency (Type H/K)
+                        // enum nai-prefix-iface-v4 - IPv4 Prefix with Interface ID (Type E)
+                        // enum nai-prefix-iface-v6 - IPv6 Prefix with Interface IDs (Type G/J)
+                    }
+                    default "ipv6-address";
+                    description
+                        "Type of segment. Currently only ipv6-address (SRv6 Type B) is supported.
+                         Additional segment types will be added in future releases.";
+                }
+
+                leaf ipv6_address {
+                    type inet:ipv6-address;
+                    when "../segment_type = 'ipv6-address'";
+                    mandatory true;
+                    description
+                        "SRv6 SID - IPv6 address representing the segment.
+                         This is the Type B segment as defined in RFC 9256.
+                         Required when segment_type is 'ipv6-address'.";
+                }
+            }
+        }
+        /* end of container SR_TE_SEGMENT_LIST */
+
+        container SR_POLICY {
+            description
+                "SR policy configuration - uses variable-length keys to represent hierarchy.
+                 2-part key (color|endpoint)                 = Policy
+                 3-part key (color|endpoint|preference)      = Candidate Path
+                 4-part key (color|endpoint|preference|name) = Segment List Association";
+
+            list SR_POLICY_LIST {
+                key "color endpoint";
+                unique "name";
+
+                leaf color {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Policy color (distinguisher)";
+                }
+
+                leaf endpoint {
+                    type inet:ip-address;
+                    description "Policy endpoint (IPv4 or IPv6 address)";
+                }
+
+                leaf name {
+                    type string {
+                        length "1..255";
+                    }
+                    description
+                        "Policy name - must be unique across all policies (optional).
+                         Note: Once set, the policy name cannot be modified due to backend limitations.";
+                }
+
+                uses sr-te-sbfd;
+            }
+            /* end of list SR_POLICY_LIST */
+
+            list SR_POLICY_CANDIDATE_PATH_LIST {
+                key "color endpoint preference";
+                unique "color endpoint name";
+
+                must "/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_LIST[srte:color=current()/color][srte:endpoint=current()/endpoint]" {
+                    error-message "Candidate path must reference an existing SR_POLICY (color|endpoint)";
+                }
+
+                leaf color {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Policy color - must match an existing SR_POLICY entry";
+                }
+
+                leaf endpoint {
+                    type inet:ip-address;
+                    description "Policy endpoint - must match an existing SR_POLICY entry";
+                }
+
+                leaf preference {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Candidate path preference (higher value = higher preference)";
+                }
+
+                leaf name {
+                    type string {
+                        length "1..255";
+                    }
+                    mandatory true;
+                    description "Candidate path name (required by the routing backend)";
+                }
+
+                leaf type {
+                    type enumeration {
+                        enum explicit {
+                            description "Explicit path using segment list";
+                        }
+                        enum per-flow {
+                            description
+                                "Per-flow CP (RFC 9256). Body in
+                                 SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST instead of a segment
+                                 list; pathd builds a CBF NHG keyed by forwarding-class.";
+                        }
+                        // Future: dynamic type (not yet supported in backend)
+                        // enum dynamic {
+                        //     description "Dynamic path computed by PCE or local computation";
+                        // }
+                    }
+                    default "explicit";
+                    description
+                        "Candidate path type. 'explicit' uses a segment list, 'per-flow' uses
+                         the body in SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST. Dynamic TBD.";
+                }
+
+                uses sr-te-sbfd;
+            }
+            /* end of list SR_POLICY_CANDIDATE_PATH_LIST */
+
+            list SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST {
+                key "color endpoint preference name";
+
+                must "/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_CANDIDATE_PATH_LIST[srte:color=current()/color][srte:endpoint=current()/endpoint][srte:preference=current()/preference]" {
+                    error-message "Segment list association must reference an existing SR_POLICY_CANDIDATE_PATH (color|endpoint|preference)";
+                }
+
+                must "/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_CANDIDATE_PATH_LIST[srte:color=current()/color][srte:endpoint=current()/endpoint][srte:preference=current()/preference]/srte:type = 'explicit'" {
+                    error-message "Segment list can only be associated with explicit candidate paths. The candidate path type must be 'explicit'.";
+                }
+
+                must "count(/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST[srte:name=current()/name]) <= 1" {
+                    error-message "A segment list cannot be shared between candidate paths or policies";
+                }
+
+                leaf color {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Policy color - must match an existing SR_POLICY_CANDIDATE_PATH entry";
+                }
+
+                leaf endpoint {
+                    type inet:ip-address;
+                    description "Policy endpoint - must match an existing SR_POLICY_CANDIDATE_PATH entry";
+                }
+
+                leaf preference {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Candidate path preference - must match an existing SR_POLICY_CANDIDATE_PATH entry";
+                }
+
+                leaf name {
+                    type leafref {
+                        path "/srte:sonic-sr-te/srte:SR_TE_SEGMENT_LIST/srte:SR_TE_SEGMENT_LIST_LIST/srte:name";
+                    }
+                    description "Name of the segment list to associate with this candidate path";
+                }
+
+                leaf weight {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    default "1";
+                    description
+                        "Weight for weighted ECMP when multiple segment lists are configured.
+                         Default weight is 1 (equal weighting).
+                         Multiple segment lists may be associated with a single candidate path,
+                         each with its own weight, to enable weighted ECMP across the segment lists.";
+                }
+            }
+            /* end of list SR_POLICY_CANDIDATE_PATH_SEGMENT_LIST_LIST */
+        }
+        /* end of container SR_POLICY */
+
+        container SR_POLICY_CANDIDATE_PATH_PER_FLOW {
+            description
+                "Per-flow CP body. One row per (color, endpoint, preference, fc_key).
+                 fc_key 0 is the default bucket. fc_key 1..7 are the FCs produced
+                 by DSCP_TO_FC_MAP at ingress. Every fc_key may set either
+                 next_color or action_best_effort.";
+
+            list SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST {
+                key "color endpoint preference fc_key";
+
+                must "/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_CANDIDATE_PATH_LIST[srte:color=current()/color][srte:endpoint=current()/endpoint][srte:preference=current()/preference]" {
+                    error-message "Per-flow entry must reference an existing SR_POLICY_CANDIDATE_PATH (color|endpoint|preference)";
+                }
+
+                must "/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_CANDIDATE_PATH_LIST[srte:color=current()/color][srte:endpoint=current()/endpoint][srte:preference=current()/preference]/srte:type = 'per-flow'" {
+                    error-message "Per-flow entries are only allowed on candidate paths whose type is 'per-flow'";
+                }
+
+                /* No multi-level chains — mirrors FRR's srte_perflow_resolve runtime guard. */
+                must "not(/srte:sonic-sr-te/srte:SR_POLICY/srte:SR_POLICY_CANDIDATE_PATH_LIST[srte:color=current()/next_color][srte:endpoint=current()/endpoint][srte:type='per-flow'])" {
+                    error-message "Child SR Policy referenced by next_color must not itself be 'per-flow'";
+                }
+
+                leaf color {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Parent SR Policy color - must match an existing per-flow SR_POLICY_CANDIDATE_PATH";
+                }
+
+                leaf endpoint {
+                    type inet:ip-address;
+                    description "Parent SR Policy endpoint - must match an existing per-flow SR_POLICY_CANDIDATE_PATH";
+                }
+
+                leaf preference {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    description "Parent candidate-path preference - must match an existing per-flow SR_POLICY_CANDIDATE_PATH";
+                }
+
+                leaf fc_key {
+                    type uint8 {
+                        range "0..7";
+                    }
+                    description "FC selector. 0 = default bucket, 1..7 = numeric FC.";
+                }
+
+                leaf next_color {
+                    type uint32 {
+                        range "1..4294967295";
+                    }
+                    must "not(../action_best_effort)" {
+                        error-message "next_color and action_best_effort are mutually exclusive";
+                    }
+                    must "current() != ../color" {
+                        error-message "next_color must differ from the parent color (self-reference)";
+                    }
+                    description "Child SR Policy color (same endpoint as the parent).";
+                }
+
+                leaf action_best_effort {
+                    type boolean;
+                    must "not(../next_color)" {
+                        error-message "next_color and action_best_effort are mutually exclusive";
+                    }
+                    description "Bypass the SR Policy and forward best-effort via the IGP-resolved next-hop.";
+                }
+            }
+            /* end of list SR_POLICY_CANDIDATE_PATH_PER_FLOW_LIST */
+        }
+        /* end of container SR_POLICY_CANDIDATE_PATH_PER_FLOW */
+    }
+    /* end of container sonic-sr-te */
+}

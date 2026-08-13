@@ -1,0 +1,150 @@
+{
+    "SR_POLICY_VALID": {
+        "desc": "Valid SR-Policy configuration with all tables"
+    },
+    "SR_TE_SEGMENT_LIST_VALID": {
+        "desc": "Valid segment list with IPv6 addresses"
+    },
+    "SR_TE_SEGMENT_LIST_INVALID_IPV6": {
+        "desc": "Segment list with invalid IPv6 address",
+        "eStrKey": "Pattern"
+    },
+    "SR_TE_SEGMENT_LIST_INVALID_INDEX_ZERO": {
+        "desc": "Segment list with index 0 (must be 1-65535)",
+        "eStrKey": "Range"
+    },
+    "SR_TE_SEGMENT_LIST_INVALID_INDEX_TOO_LARGE": {
+        "desc": "Segment list with index > 65535",
+        "eStrKey": "Range"
+    },
+    "SR_TE_SEGMENT_LIST_MISSING_IPV6": {
+        "desc": "Segment list missing required ipv6_address field when segment_type is ipv6-address",
+        "eStrKey": "Mandatory"
+    },
+    "SR_POLICY_INVALID_COLOR_ZERO": {
+        "desc": "SR-Policy with color 0 (must be 1-4294967295)",
+        "eStrKey": "Range"
+    },
+    "SR_POLICY_INVALID_ENDPOINT_IPV4": {
+        "desc": "SR-Policy with invalid IPv4 endpoint",
+        "eStrKey": "Pattern"
+    },
+    "SR_POLICY_INVALID_ENDPOINT_IPV6": {
+        "desc": "SR-Policy with invalid IPv6 endpoint",
+        "eStrKey": "Pattern"
+    },
+    "SR_POLICY_CANDIDATE_PATH_VALID_EXPLICIT": {
+        "desc": "Valid explicit candidate path"
+    },
+    "SR_POLICY_CANDIDATE_PATH_INVALID_SEGMENT_LIST_REF": {
+        "desc": "Candidate path referencing non-existent segment list",
+        "eStrKey": "LeafRef"
+    },
+    "SR_POLICY_CANDIDATE_PATH_INVALID_PREFERENCE_ZERO": {
+        "desc": "Candidate path with preference 0 (must be > 0)",
+        "eStrKey": "Range"
+    },
+    "SR_POLICY_CANDIDATE_PATH_MISSING_NAME": {
+        "desc": "Candidate path missing required name field",
+        "eStrKey": "Mandatory"
+    },
+    "SR_POLICY_MULTIPLE_SEGMENT_LISTS": {
+        "desc": "Valid configuration with multiple segment lists"
+    },
+    "SR_POLICY_MULTIPLE_CANDIDATE_PATHS": {
+        "desc": "Valid configuration with multiple candidate paths for same policy"
+    },
+    "SR_POLICY_CANDIDATE_PATH_NO_PARENT_POLICY": {
+        "desc": "Candidate path without parent policy - should fail must validation",
+        "eStr": ["Candidate path must reference an existing SR_POLICY"]
+    },
+    "SR_POLICY_SEGMENT_LIST_NO_PARENT_CP": {
+        "desc": "Segment list association without parent candidate path - should fail must validation",
+        "eStr": ["Segment list association must reference an existing SR_POLICY_CANDIDATE_PATH"]
+    },
+    "SR_POLICY_SEGMENT_LIST_REUSE_SAME_POLICY": {
+        "desc": "Segment list shared by two candidate paths in the same policy - should fail must validation",
+        "eStr": ["A segment list cannot be shared between candidate paths or policies"]
+    },
+    "SR_POLICY_SEGMENT_LIST_REUSE_ACROSS_POLICIES": {
+        "desc": "Segment list shared by candidate paths in different policies - should fail must validation",
+        "eStr": ["A segment list cannot be shared between candidate paths or policies"]
+    },
+    "SR_POLICY_SEGMENT_LIST_REUSE_WEIGHTED_ECMP": {
+        "desc": "Segment list from a weighted ECMP candidate path reused by another candidate path - should fail must validation",
+        "eStr": ["A segment list cannot be shared between candidate paths or policies"]
+    },
+    "SR_POLICY_DISTINCT_SEGMENT_LISTS_ACROSS_POLICIES": {
+        "desc": "Valid configuration with distinct segment lists used by candidate paths in different policies"
+    },
+    "SR_TE_GLOBAL_SBFD_ENABLE_VALID": {
+        "desc": "Valid global S-BFD enable with profile"
+    },
+    "SR_TE_GLOBAL_SBFD_DISABLE_VALID": {
+        "desc": "Valid global S-BFD disable"
+    },
+    "SR_POLICY_SBFD_ENABLE_VALID": {
+        "desc": "Valid policy-level S-BFD enable with profile"
+    },
+    "SR_POLICY_SBFD_DISABLE_VALID": {
+        "desc": "Valid policy-level S-BFD disable"
+    },
+    "SR_POLICY_CP_SBFD_ENABLE_VALID": {
+        "desc": "Valid candidate-path level S-BFD enable with profile"
+    },
+    "SR_POLICY_CP_SBFD_DISABLE_VALID": {
+        "desc": "Valid candidate-path level S-BFD disable"
+    },
+    "SR_TE_SBFD_THREE_LEVEL_VALID": {
+        "desc": "Valid S-BFD configured at all three levels (global, policy, candidate-path)"
+    },
+    "SR_TE_GLOBAL_SBFD_PROFILE_WRONG_MODE": {
+        "desc": "Global sbfd_profile references a BFD_PROFILE with mode 'bfd' instead of 'sbfd_echo'",
+        "eStr": ["sbfd_profile must reference a BFD_PROFILE configured with mode 'sbfd_echo'"]
+    },
+    "SR_TE_GLOBAL_SBFD_PROFILE_NOT_FOUND": {
+        "desc": "Global sbfd_profile references a BFD_PROFILE name that does not exist",
+        "eStr": ["sbfd_profile must reference a BFD_PROFILE configured with mode 'sbfd_echo'"]
+    },
+    "SR_TE_GLOBAL_SBFD_NONE_INVALID": {
+        "desc": "Global sbfd='none' is rejected - no parent level to inherit from",
+        "eStr": ["sbfd must be 'enable' or 'disable' at the global level"]
+    },
+    "SR_POLICY_SBFD_NONE_VALID": {
+        "desc": "Policy-level sbfd='none' is valid (explicit no-override)"
+    },
+    "SR_POLICY_CP_SBFD_NONE_VALID": {
+        "desc": "Candidate-path-level sbfd='none' is valid (explicit no-override)"
+    },
+    "SR_POLICY_PER_FLOW_VALID": {
+        "desc": "Valid per-flow CP: parent type=per-flow plus FC entries referencing two child colors and a default best-effort fallback"
+    },
+    "SR_POLICY_PER_FLOW_INVALID_FC_KEY_TOO_LARGE": {
+        "desc": "Per-flow entry with fc_key > 7 (only 0..7 allowed)",
+        "eStrKey": "Range"
+    },
+    "SR_POLICY_PER_FLOW_VALID_BEST_EFFORT_ON_NUMERIC_FC": {
+        "desc": "action_best_effort on a numeric FC (fc_key != 0) is valid - every fc_key may forward best-effort, not just the default bucket"
+    },
+    "SR_POLICY_PER_FLOW_INVALID_BOTH_ACTIONS": {
+        "desc": "Per-flow entry with both next_color and action_best_effort - mutual exclusion must should reject",
+        "eStr": ["mutually exclusive"]
+    },
+    "SR_POLICY_PER_FLOW_INVALID_SELF_REFERENCE": {
+        "desc": "Per-flow entry whose next_color matches the parent SR Policy color - rejected (substring matches either the self-reference or child-must-be-leaf must, whichever libyang evaluates first)",
+        "eStr": ["next_color"]
+    },
+    "SR_POLICY_PER_FLOW_INVALID_PARENT_TYPE": {
+        "desc": "Per-flow entry parented to a CP whose type is 'explicit' rather than 'per-flow' - must should reject",
+        "eStr": ["Per-flow entries are only allowed on candidate paths whose type is 'per-flow'"]
+    },
+    "SR_POLICY_PER_FLOW_INVALID_NO_PARENT_CP": {
+        "desc": "Per-flow entry without a matching parent CP - first must constraint should reject",
+        "eStr": ["Per-flow entry must reference an existing SR_POLICY_CANDIDATE_PATH"]
+    },
+    "SR_POLICY_PER_FLOW_INVALID_CHILD_IS_PER_FLOW": {
+        "desc": "Per-flow entry whose next_color points at a child policy that itself has a per-flow CP - chains/loops must constraint should reject",
+        "eStr": ["Child SR Policy referenced by next_color must not itself be 'per-flow'"]
+    }
+}
+
