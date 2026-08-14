@@ -9,11 +9,31 @@
         },
         {
             "type": "psu_info"
+        },
+        {
+            "type": "chassis_info"
         }
     ],
     "policies": [
         {
+<<<<<<< HEAD
             "name": "One fan drawer present",
+=======
+            "name": "Over-temperature reboot",
+            "conditions": [
+                {
+                    "type": "temperature.any_over_critical"
+                }
+            ],
+            "actions": [
+                {
+                    "type": "reboot.over_temperature"
+                }
+            ]
+        },
+        {
+            "name": "One fan drawer functional",
+>>>>>>> 80dbdbea2 (NOS-3746: Enable SW thermal powercycle for Sea Eagle (#7138))
             "conditions": [
                 {
                     "type": "fandrawer.one.present"
