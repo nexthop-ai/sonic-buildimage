@@ -10,11 +10,93 @@ module sonic-static-route {
   contact
     "SONiC";
   description
+<<<<<<< HEAD
     "STATIC ROUTE yang Module for SONiC OS";
+=======
+    "STATIC ROUTE configuration";
+
+  revision 2026-08-14 {
+    description
+      "bfd and advertise are single route-level flags, not per-nexthop lists: one value
+       applies to the whole route, and when bfd is enabled one session is created per
+       nexthop. ifname entries are constrained to interface-name forms. The per-nexthop
+       lists must agree in entry count, so the leaves that carry them no longer declare a
+       scalar default -- a single default value cannot be correct for a list whose length
+       must match the nexthop count. A route may not be configured under both key shapes.";
+  }
+
+  revision 2026-08-07 {
+    description
+      "Remodel sidlist out of static route list into its own composite-keyed list container,
+       holding both STATIC_ROUTE_TEMPLATE_SIDLIST_LIST and STATIC_ROUTE_SIDLIST_LIST.
+       The rearrangement is aftereffect of sonic environmental limitation which cannot
+       validate nested list and configdb fails to disambiguates multiple lists sharing a
+       container purely by key count.";
+  }
+
+  revision 2026-07-21 {
+    description
+      "Align STATIC_ROUTE_TEMPLATE_LIST with STATIC_ROUTE_LIST (distance, nexthop-vrf, blackhole, sidlist)
+       and add the route tag attribute to both lists.";
+  }
+
+  revision 2026-03-19 {
+    description
+      "Add SR-Policy color attribute for nexthops";
+  }
+
+  revision 2026-02-25 {
+    description
+      "Add sidlist for SRv6 traffic steering.";
+  }
+
+  revision 2025-12-09 {
+    description
+      "Add BFD custom timer parameters: bfd_detect_multiplier, bfd_min_rx, bfd_min_tx";
+  }
+>>>>>>> e8ab45ae3 (NOS-14137: [sonic-yang-models] state the static-route contract in the model (#8012))
 
   revision 2022-03-17 {
     description
       "First Revision";
+  }
+
+  typedef static-route-flag {
+    type string {
+      pattern "(true|false)";
+    }
+    description
+      "A route-level true/false flag. One value applies to the whole route.";
+  }
+
+  typedef static-route-ifname-list {
+    type string {
+      pattern "("
+            + "Ethernet[0-9]+"
+            + "|PortChannel[0-9]{1,4}"
+            + "|Vlan(409[0-5]|40[0-8][0-9]|[1-3][0-9]{3}|[1-9][0-9]{2}|[1-9][0-9]|[2-9])"
+            + "|Loopback[0-9]+"
+            + "|eth[0-9]+"
+            + "|(Ethernet[0-9]+|PortChannel[0-9]{1,4})\\.([1-9][0-9]{0,2}|[1-3][0-9]{3}|[4][0][0-8][0-9]|[4][0][9][0-4])"
+            + "|(Eth[0-9]+|Po[0-9]+)\\.([1-9][0-9]{0,2}|[1-3][0-9]{3}|[4][0][0-8][0-9]|[4][0][9][0-4])"
+            + "|null"
+            + ")?"
+            + "(,("
+            + "Ethernet[0-9]+"
+            + "|PortChannel[0-9]{1,4}"
+            + "|Vlan(409[0-5]|40[0-8][0-9]|[1-3][0-9]{3}|[1-9][0-9]{2}|[1-9][0-9]|[2-9])"
+            + "|Loopback[0-9]+"
+            + "|eth[0-9]+"
+            + "|(Ethernet[0-9]+|PortChannel[0-9]{1,4})\\.([1-9][0-9]{0,2}|[1-3][0-9]{3}|[4][0][0-8][0-9]|[4][0][9][0-4])"
+            + "|(Eth[0-9]+|Po[0-9]+)\\.([1-9][0-9]{0,2}|[1-3][0-9]{3}|[4][0][0-8][0-9]|[4][0][9][0-4])"
+            + "|null"
+            + ")?)*";
+    }
+    description
+      "Comma-separated egress interfaces, one entry per nexthop. An entry may be empty when
+       its nexthop has no egress interface; 'null' selects the null interface. Internal port
+       names are excluded: the alternatives above are the only accepted spellings, so any
+       other name -- recycle ports among them -- is refused rather than enumerated.";
   }
 
   container sonic-static-route {
@@ -23,6 +105,75 @@ module sonic-static-route {
         "Static route entries for deterministic IP forwarding.";
       list STATIC_ROUTE_TEMPLATE_LIST {
         key "prefix";
+        must "not(bfd = 'true') or (ifname and ifname != '')" {
+          error-message
+            "bfd requires ifname: BFD monitoring creates one session per nexthop and the egress
+             interface of each is what identifies it, so a route with bfd enabled and no ifname
+             is handed to staticroutebfd, refused there, and programmed nowhere.";
+        }
+        must "not(ifname) or ifname = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(ifname) - string-length(translate(ifname, ',', ''))" {
+          error-message
+            "ifname must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(nexthop-vrf) or nexthop-vrf = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(nexthop-vrf) - string-length(translate(nexthop-vrf, ',', ''))" {
+          error-message
+            "nexthop-vrf must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(distance) or distance = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(distance) - string-length(translate(distance, ',', ''))" {
+          error-message
+            "distance must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(blackhole) or blackhole = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(blackhole) - string-length(translate(blackhole, ',', ''))" {
+          error-message
+            "blackhole must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(tag) or tag = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(tag) - string-length(translate(tag, ',', ''))" {
+          error-message
+            "tag must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(color) or color = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(color) - string-length(translate(color, ',', ''))" {
+          error-message
+            "color must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_detect_multiplier) or bfd_detect_multiplier = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_detect_multiplier) - string-length(translate(bfd_detect_multiplier, ',', ''))" {
+          error-message
+            "bfd_detect_multiplier must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_rx) or bfd_min_rx = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_rx) - string-length(translate(bfd_min_rx, ',', ''))" {
+          error-message
+            "bfd_min_rx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_tx) or bfd_min_tx = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_tx) - string-length(translate(bfd_min_tx, ',', ''))" {
+          error-message
+            "bfd_min_tx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
         leaf prefix {
           type inet:ip-prefix;
           description
@@ -36,27 +187,182 @@ module sonic-static-route {
              specified, use 0.0.0.0 as leaf value";
         }
         leaf ifname {
-          type string;
+          type static-route-ifname-list;
           description
-            "When interface is specified, forwarding happens through it";
+            "When interface is specified, forwarding happens through it. Comma-separated list
+             with one entry per nexthop; an entry may be empty when its nexthop has none.";
         }
         leaf advertise {
+          type static-route-flag;
+          default "false";
+          description
+            "Advertise this static route to BGP. One value applies to the whole route.";
+        }
+<<<<<<< HEAD
+=======
+        leaf distance {
+          type string {
+            pattern "((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?),)*(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)";
+          }
+          description
+            "Administrative Distance (preference) of the entry.  The
+             preference defines the order of selection when multiple
+             sources (protocols, static, etc.) contribute to the same
+             prefix entry.  The lower the preference, the more preferable the
+             prefix is.  When this value is not specified, the preference is
+             inherited from the default preference of the implementation for
+             static routes.  Comma-separated list with one entry per nexthop.";
+        }
+        leaf nexthop-vrf {
+          type string {
+            pattern "((((Vrf[a-zA-Z0-9_-]+)|(default)|(mgmt)),)*((Vrf[a-zA-Z0-9_-]+)|(default)|(mgmt)))?";
+          }
+          description
+            "VRF name of the nexthop, used for VRF leaking. Comma-separated list with one
+             entry per nexthop.";
+        }
+        leaf blackhole {
           type string {
             pattern "((true|false),)*(true|false)";
           }
-          default "false";
-          description "Advertise this static route to BGP, comma-separated per nexthop.";
+          description
+            "blackhole refers to a route that, if matched, discards the message silently.
+             Comma-separated list with one entry per nexthop. An absent field means no
+             nexthop discards.";
         }
+        leaf tag {
+          type string {
+            pattern "(0|[1-9][0-9]{0,9})(,(0|[1-9][0-9]{0,9}))*";
+          }
+          description
+            "Route tag applied to the static route (0-4294967295), comma-separated for multiple nexthops.
+             Value 0 means no tag is applied. Matches the FRR `tag (1-4294967295)` static-route parameter,
+             with 0 reserved to express the absence of a tag.
+             Note: Pattern allows up to 10 digits; values above 4294967295 will be rejected by application logic.
+             An absent field means no tag on any nexthop.";
+        }
+>>>>>>> e8ab45ae3 (NOS-14137: [sonic-yang-models] state the static-route contract in the model (#8012))
         leaf bfd {
-          type string {
-            pattern "((true|false),)*(true|false)";
-          }
+          type static-route-flag;
           default "false";
-          description "Enable BFD monitoring for each nexthop, comma-separated per nexthop.";
+          description
+            "Enable BFD monitoring for this route. One value applies to the whole route; when
+             enabled, one BFD session is created per nexthop.";
         }
+<<<<<<< HEAD
+=======
+        leaf bfd_detect_multiplier {
+          type string {
+            pattern "(([2-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]),)*([2-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
+          }
+          description
+            "BFD detection multiplier (2-255), comma-separated for multiple nexthops";
+        }
+        leaf bfd_min_rx {
+          type string {
+            pattern "(([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000),)*([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000)";
+          }
+          description
+            "BFD minimum receive interval in milliseconds (50-60000), comma-separated for multiple nexthops";
+        }
+        leaf bfd_min_tx {
+          type string {
+            pattern "(([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000),)*([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000)";
+          }
+          description
+            "BFD minimum transmit interval in milliseconds (50-60000), comma-separated for multiple nexthops";
+        }
+        leaf color {
+          type string {
+            pattern "(0|[1-9][0-9]{0,9})(,(0|[1-9][0-9]{0,9}))*";
+          }
+          description
+            "SR-Policy color value for the nexthop (0-4294967295), comma-separated for multiple nexthops.
+             Value 0 means no SR-Policy color is associated with the nexthop (backward compatible default).
+             When specified, the static route will use the SR-Policy matching this color and the route's endpoint.
+             Note: Pattern allows up to 10 digits; values above 4294967295 will be rejected by application logic.
+             An absent field means no nexthop carries a color.";
+        }
+>>>>>>> e8ab45ae3 (NOS-14137: [sonic-yang-models] state the static-route contract in the model (#8012))
       }
       list STATIC_ROUTE_LIST {
         key "vrf_name prefix";
+        must "not(bfd = 'true') or (ifname and ifname != '')" {
+          error-message
+            "bfd requires ifname: BFD monitoring creates one session per nexthop and the egress
+             interface of each is what identifies it, so a route with bfd enabled and no ifname
+             is handed to staticroutebfd, refused there, and programmed nowhere.";
+        }
+        must "not(ifname) or ifname = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(ifname) - string-length(translate(ifname, ',', ''))" {
+          error-message
+            "ifname must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(nexthop-vrf) or nexthop-vrf = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(nexthop-vrf) - string-length(translate(nexthop-vrf, ',', ''))" {
+          error-message
+            "nexthop-vrf must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(distance) or distance = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(distance) - string-length(translate(distance, ',', ''))" {
+          error-message
+            "distance must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(blackhole) or blackhole = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(blackhole) - string-length(translate(blackhole, ',', ''))" {
+          error-message
+            "blackhole must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(tag) or tag = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(tag) - string-length(translate(tag, ',', ''))" {
+          error-message
+            "tag must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(color) or color = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(color) - string-length(translate(color, ',', ''))" {
+          error-message
+            "color must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_detect_multiplier) or bfd_detect_multiplier = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_detect_multiplier) - string-length(translate(bfd_detect_multiplier, ',', ''))" {
+          error-message
+            "bfd_detect_multiplier must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_rx) or bfd_min_rx = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_rx) - string-length(translate(bfd_min_rx, ',', ''))" {
+          error-message
+            "bfd_min_rx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_tx) or bfd_min_tx = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_tx) - string-length(translate(bfd_min_tx, ',', ''))" {
+          error-message
+            "bfd_min_tx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(vrf_name = 'default'"
+           + "      and ../STATIC_ROUTE_TEMPLATE_LIST[prefix = current()/prefix])" {
+          error-message
+            "This prefix is configured twice: once with vrf default and once without, and
+             both name the same route. Delete one of them. They can hold different
+             nexthops, so keep the one carrying the settings that should survive.";
+        }
         leaf vrf_name {
           type union {
             type string {
@@ -85,22 +391,21 @@ module sonic-static-route {
              specified, use 0.0.0.0 as leaf value";
         }
         leaf ifname {
-          type string;
+          type static-route-ifname-list;
           description
-            "When interface is specified, forwarding happens through it";
+            "When interface is specified, forwarding happens through it. Comma-separated list
+             with one entry per nexthop; an entry may be empty when its nexthop has none.";
         }
         leaf advertise {
-          type string {
-            pattern "((true|false),)*(true|false)";
-          }
+          type static-route-flag;
           default "false";
-          description "Advertise this static route to BGP, comma-separated per nexthop.";
+          description
+            "Advertise this static route to BGP. One value applies to the whole route.";
         }
         leaf distance {
           type string {
             pattern "((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?),)*(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)";
           }
-          default "0";
           description
             "Administrative Distance (preference) of the entry.  The
              preference defines the order of selection when multiple
@@ -121,9 +426,64 @@ module sonic-static-route {
           type string {
             pattern "((true|false),)*(true|false)";
           }
+          description
+<<<<<<< HEAD
+            "blackhole refers to a route that, if matched, discards the message silently.";
+=======
+            "blackhole refers to a route that, if matched, discards the message silently.
+             Comma-separated list with one entry per nexthop. An absent field means no
+             nexthop discards.";
+        }
+        leaf tag {
+          type string {
+            pattern "(0|[1-9][0-9]{0,9})(,(0|[1-9][0-9]{0,9}))*";
+          }
+          description
+            "Route tag applied to the static route (0-4294967295), comma-separated for multiple nexthops.
+             Value 0 means no tag is applied. Matches the FRR `tag (1-4294967295)` static-route parameter,
+             with 0 reserved to express the absence of a tag.
+             Note: Pattern allows up to 10 digits; values above 4294967295 will be rejected by application logic.
+             An absent field means no tag on any nexthop.";
+        }
+        leaf bfd {
+          type static-route-flag;
           default "false";
           description
-            "blackhole refers to a route that, if matched, discards the message silently.";
+            "Enable BFD monitoring for this route. One value applies to the whole route; when
+             enabled, one BFD session is created per nexthop.";
+        }
+        leaf bfd_detect_multiplier {
+          type string {
+            pattern "(([2-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]),)*([2-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
+          }
+          description
+            "BFD detection multiplier (2-255), comma-separated for multiple nexthops";
+        }
+        leaf bfd_min_rx {
+          type string {
+            pattern "(([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000),)*([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000)";
+          }
+          description
+            "BFD minimum receive interval in milliseconds (50-60000), comma-separated for multiple nexthops";
+        }
+        leaf bfd_min_tx {
+          type string {
+            pattern "(([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000),)*([5-9][0-9]|[1-9][0-9]{2,3}|[1-5][0-9]{4}|60000)";
+          }
+          description
+            "BFD minimum transmit interval in milliseconds (50-60000), comma-separated for multiple nexthops";
+        }
+        leaf color {
+          type string {
+            pattern "(0|[1-9][0-9]{0,9})(,(0|[1-9][0-9]{0,9}))*";
+          }
+          description
+            "SR-Policy color value for the nexthop (0-4294967295), comma-separated for multiple nexthops.
+             Value 0 means no SR-Policy color is associated with the nexthop (backward compatible default).
+             When specified, the static route will use the SR-Policy matching this color and the route's endpoint.
+             Note: Pattern allows up to 10 digits; values above 4294967295 will be rejected by application logic.
+             An absent field means no nexthop carries a color.";
+>>>>>>> e8ab45ae3 (NOS-14137: [sonic-yang-models] state the static-route contract in the model (#8012))
         }
       } /* end of list STATIC_ROUTE_LIST */
     } /* end of container STATIC_ROUTE */
