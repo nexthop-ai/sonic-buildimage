@@ -23,6 +23,72 @@ module sonic-static-route {
         "Static route entries for deterministic IP forwarding.";
       list STATIC_ROUTE_TEMPLATE_LIST {
         key "prefix";
+<<<<<<< HEAD
+=======
+        must "not(ifname) or ifname = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(ifname) - string-length(translate(ifname, ',', ''))" {
+          error-message
+            "ifname must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(nexthop-vrf) or nexthop-vrf = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(nexthop-vrf) - string-length(translate(nexthop-vrf, ',', ''))" {
+          error-message
+            "nexthop-vrf must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(distance) or string-length(distance) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(distance) - string-length(translate(distance, ',', ''))" {
+          error-message
+            "distance must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(blackhole) or string-length(blackhole) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(blackhole) - string-length(translate(blackhole, ',', ''))" {
+          error-message
+            "blackhole must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(tag) or string-length(tag) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(tag) - string-length(translate(tag, ',', ''))" {
+          error-message
+            "tag must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(color) or string-length(color) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(color) - string-length(translate(color, ',', ''))" {
+          error-message
+            "color must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_detect_multiplier) or string-length(bfd_detect_multiplier) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_detect_multiplier) - string-length(translate(bfd_detect_multiplier, ',', ''))" {
+          error-message
+            "bfd_detect_multiplier must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_rx) or string-length(bfd_min_rx) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_rx) - string-length(translate(bfd_min_rx, ',', ''))" {
+          error-message
+            "bfd_min_rx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_tx) or string-length(bfd_min_tx) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_tx) - string-length(translate(bfd_min_tx, ',', ''))" {
+          error-message
+            "bfd_min_tx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+>>>>>>> af866d080 (NOS-14545: [sonic-yang-models] test static-route per-nexthop columns with string-length (#8159))
         leaf prefix {
           type inet:ip-prefix;
           description
@@ -57,6 +123,79 @@ module sonic-static-route {
       }
       list STATIC_ROUTE_LIST {
         key "vrf_name prefix";
+<<<<<<< HEAD
+=======
+        must "not(ifname) or ifname = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(ifname) - string-length(translate(ifname, ',', ''))" {
+          error-message
+            "ifname must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(nexthop-vrf) or nexthop-vrf = '' or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(nexthop-vrf) - string-length(translate(nexthop-vrf, ',', ''))" {
+          error-message
+            "nexthop-vrf must have one comma-separated entry per nexthop; an entry may be empty
+             where that nexthop has no value for it.";
+        }
+        must "not(distance) or string-length(distance) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(distance) - string-length(translate(distance, ',', ''))" {
+          error-message
+            "distance must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(blackhole) or string-length(blackhole) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(blackhole) - string-length(translate(blackhole, ',', ''))" {
+          error-message
+            "blackhole must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(tag) or string-length(tag) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(tag) - string-length(translate(tag, ',', ''))" {
+          error-message
+            "tag must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(color) or string-length(color) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(color) - string-length(translate(color, ',', ''))" {
+          error-message
+            "color must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_detect_multiplier) or string-length(bfd_detect_multiplier) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_detect_multiplier) - string-length(translate(bfd_detect_multiplier, ',', ''))" {
+          error-message
+            "bfd_detect_multiplier must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_rx) or string-length(bfd_min_rx) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_rx) - string-length(translate(bfd_min_rx, ',', ''))" {
+          error-message
+            "bfd_min_rx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(bfd_min_tx) or string-length(bfd_min_tx) = 0 or not(nexthop) or nexthop = ''"
+           + " or string-length(nexthop) - string-length(translate(nexthop, ',', ''))"
+           + "  = string-length(bfd_min_tx) - string-length(translate(bfd_min_tx, ',', ''))" {
+          error-message
+            "bfd_min_tx must have one comma-separated entry per nexthop, and every entry must
+             carry a value.";
+        }
+        must "not(vrf_name = 'default'"
+           + "      and ../STATIC_ROUTE_TEMPLATE_LIST[prefix = current()/prefix])" {
+          error-message
+            "This prefix is configured twice: once with vrf default and once without, and
+             both name the same route. Delete one of them. They can hold different
+             nexthops, so keep the one carrying the settings that should survive.";
+        }
+>>>>>>> af866d080 (NOS-14545: [sonic-yang-models] test static-route per-nexthop columns with string-length (#8159))
         leaf vrf_name {
           type union {
             type string {
