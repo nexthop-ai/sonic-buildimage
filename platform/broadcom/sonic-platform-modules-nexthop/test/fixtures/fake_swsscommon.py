@@ -71,6 +71,9 @@ class FakeTable:
     def getKeys(self) -> list[str]:
         return list(self._global_db[self.db_name][self.table_name].keys())
 
+    def _del(self, key: str) -> None:
+        self._global_db[self.db_name][self.table_name].pop(key, None)
+
 
 class FakeSonicV2Connector:
     APPL_DB = "APPL_DB"

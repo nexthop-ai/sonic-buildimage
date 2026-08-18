@@ -10,6 +10,8 @@ except ImportError as e:
 from sonic_py_common import syslogger
 from swsscommon import swsscommon
 
+from sonic_platform.state_db import try_get_state_db_table
+
 _FAN_INFO_TABLE_NAME = "FAN_INFO"
 _STATE_MAX_SPEED_KEY = "max_speed"
 
@@ -18,20 +20,15 @@ logger = syslogger.SysLogger(SYSLOG_IDENTIFIER)
 
 def _try_get_state_db_table(table_name) -> swsscommon.Table | None:
     """
-    Attempts to establish a connection to STATE_DB and returns the table.
+    Connects to a STATE_DB table, or returns None (see state_db helper).
 
-    If failed, it is likely that redis-server is not up yet, especially
-    when SONiC Platform is initialized by some services early after boot.
-    Ignore the error and return None to not break fan initialization, as
-    we will retry later when needed by the runtime operations (and we expect
-    redis-server to already be up by then, e.g. when utilized by pmon container).
+    Failure is likely redis-server not being up yet, especially when SONiC
+    Platform is initialized by some services early after boot. Not breaking
+    fan initialization matters: we retry later when needed by the runtime
+    operations (and we expect redis-server to already be up by then, e.g.
+    when utilized by pmon container).
     """
-    try:
-        state_db = swsscommon.DBConnector("STATE_DB", 0)
-    except Exception as e:
-        logger.log_warning(f"Failed to connect to STATE_DB: {e}. Ignoring.")
-        return None
-    return swsscommon.Table(state_db, table_name)
+    return try_get_state_db_table(logger, table_name)
 
 class Fan(PddfFan):
     """PDDF Platform-Specific Fan class"""

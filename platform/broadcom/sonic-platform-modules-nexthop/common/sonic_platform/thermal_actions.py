@@ -9,6 +9,12 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Any, Union
 
 from sonic_platform_base.sonic_thermal_control.thermal_action_base import ThermalPolicyActionBase
 from sonic_platform_base.sonic_thermal_control.thermal_json_object import thermal_json_object
+<<<<<<< HEAD
+=======
+from sonic_platform.thermal import PID_DOMAIN_NONE, PidDomainDetails, PidOutput, SensorDetails
+from sonic_platform.thermal_csv_logger import ThermalCsvLogger
+from sonic_platform.thermal_pid_state import ThermalPidStatePublisher
+>>>>>>> 42084499f (NOS-12079: Publish thermal PID state to STATE_DB (#6901))
 
 if TYPE_CHECKING:
     from sonic_platform_base.fan_base import Fan
@@ -168,6 +174,11 @@ class ThermalControlAlgorithmAction(ThermalPolicyActionBase, NhLoggerMixin):
         self._constants: Optional[Dict[str, Any]] = None
         self._fan_limits: Optional[Dict[str, Union[int, float]]] = None
         self._pidControllers: Dict[str, 'PIDController'] = {}
+<<<<<<< HEAD
+=======
+        self._thermal_csv_logger: ThermalCsvLogger = ThermalCsvLogger()
+        self._pid_state_publisher: ThermalPidStatePublisher = ThermalPidStatePublisher()
+>>>>>>> 42084499f (NOS-12079: Publish thermal PID state to STATE_DB (#6901))
         self._extra_setpoint_margin: Dict[str, float] = {}
 
         self.log_debug("Initialized")
@@ -238,7 +249,21 @@ class ThermalControlAlgorithmAction(ThermalPolicyActionBase, NhLoggerMixin):
             self.log_error(f"Exception executing thermal control algorithm: {e}")
             self.log_error(f"Traceback:\n{traceback.format_exc()}")
             self.log_error(f"Setting fan speed to {FAN_MAX_SPEED}% (max)")
-            self._set_all_fan_speeds(thermal_info_dict, FAN_MAX_SPEED)
+            fans_set = False
+            try:
+                self._set_all_fan_speeds(thermal_info_dict, FAN_MAX_SPEED)
+                fans_set = True
+            finally:
+                # fan_speed=None when forcing the fans failed: their actual
+                # speed is unknown and must not be reported as max. Seeding
+                # the configured domains records failsafe even when the very
+                # first cycle fails (no keys published yet). The bounded wait
+                # lands the marker before the exception can end the daemon.
+                self._pid_state_publisher.publish_failsafe(
+                    FAN_MAX_SPEED if fans_set else None,
+                    domains=list(self._pidDomains.keys()) if self._pidDomains else [],
+                )
+                self._pid_state_publisher.wait_for_idle(timeout=2.0)
             raise
 
     def _execute_raise_on_error(self, thermal_info_dict: Dict[str, Any]) -> None:
@@ -293,7 +318,23 @@ class ThermalControlAlgorithmAction(ThermalPolicyActionBase, NhLoggerMixin):
         # Set all fan speeds
         self._set_all_fan_speeds(thermal_info_dict, final_speed)
 
+<<<<<<< HEAD
     def _initialize_pid_controllers(self, interval: int, fan_max_speed: float) -> None:
+=======
+        # Logging
+        self.log_info(f"PID driving domain: '{driving_domain}', setting fan speed to {fan_speed:.1f}%")
+        self._thermal_csv_logger.log(driving_domain, fan_speed, pid_details_by_domain)
+
+        # Publish PID state to STATE_DB for CLI/telemetry consumers. The
+        # extra margins let the publisher report effective setpoints, so
+        # published error == temperature - setpoint.
+        self._pid_state_publisher.publish(
+            driving_domain, fan_speed, pid_details_by_domain, self._pidDomains,
+            self._extra_setpoint_margin,
+        )
+
+    def _initialize_pid_controllers(self, interval: int, fan_min_speed: float, fan_max_speed: float) -> None:
+>>>>>>> 42084499f (NOS-12079: Publish thermal PID state to STATE_DB (#6901))
         """
         Initialize PID controllers for each domain.
 
@@ -384,6 +425,7 @@ class ThermalControlAlgorithmAction(ThermalPolicyActionBase, NhLoggerMixin):
                 # We may have no temperature reading if thermal is not present
                 self.log_info(f"Thermal '{thermal.get_name()}' has no temperature reading, skipping")
                 continue
+<<<<<<< HEAD
 
             setpoint = thermal.get_pid_setpoint()
             if setpoint is None:
@@ -403,6 +445,23 @@ class ThermalControlAlgorithmAction(ThermalPolicyActionBase, NhLoggerMixin):
 
         self.log_debug(f"Domain '{domain}': using thermal '{max_error_thermal.get_name()}' "
                        f"with error {max_error:.2f}°C (setpoint={max_error_thermal_setpoint:.2f}°C)")
+=======
+            error = None
+            setpoint = None
+            if domain != PID_DOMAIN_NONE:
+                # Only consider PID-controlled sensors for setpoint calculations
+                setpoint = thermal.get_pid_setpoint()
+                if setpoint is None:
+                    # Can happen if thermal is not present.
+                    self.log_info(f"Thermal '{thermal.get_name()}' has no setpoint, skipping")
+                    continue
+                error = current_temp - setpoint - self._extra_setpoint_margin[domain]
+                if error > max_error:
+                    max_error = error
+                    max_error_thermal_name = thermal.get_name()
+                    max_error_thermal_setpoint = setpoint
+            sensors.append(SensorDetails(thermal.get_name(), current_temp, error, setpoint))
+>>>>>>> 42084499f (NOS-12079: Publish thermal PID state to STATE_DB (#6901))
 
         # Compute PID output using the largest error
         pid_output = controller.compute(max_error)

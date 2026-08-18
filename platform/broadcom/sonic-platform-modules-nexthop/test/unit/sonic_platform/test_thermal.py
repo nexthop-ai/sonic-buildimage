@@ -1137,3 +1137,251 @@ class TestSfpThermal:
             # Values should remain cached (unchanged)
             assert sfp_th.get_high_threshold() == 75.0
             assert sfp_th.get_low_threshold() == 10.5
+<<<<<<< HEAD
+=======
+
+
+class TestThermalActionsCsvLogging:
+    """Test class for CSV logging integration in ThermalControlAlgorithmAction."""
+
+    @pytest.fixture
+    def temp_csv_dir(self, tmp_path):
+        """Create a temporary directory for CSV files."""
+        csv_dir = tmp_path / "csv_logs"
+        csv_dir.mkdir()
+        return str(csv_dir)
+
+    @pytest.fixture
+    def thermal_action_with_csv(self, thermal_actions_module, temp_csv_dir):
+        """Fixture providing a ThermalControlAlgorithmAction instance with mocked CSV logging."""
+        action = thermal_actions_module.ThermalControlAlgorithmAction()
+        # Mock the CSV logger's log method so tests can verify it was called
+        action._thermal_csv_logger.log = Mock()
+        yield action, temp_csv_dir
+
+    @pytest.fixture
+    def mock_thermal_info(self):
+        """Create a mock thermal_info with thermal_manager."""
+        thermal_info = Mock()
+        thermal_manager = Mock()
+        thermal_manager.get_interval.return_value = 5
+        thermal_info.get_thermal_manager.return_value = thermal_manager
+        return thermal_info
+
+    @pytest.fixture
+    def mock_fan_drawer_info(self):
+        """Create a mock fan_drawer_info with a fan."""
+        fan_drawer_info = Mock()
+        fan_drawer_info.INFO_TYPE = 'fan_drawer_info'
+        mock_fan = Mock()
+        mock_fan.get_speed_tolerance.return_value = 20
+        mock_fan.get_max_speed.return_value = 100.0
+        mock_fan.set_speed.return_value = True
+        fan_drawer_info.get_fans.return_value = [mock_fan]
+        return fan_drawer_info
+
+    def _create_mock_thermal(self, name, temperature, is_pid_controlled=True,
+                            domain="domain1", setpoint=40.0):
+        """Helper to create a mock thermal sensor."""
+        thermal = Mock()
+        thermal.get_name.return_value = name
+        thermal.get_temperature.return_value = temperature
+        thermal.is_controlled_by_pid.return_value = is_pid_controlled
+        thermal.get_pid_domain.return_value = domain
+        thermal.get_pid_setpoint.return_value = setpoint
+        return thermal
+
+    def _create_json_config(self, domains_config, max_speed=100.0, min_fan_limit=30.0, interval=5):
+        """Helper to create a JSON configuration for thermal control."""
+        return {
+            "max_speed": max_speed,
+            "pid_domains": domains_config,
+            "constants": {"interval": interval},
+            "fan_limits": {"min": min_fan_limit}
+        }
+
+    def _create_thermal_info_dict(self, thermal_info, fan_drawer_info):
+        """Helper to create thermal_info_dict."""
+        return {
+            'thermal_info': thermal_info,
+            'fan_drawer_info': fan_drawer_info
+        }
+
+    def test_csv_loggers_initialized(self, thermal_action_with_csv):
+        """Test that CSV loggers are initialized in ThermalControlAlgorithmAction."""
+        action, _ = thermal_action_with_csv
+        assert hasattr(action, '_thermal_csv_logger')
+        assert action._thermal_csv_logger is not None
+
+    def test_csv_logging_integration_with_execute(self, thermal_action_with_csv,
+                                                   mock_thermal_info, mock_fan_drawer_info):
+        """Test that CSV loggers are called with correct arguments during execute() method."""
+        action, _ = thermal_action_with_csv
+
+        # Create mock thermals
+        mock_thermal1 = self._create_mock_thermal("Sensor1", 45.5, domain="domain1", setpoint=40.0)
+        mock_thermal2 = self._create_mock_thermal("Sensor2", 50.2, domain="domain1", setpoint=45.0)
+        mock_thermal_info.get_thermals.return_value = [mock_thermal1, mock_thermal2]
+
+        # Create thermal_info_dict
+        thermal_info_dict = self._create_thermal_info_dict(mock_thermal_info, mock_fan_drawer_info)
+
+        # Load JSON configuration
+        json_config = self._create_json_config(
+            domains_config={"domain1": {"KP": 2.0, "KI": 0.5, "KD": 0.1}},
+            max_speed=80.0
+        )
+        action.load_from_json(json_config)
+
+        # Execute the action
+        action.execute(thermal_info_dict)
+
+        # Verify CSV logger was called (ThermalCsvLogger.log())
+        assert action._thermal_csv_logger.log.called, "CSV logger should be called"
+
+        # Verify logger was called with 3 positional args: selected_domain, configured_fan_speed, pid_details_by_domain
+        log_call = action._thermal_csv_logger.log.call_args
+        assert log_call is not None, "CSV logger should have been called"
+        assert len(log_call[0]) == 3, "CSV logger should be called with 3 positional args"
+        selected_domain, configured_fan_speed, pid_details_by_domain = log_call[0]
+        assert isinstance(selected_domain, str), "First arg should be selected_domain string"
+        assert isinstance(configured_fan_speed, (int, float)), "Second arg should be configured_fan_speed number"
+        assert isinstance(pid_details_by_domain, dict), "Third arg should be pid_details_by_domain dict"
+
+    def test_pid_state_publisher_called_on_execute(self, thermal_action_with_csv,
+                                                   mock_thermal_info, mock_fan_drawer_info):
+        """execute() must hand the cycle's results to the STATE_DB publisher."""
+        action, _ = thermal_action_with_csv
+        action._pid_state_publisher = Mock()
+
+        mock_thermal = self._create_mock_thermal("Sensor1", 45.5, domain="domain1", setpoint=40.0)
+        mock_thermal_info.get_thermals.return_value = [mock_thermal]
+        thermal_info_dict = self._create_thermal_info_dict(mock_thermal_info, mock_fan_drawer_info)
+        json_config = self._create_json_config(
+            domains_config={"domain1": {"KP": 2.0, "KI": 0.5, "KD": 0.1}}
+        )
+        action.load_from_json(json_config)
+
+        action.execute(thermal_info_dict)
+
+        assert action._pid_state_publisher.publish.called, "publisher should be called each cycle"
+        driving_domain, fan_speed, pid_details_by_domain, domain_gains, extra_margins = \
+            action._pid_state_publisher.publish.call_args[0]
+        assert isinstance(driving_domain, str)
+        assert isinstance(fan_speed, (int, float))
+        assert "domain1" in pid_details_by_domain
+        assert domain_gains == {"domain1": {"KP": 2.0, "KI": 0.5, "KD": 0.1}}
+        assert extra_margins == {"domain1": 0}
+        assert not action._pid_state_publisher.publish_failsafe.called
+
+    def test_pid_state_publisher_failsafe_even_when_fan_write_fails(
+            self, thermal_action_with_csv, mock_thermal_info, mock_fan_drawer_info,
+            thermal_actions_module):
+        """On the failsafe path, publish_failsafe must run even if forcing the
+        fans to maximum itself raises (the try/finally ordering in execute)."""
+        action, _ = thermal_action_with_csv
+        action._pid_state_publisher = Mock()
+
+        # No thermals in the configured domain -> the control cycle raises;
+        # and forcing fans to max also fails.
+        mock_thermal_info.get_thermals.return_value = []
+        mock_fan_drawer_info.get_fans.return_value[0].set_speed.side_effect = \
+            RuntimeError("i2c write failed")
+        thermal_info_dict = self._create_thermal_info_dict(mock_thermal_info, mock_fan_drawer_info)
+        json_config = self._create_json_config(
+            domains_config={"domain1": {"KP": 2.0, "KI": 0.5, "KD": 0.1}}
+        )
+        action.load_from_json(json_config)
+
+        with pytest.raises(Exception):
+            action.execute(thermal_info_dict)
+
+        # fan_speed=None: forcing the fans failed, so the actual speed is
+        # unknown; the configured domains are seeded so failsafe is recorded
+        # even when no key was ever published.
+        action._pid_state_publisher.publish_failsafe.assert_called_once_with(
+            None, domains=["domain1"])
+        assert action._pid_state_publisher.wait_for_idle.called
+        assert not action._pid_state_publisher.publish.called
+
+    def test_csv_control_logger_called_with_pid_details(self, thermal_action_with_csv,
+                                                         mock_thermal_info, mock_fan_drawer_info):
+        """Test that control CSV logger is called with correct PID computation details."""
+        action, _ = thermal_action_with_csv
+
+        # Create mock thermal with known values (10 degrees above setpoint)
+        mock_thermal = self._create_mock_thermal("TestSensor", 50.0, domain="test_domain", setpoint=40.0)
+        mock_thermal_info.get_thermals.return_value = [mock_thermal]
+
+        # Create thermal_info_dict
+        thermal_info_dict = self._create_thermal_info_dict(mock_thermal_info, mock_fan_drawer_info)
+
+        # Load JSON configuration with known PID gains
+        json_config = self._create_json_config(
+            domains_config={"test_domain": {"KP": 2.0, "KI": 0.5, "KD": 0.1}}
+        )
+        action.load_from_json(json_config)
+
+        # Execute the action
+        action.execute(thermal_info_dict)
+
+        # Verify CSV logger was called
+        assert action._thermal_csv_logger.log.called, "CSV logger should be called"
+
+        # Extract the arguments
+        log_call = action._thermal_csv_logger.log.call_args
+        selected_domain, configured_fan_speed, pid_details_by_domain = log_call[0]
+
+        # Verify selected_domain is our test domain
+        assert selected_domain == "test_domain", "Selected domain should be test_domain"
+
+        # Verify pid_details_by_domain contains our domain with computation details
+        assert "test_domain" in pid_details_by_domain, "pid_details_by_domain should contain test_domain"
+        domain_details = pid_details_by_domain["test_domain"]
+        # domain_details is a PidDomainDetails dataclass with: domain, sensors, max_error_sensor_name, pid_output
+        assert hasattr(domain_details, 'domain'), "Should have domain attribute"
+        assert hasattr(domain_details, 'sensors'), "Should have sensors attribute"
+        assert hasattr(domain_details, 'max_error_sensor_name'), "Should have max_error_sensor_name attribute"
+        assert hasattr(domain_details, 'pid_output'), "Should have pid_output attribute"
+        assert domain_details.max_error_sensor_name == "TestSensor", "Should identify TestSensor as max error"
+
+    def test_csv_temperature_logger_called_with_thermals(self, thermal_action_with_csv,
+                                                          mock_thermal_info, mock_fan_drawer_info):
+        """Test that CSV logger is called with PID details including sensor information."""
+        action, _ = thermal_action_with_csv
+
+        # Create mix of PID-controlled and non-PID-controlled thermals
+        # Need at least one PID-controlled thermal for execute to succeed
+        mock_thermal1 = self._create_mock_thermal("CPU", 55.0, domain="default", setpoint=50.0)
+        mock_thermal2 = self._create_mock_thermal("Board", 45.0, is_pid_controlled=False)
+        thermals_list = [mock_thermal1, mock_thermal2]
+        mock_thermal_info.get_thermals.return_value = thermals_list
+
+        # Create thermal_info_dict
+        thermal_info_dict = self._create_thermal_info_dict(mock_thermal_info, mock_fan_drawer_info)
+
+        # Load minimal JSON configuration
+        json_config = self._create_json_config(
+            domains_config={"default": {"KP": 1.0, "KI": 0.1, "KD": 0.01}}
+        )
+        action.load_from_json(json_config)
+
+        # Execute the action
+        action.execute(thermal_info_dict)
+
+        # Verify CSV logger was called
+        assert action._thermal_csv_logger.log.called, "CSV logger should be called"
+
+        # Extract the arguments
+        log_call = action._thermal_csv_logger.log.call_args
+        selected_domain, configured_fan_speed, pid_details_by_domain = log_call[0]
+
+        # Verify pid_details_by_domain contains sensor information
+        assert "default" in pid_details_by_domain, "Should have default domain"
+        domain_details = pid_details_by_domain["default"]
+        assert hasattr(domain_details, 'sensors'), "Should have sensors attribute"
+        # The sensors list should contain SensorDetails for the PID-controlled thermal
+        assert len(domain_details.sensors) > 0, "Should have at least one sensor"
+
+
+>>>>>>> 42084499f (NOS-12079: Publish thermal PID state to STATE_DB (#6901))

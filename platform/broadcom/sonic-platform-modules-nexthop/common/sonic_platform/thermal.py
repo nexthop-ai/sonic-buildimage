@@ -26,6 +26,37 @@ TYPE_TO_CELSIUS_LAMBDA_DICT = {
 thermal_syslogger = syslogger.SysLogger(SYSLOG_IDENTIFIER_THERMAL)
 
 
+<<<<<<< HEAD
+=======
+@dataclass
+class PidOutput:
+    P: float
+    I: float
+    D: float
+    raw_output: float
+    saturated_output: float
+    frozen_integral: bool
+
+
+@dataclass(frozen=True)
+class SensorDetails:
+    sensor_name: str
+    temperature: float
+    # Input error and setpoint are not applicable to sensors not in a PID domain
+    input_error: float | None = None
+    setpoint: float | None = None
+
+
+@dataclass
+class PidDomainDetails:
+    domain: str
+    sensors: List[SensorDetails]
+    # Following fields are not applicable for PID_DOMAIN_NONE
+    max_error_sensor_name: str | None = None
+    pid_output: PidOutput | None = None
+
+
+>>>>>>> 42084499f (NOS-12079: Publish thermal PID state to STATE_DB (#6901))
 def _intf_name_key(intf_name):
     """Convert interface name to key for sorting"""
     match = re.match(r"Ethernet(\d+)", intf_name)
