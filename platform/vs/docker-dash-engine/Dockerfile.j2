@@ -7,12 +7,15 @@ FROM $BASE AS base
 ## Make apt-get non-interactive
 ENV DEBIAN_FRONTEND=noninteractive
 
-## Update apt source list to ubuntu Azure mirror
-RUN sed -i 's|http://.*.ubuntu.com|http://azure.archive.ubuntu.com|g' /etc/apt/sources.list
+## Bound every mirror request and retry transient failures, mirroring
+## files/apt/apt.conf.d/apt-timeout-n-retries, which is not staged into
+## this build context.
+RUN printf 'Acquire::http::Timeout "20";\nAcquire::https::Timeout "20";\nAcquire::Retries "3";\n' \
+    > /etc/apt/apt.conf.d/apt-timeout-n-retries
 
-RUN apt-get update
-
-RUN apt-get install -f -y net-tools supervisor rsyslog  python3-pip
+## Update and install in a single step so a failed update fails the build
+## here, instead of the install resolving against empty package lists.
+RUN apt-get update && apt-get install -f -y net-tools supervisor rsyslog python3-pip
 RUN pip3 install --break-system-packages supervisord-dependent-startup || pip3 install supervisord-dependent-startup
 
 COPY ["start.sh", "/usr/bin/"]
