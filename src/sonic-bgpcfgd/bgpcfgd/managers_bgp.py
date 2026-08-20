@@ -10,6 +10,35 @@ from .manager import Manager
 from .template import TemplateFabric
 from .utils import run_command
 from .managers_device_global import DeviceGlobalCfgMgr
+<<<<<<< HEAD
+=======
+from .managers_bfd_profile import detect_hw_bfd_offload
+
+# Pattern to identify interface-based neighbors (Ethernet, PortChannel, Vlan)
+INTERFACE_NEIGHBOR_PATTERN = re.compile(r'^(Ethernet|PortChannel|Vlan)\d+')
+
+# Per-peer BGP graceful control knobs. Mirrors the leaves added to
+# sonic-bgp-cmn and the neighbor commands frrcfgd emits in unified mode.
+GRACEFUL_SHUTDOWN_FIELD = 'graceful_shutdown'
+# The three graceful-restart leaves map onto FRR's single per-peer GR mode, so
+# at most one may be true. Ordered most- to least-specific for logging only.
+GRACEFUL_RESTART_MODES = (
+    ('graceful_restart',         'graceful-restart'),
+    ('graceful_restart_disable', 'graceful-restart-disable'),
+    ('graceful_restart_helper',  'graceful-restart-helper'),
+)
+GRACEFUL_FIELDS = {GRACEFUL_SHUTDOWN_FIELD} | {field for field, _ in GRACEFUL_RESTART_MODES}
+
+
+def is_interface_neighbor(neighbor):
+    """
+    Check if a neighbor is interface-based (not an IP address).
+    Interface neighbors start with Ethernet, PortChannel, or Vlan.
+    :param neighbor: neighbor address or interface name
+    :return: True if this is an interface-based neighbor, False if it's an IP address
+    """
+    return bool(INTERFACE_NEIGHBOR_PATTERN.match(neighbor))
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
 
 
 class BGPPeerGroupMgr(object):
@@ -339,16 +368,141 @@ class BGPPeerMgrBase(Manager):
         :param data: associated data
         :return: True if this adding was successful, False otherwise
         """
+<<<<<<< HEAD
+=======
+        # Handle v6only change for interface neighbors - requires deletion and recreation
+        if is_interface_neighbor(nbr) and 'v6only' in data:
+            new_v6only = data.get('v6only', 'false')
+            peer_key = (vrf, nbr)
+            old_v6only = self.intf_nbr_v6only.get(peer_key, 'false')
+            if new_v6only != old_v6only:
+                log_info("v6only changed for interface neighbor %s from %s to %s, recreating" % (nbr, old_v6only, new_v6only))
+                # Delete the existing neighbor
+                self.del_handler(vrf + '|' + nbr if vrf != 'default' else nbr)
+                # Recreate with new v6only setting
+                return self.add_peer(vrf, nbr, data)
+
+        if "capability_ext_nexthop" in data:
+            self.change_capability_ext_nexthop(vrf, nbr, data)
+
+        bfd_fields = {'bfd', 'bfd_profile', 'bfd_min_rx', 'bfd_min_tx',
+                      'bfd_detect_multiplier', 'bfd_check_ctrl_plane_failure'}
+        bfd_changed = bool(bfd_fields & set(data.keys()))
+        if bfd_changed:
+            self.change_bfd(vrf, nbr, data)
+
+        graceful_changed = bool(GRACEFUL_FIELDS & set(data.keys()))
+        if graceful_changed:
+            self.change_graceful(vrf, nbr, data)
+
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
         if "admin_status" in data:
             self.change_admin_status(vrf, nbr, data)
         elif "update" in self.templates and "ip_range" in data and self.peer_type == 'dynamic':
             self.change_ip_range(vrf, nbr, data)
+<<<<<<< HEAD
         else:
             log_err("Peer '(%s|%s)': Can't update the peer. Only 'admin_status' attribute is supported" % (vrf, nbr))
+=======
+        elif "capability_ext_nexthop" not in data and not bfd_changed and not graceful_changed:
+            log_err("Peer '(%s|%s)': Can't update the peer — no actionable attribute in update (received: %s)" % (vrf, nbr, sorted(data.keys())))
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
 
         self.directory.put(self.db_name, self.table_name, vrf + '|' + nbr, data)
         return True
 
+<<<<<<< HEAD
+=======
+    def change_bfd(self, vrf, nbr, data):
+        """Apply BFD config on an existing peer (no peer recreation / BGP flap).
+        Bare/profile/inline-timer precedence mirrors instance.conf.j2."""
+        if data.get('bfd', 'false') != 'true':
+            self.apply_op(" no neighbor %s bfd" % nbr, vrf)
+            self.update_state_db(vrf, nbr, data, "SET")
+            log_info("Peer '%s|%s' BFD configuration updated" % (vrf, nbr))
+            return
+        if data.get('bfd_profile'):
+            self.apply_op(" neighbor %s bfd" % nbr, vrf)
+            self.apply_op(" neighbor %s bfd profile %s" % (nbr, data['bfd_profile']), vrf)
+        elif self.hw_bfd_offload_active:
+            # HW offload can't run FRR's 300 ms session defaults; merge
+            # per-field offload defaults (3/1000/1000), mirroring the
+            # instance.conf.j2 offload branch. Clear any stale profile first.
+            self.apply_op(" no neighbor %s bfd profile" % nbr, vrf)
+            self.apply_op(" neighbor %s bfd %s %s %s" % (
+                nbr,
+                (data.get('bfd_detect_multiplier') or '3'),
+                (data.get('bfd_min_rx') or '1000'),
+                (data.get('bfd_min_tx') or '1000')), vrf)
+        elif all(k in data for k in ('bfd_detect_multiplier', 'bfd_min_rx', 'bfd_min_tx')):
+            # Clear any stale profile when switching to inline timers; FRR keeps
+            # the old profile association otherwise. `no ... profile` is a no-op
+            # when none is set.
+            self.apply_op(" no neighbor %s bfd profile" % nbr, vrf)
+            self.apply_op(" neighbor %s bfd %s %s %s" % (nbr, data['bfd_detect_multiplier'],
+                                                         data['bfd_min_rx'], data['bfd_min_tx']), vrf)
+        else:
+            self.apply_op(" neighbor %s bfd" % nbr, vrf)
+        # check-control-plane-failure is orthogonal to the bare/profile/inline choice.
+        if 'bfd_check_ctrl_plane_failure' in data:
+            if str(data['bfd_check_ctrl_plane_failure']).lower() == 'true':
+                self.apply_op(" neighbor %s bfd check-control-plane-failure" % nbr, vrf)
+            else:
+                self.apply_op(" no neighbor %s bfd check-control-plane-failure" % nbr, vrf)
+        self.update_state_db(vrf, nbr, data, "SET")
+        log_info("Peer '%s|%s' BFD configuration updated" % (vrf, nbr))
+
+    def change_graceful(self, vrf, nbr, data):
+        """Apply per-peer graceful-shutdown / graceful-restart on an existing peer
+        (no peer recreation / BGP flap). Mirrors the rendering in instance.conf.j2
+        and the neighbor commands frrcfgd emits in unified mode.
+
+        `data` is the full BGP_NEIGHBOR row, so an absent key means "not
+        configured" and is driven to the cleared state. The one gap — the same
+        one change_bfd has — is a row where every graceful field is removed at
+        once: update_peer gates on at least one being present, so there is
+        nothing left to trigger the clear. A leaf that is simply absent (HDEL)
+        is also not cleared, as long as another graceful field remains to
+        invoke this method; only an explicit 'false' emits the FRR 'no' form.
+        """
+        if GRACEFUL_SHUTDOWN_FIELD in data:
+            if str(data[GRACEFUL_SHUTDOWN_FIELD]).lower() == 'true':
+                self.apply_op(" neighbor %s graceful-shutdown" % nbr, vrf)
+            else:
+                self.apply_op(" no neighbor %s graceful-shutdown" % nbr, vrf)
+
+        selected = [(field, cmd) for field, cmd in GRACEFUL_RESTART_MODES
+                    if str(data.get(field, 'false')).lower() == 'true']
+        if len(selected) > 1:
+            # YANG rejects this, but CONFIG_DB can be written directly, so the
+            # daemon must not push a contradictory sequence to FRR.
+            log_err("Peer '%s|%s': graceful_restart, graceful_restart_disable and "
+                    "graceful_restart_helper are mutually exclusive; got %s" %
+                    (vrf, nbr, sorted(field for field, _ in selected)))
+            self.update_state_db(vrf, nbr, data, "SET")
+            return
+
+        # Apply the wanted mode BEFORE clearing the others. FRR keeps a single
+        # per-peer GR mode, and unsetting the mode the peer is *currently* in
+        # returns it to PEER_GLOBAL_INHERIT with a real action (see the
+        # PEER_GR / PEER_DISABLE / PEER_HELPER rows of local_Peer_GR_FSM in
+        # bgp_peer_gr_init(), bgpd/bgpd.c). Once the new mode is applied, the
+        # remaining 'no' commands hit a PEER_INVALID next-state, which
+        # bgp_neighbor_graceful_restart() in bgpd/bgp_fsm.c treats as an ignore
+        # and returns BGP_GR_NO_OPERATION for; bgp_vty_return() in
+        # bgpd/bgp_vty.c counts that as success. So they are true no-ops and
+        # cannot clobber the mode just set or trigger a session reset.
+        # Re-check this FSM table when bumping the sonic-frr submodule.
+        for _, cmd in selected:
+            self.apply_op(" neighbor %s %s" % (nbr, cmd), vrf)
+        for field, cmd in GRACEFUL_RESTART_MODES:
+            if field in data and (field, cmd) not in selected:
+                self.apply_op(" no neighbor %s %s" % (nbr, cmd), vrf)
+
+        self.update_state_db(vrf, nbr, data, "SET")
+        log_info("Peer '%s|%s' graceful configuration updated" % (vrf, nbr))
+
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
     def change_admin_status(self, vrf, nbr, data):
         """
         Change admin status of a peer

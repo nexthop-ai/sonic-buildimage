@@ -346,3 +346,549 @@ def test_del_handler_dynamic_nonexist_peer_template_exists(mocked_log_warn, mock
             mocked_log_info.assert_called_with("Using delete template found at %s" % base_template)
         m.del_handler("40.40.40.1")
         mocked_log_warn.assert_called_with("Peer '(default|40.40.40.1)' has not been found")
+<<<<<<< HEAD
+=======
+
+# Tests for is_interface_neighbor helper function
+def test_is_interface_neighbor():
+    from bgpcfgd.managers_bgp import is_interface_neighbor
+    # Interface neighbors
+    assert is_interface_neighbor("Ethernet0") == True
+    assert is_interface_neighbor("Ethernet100") == True
+    assert is_interface_neighbor("PortChannel1") == True
+    assert is_interface_neighbor("PortChannel100") == True
+    assert is_interface_neighbor("Vlan100") == True
+    assert is_interface_neighbor("Vlan4094") == True
+    # IP addresses (not interface neighbors)
+    assert is_interface_neighbor("10.10.10.1") == False
+    assert is_interface_neighbor("fc00:10::1") == False
+    assert is_interface_neighbor("192.168.1.1") == False
+
+# Tests for interface neighbor with v6only
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_add_interface_neighbor(mocked_log_info):
+    for constant in load_constant_files():
+        m = constructor(constant)
+        # Add neighbor metadata entry if check_neig_meta is enabled
+        if m.check_neig_meta:
+            m.directory.put("CONFIG_DB", swsscommon.CFG_DEVICE_NEIGHBOR_METADATA_TABLE_NAME, "INTF_NBR", {})
+        res = m.set_handler("Ethernet0", {'asn': '65200', 'holdtime': '180', 'keepalive': '60', 'name': 'INTF_NBR', 'nhopself': '0', 'rrclient': '0'})
+        assert res, "Expect True return value for interface neighbor"
+        # Verify v6only tracking is set to 'false' by default
+        assert ('default', 'Ethernet0') in m.intf_nbr_v6only
+        assert m.intf_nbr_v6only[('default', 'Ethernet0')] == 'false'
+
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_add_interface_neighbor_v6only(mocked_log_info):
+    for constant in load_constant_files():
+        m = constructor(constant)
+        # Add neighbor metadata entry if check_neig_meta is enabled
+        if m.check_neig_meta:
+            m.directory.put("CONFIG_DB", swsscommon.CFG_DEVICE_NEIGHBOR_METADATA_TABLE_NAME, "INTF_NBR_V6", {})
+        res = m.set_handler("Ethernet4", {'asn': '65200', 'holdtime': '180', 'keepalive': '60', 'name': 'INTF_NBR_V6', 'nhopself': '0', 'rrclient': '0', 'v6only': 'true'})
+        assert res, "Expect True return value for interface neighbor with v6only"
+        # Verify v6only tracking is set to 'true'
+        assert ('default', 'Ethernet4') in m.intf_nbr_v6only
+        assert m.intf_nbr_v6only[('default', 'Ethernet4')] == 'true'
+
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_add_portchannel_neighbor_v6only(mocked_log_info):
+    for constant in load_constant_files():
+        m = constructor(constant)
+        # Add neighbor metadata entry if check_neig_meta is enabled
+        if m.check_neig_meta:
+            m.directory.put("CONFIG_DB", swsscommon.CFG_DEVICE_NEIGHBOR_METADATA_TABLE_NAME, "PC_NBR", {})
+        res = m.set_handler("PortChannel1", {'asn': '65200', 'holdtime': '180', 'keepalive': '60', 'name': 'PC_NBR', 'nhopself': '0', 'rrclient': '0', 'v6only': 'true'})
+        assert res, "Expect True return value for PortChannel neighbor with v6only"
+        assert ('default', 'PortChannel1') in m.intf_nbr_v6only
+        assert m.intf_nbr_v6only[('default', 'PortChannel1')] == 'true'
+
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_add_vlan_neighbor_v6only(mocked_log_info):
+    for constant in load_constant_files():
+        m = constructor(constant)
+        # Add neighbor metadata entry if check_neig_meta is enabled
+        if m.check_neig_meta:
+            m.directory.put("CONFIG_DB", swsscommon.CFG_DEVICE_NEIGHBOR_METADATA_TABLE_NAME, "VLAN_NBR", {})
+        res = m.set_handler("Vlan100", {'asn': '65200', 'holdtime': '180', 'keepalive': '60', 'name': 'VLAN_NBR', 'nhopself': '0', 'rrclient': '0', 'v6only': 'true'})
+        assert res, "Expect True return value for Vlan neighbor with v6only"
+        assert ('default', 'Vlan100') in m.intf_nbr_v6only
+        assert m.intf_nbr_v6only[('default', 'Vlan100')] == 'true'
+
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_del_interface_neighbor_cleans_v6only_tracking(mocked_log_info):
+    for constant in load_constant_files():
+        m = constructor(constant)
+        # Add neighbor metadata entry if check_neig_meta is enabled
+        if m.check_neig_meta:
+            m.directory.put("CONFIG_DB", swsscommon.CFG_DEVICE_NEIGHBOR_METADATA_TABLE_NAME, "INTF_NBR", {})
+        # Add interface neighbor with v6only
+        m.set_handler("Ethernet8", {'asn': '65200', 'holdtime': '180', 'keepalive': '60', 'name': 'INTF_NBR', 'nhopself': '0', 'rrclient': '0', 'v6only': 'true'})
+        assert ('default', 'Ethernet8') in m.intf_nbr_v6only
+        # Delete the neighbor
+        m.del_handler("Ethernet8")
+        # Verify v6only tracking is cleaned up
+        assert ('default', 'Ethernet8') not in m.intf_nbr_v6only
+
+
+# -----------------------------------------------------------------------------
+# RFC 5549: capability_ext_nexthop
+# -----------------------------------------------------------------------------
+def _pushed_cmds(m):
+    """Concatenated text of every cfg_mgr.push() call."""
+    return "\n".join(call.args[0] for call in m.cfg_mgr.push.call_args_list)
+
+
+@pytest.mark.parametrize("peer_type,with_lo4096", [("general", False), ("internal", True), ("voq_chassis", False)])
+def test_add_peer_capability_ext_nexthop_true_emits_command(peer_type, with_lo4096):
+    """When BGP_NEIGHBOR has capability_ext_nexthop=true the rendered instance
+    template must emit the FRR 'capability extended-nexthop' line."""
+    for constant in load_constant_files():
+        m = constructor(constant, peer_type=peer_type, with_lo4096_ipv4=with_lo4096)
+        data = {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                'local_addr': '30.30.30.30', 'name': 'TOR',
+                'nhopself': '0', 'rrclient': '0',
+                'capability_ext_nexthop': 'true'}
+        assert m.set_handler("30.30.30.1", data), "Expect True return value"
+        assert "neighbor 30.30.30.1 capability extended-nexthop" in _pushed_cmds(m)
+
+
+@pytest.mark.parametrize("peer_type,with_lo4096", [("general", False), ("internal", True), ("voq_chassis", False)])
+def test_add_peer_capability_ext_nexthop_absent_or_false(peer_type, with_lo4096):
+    """The capability line must not be emitted if the field is missing or
+    explicitly false."""
+    for constant in load_constant_files():
+        # absent
+        m = constructor(constant, peer_type=peer_type, with_lo4096_ipv4=with_lo4096)
+        data = {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                'local_addr': '30.30.30.30', 'name': 'TOR',
+                'nhopself': '0', 'rrclient': '0'}
+        assert m.set_handler("30.30.30.1", data), "Expect True return value"
+        assert "capability extended-nexthop" not in _pushed_cmds(m)
+
+        # explicitly false
+        m = constructor(constant, peer_type=peer_type, with_lo4096_ipv4=with_lo4096)
+        data['capability_ext_nexthop'] = 'false'
+        assert m.set_handler("30.30.30.1", data), "Expect True return value"
+        assert "capability extended-nexthop" not in _pushed_cmds(m)
+
+
+def test_add_peer_capability_ext_nexthop_ipv6_peer():
+    """RFC 5549's normal deployment is an IPv6 transport carrying v4 routes;
+    make sure the line is emitted for v6-addressed neighbors too."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        data = {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                'local_addr': 'fc00:20::20', 'name': 'TOR',
+                'nhopself': '0', 'rrclient': '0',
+                'capability_ext_nexthop': 'true'}
+        assert m.set_handler("fc00:20::1", data), "Expect True return value"
+        assert "neighbor fc00:20::1 capability extended-nexthop" in _pushed_cmds(m)
+
+
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_update_peer_capability_ext_nexthop_true(mocked_log_info):
+    """Toggling the field on an already-existing peer issues the FRR
+    'neighbor X capability extended-nexthop' command at runtime — no
+    config_reload required."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        res = m.set_handler("10.10.10.1", {"capability_ext_nexthop": "true"})
+        assert res, "Expect True return value for peer update"
+        pushed = _pushed_cmds(m)
+        assert "neighbor 10.10.10.1 capability extended-nexthop" in pushed
+        assert "no neighbor 10.10.10.1 capability extended-nexthop" not in pushed
+        mocked_log_info.assert_called_with(
+            "Peer 'default|10.10.10.1' capability_ext_nexthop is set to 'true'")
+
+
+@patch('bgpcfgd.managers_bgp.log_info')
+def test_update_peer_capability_ext_nexthop_false(mocked_log_info):
+    """Setting capability_ext_nexthop=false must emit the matching 'no' form."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        res = m.set_handler("10.10.10.1", {"capability_ext_nexthop": "false"})
+        assert res, "Expect True return value for peer update"
+        assert "no neighbor 10.10.10.1 capability extended-nexthop" in _pushed_cmds(m)
+        mocked_log_info.assert_called_with(
+            "Peer 'default|10.10.10.1' capability_ext_nexthop is set to 'false'")
+
+
+@patch('bgpcfgd.managers_bgp.log_err')
+def test_update_peer_capability_ext_nexthop_invalid(mocked_log_err):
+    """An invalid value is rejected and logged, with nothing pushed to FRR."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.cfg_mgr.reset_mock()
+        res = m.set_handler("10.10.10.1", {"capability_ext_nexthop": "maybe"})
+        assert res, "set_handler always returns True for known neighbors"
+        assert m.cfg_mgr.push.call_count == 0
+        mocked_log_err.assert_called_with(
+            "Peer 'default|10.10.10.1': Can't update the peer. "
+            "capability_ext_nexthop has wrong attribute value")
+
+
+def test_update_peer_full_row_with_capability_ext_nexthop():
+    """In production the CONFIG_DB subscriber delivers the full BGP_NEIGHBOR
+    row on every HSET — admin_status is always present alongside whichever
+    field actually changed. Verify capability_ext_nexthop is honored even
+    when the row also carries admin_status (no mutually-exclusive elif)."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        full_row = {'admin_status': 'up', 'asn': '64600', 'holdtime': '10',
+                    'keepalive': '3', 'local_addr': '10.0.0.130',
+                    'name': 'ARISTA02T1', 'nhopself': '0', 'rrclient': '0',
+                    'capability_ext_nexthop': 'true'}
+        res = m.set_handler("10.10.10.1", full_row)
+        assert res, "Expect True return value for peer update"
+        pushed = _pushed_cmds(m)
+        # capability line emitted ...
+        assert "neighbor 10.10.10.1 capability extended-nexthop" in pushed
+        # ... and admin_status branch also ran (idempotent 'no shutdown').
+        assert "no neighbor 10.10.10.1 shutdown" in pushed
+
+
+def test_update_peer_capability_ext_nexthop_non_default_vrf():
+    """apply_op wraps the per-neighbor command in 'router bgp <asn> vrf <name>'
+    for non-default VRFs (managers_bgp.apply_op). Verify the capability_ext_nexthop
+    update path threads through that VRF wrapper correctly — important for
+    multi-VRF RFC 5549 deployments."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        # load_peers() only sees default-VRF neighbors via the mocked vtysh.
+        # Seed the (Vrf-red, 10.10.10.1) peer so set_handler routes through
+        # update_peer rather than add_peer.
+        m.peers.add(("Vrf-red", "10.10.10.1"))
+        res = m.set_handler("Vrf-red|10.10.10.1", {"capability_ext_nexthop": "true"})
+        assert res, "Expect True return value for peer update"
+        pushed = _pushed_cmds(m)
+        assert "router bgp 65100 vrf Vrf-red" in pushed
+        assert "neighbor 10.10.10.1 capability extended-nexthop" in pushed
+
+
+# ---------------------------------------------------------------------------
+# change_bfd — BFD on an EXISTING neighbor renders in place (no del/add, no
+# BGP flap). 10.10.10.1 is already a known peer (mocked vtysh neighbors), so
+# set_handler routes through update_peer -> change_bfd.
+# ---------------------------------------------------------------------------
+
+def test_change_bfd_bare_enable_on_existing_neighbor():
+    """bfd=true on an existing neighbor emits a bare 'neighbor X bfd' through
+    the update path (regression for the dropped-on-update gap)."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        res = m.set_handler("10.10.10.1", {"bfd": "true"})
+        assert res, "Expect True return value for peer update"
+        pushed = _pushed_cmds(m)
+        assert "neighbor 10.10.10.1 bfd" in pushed
+
+
+def test_change_bfd_disable():
+    """bfd=false emits 'no neighbor X bfd'."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"bfd": "false"})
+        assert "no neighbor 10.10.10.1 bfd" in _pushed_cmds(m)
+
+
+def test_change_bfd_profile():
+    """bfd_profile emits the enable line plus 'bfd profile <name>'."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_profile": "fast-failover"})
+        pushed = _pushed_cmds(m)
+        assert "neighbor 10.10.10.1 bfd" in pushed
+        assert "neighbor 10.10.10.1 bfd profile fast-failover" in pushed
+
+
+def test_change_bfd_inline_timers_clears_stale_profile():
+    """Inline timers emit 'neighbor X bfd <m> <rx> <tx>' and first clear any
+    stale profile (FRR retains the old profile association otherwise)."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {
+            "bfd": "true", "bfd_detect_multiplier": "3",
+            "bfd_min_rx": "100", "bfd_min_tx": "100"})
+        pushed = _pushed_cmds(m)
+        assert "no neighbor 10.10.10.1 bfd profile" in pushed
+        assert "neighbor 10.10.10.1 bfd 3 100 100" in pushed
+
+
+def test_change_bfd_check_ctrl_plane_failure_true():
+    """bfd_check_ctrl_plane_failure=true emits the FRR check-control-plane-failure
+    line (previously dropped in bgpcfgd mode)."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_check_ctrl_plane_failure": "true"})
+        assert "neighbor 10.10.10.1 bfd check-control-plane-failure" in _pushed_cmds(m)
+
+
+def test_change_bfd_check_ctrl_plane_failure_false():
+    """bfd_check_ctrl_plane_failure=false emits the negated form."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_check_ctrl_plane_failure": "false"})
+        assert "no neighbor 10.10.10.1 bfd check-control-plane-failure" in _pushed_cmds(m)
+
+
+# ---------------------------------------------------------------------------
+# Hardware BFD offload (NOS-12951): bare/partial BFD enables merge per-field
+# offload defaults (3/1000/1000) so the session never registers at FRR's
+# unsupported 300 ms defaults. Covers both the add_peer template render and
+# the change_bfd update path.
+# ---------------------------------------------------------------------------
+
+def test_add_peer_hw_offload_bare_bfd_merges_defaults():
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        res = m.set_handler("30.30.30.1", {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                                           'local_addr': '30.30.30.30', 'name': 'TOR', 'nhopself': '0',
+                                           'rrclient': '0', 'bfd': 'true'})
+        assert res, "Expect True return value"
+        assert "neighbor 30.30.30.1 bfd 3 1000 1000" in _pushed_cmds(m)
+
+
+def test_add_peer_hw_offload_partial_timers_merge():
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        res = m.set_handler("30.30.30.1", {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                                           'local_addr': '30.30.30.30', 'name': 'TOR', 'nhopself': '0',
+                                           'rrclient': '0', 'bfd': 'true', 'bfd_min_rx': '100'})
+        assert res, "Expect True return value"
+        assert "neighbor 30.30.30.1 bfd 3 100 1000" in _pushed_cmds(m)
+
+
+def test_add_peer_hw_offload_empty_string_fields_take_defaults():
+    """An empty-string timer field in the row must render the offload default
+    (Jinja default() needs the boolean arg to catch '' as well as undefined)."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        res = m.set_handler("30.30.30.1", {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                                           'local_addr': '30.30.30.30', 'name': 'TOR', 'nhopself': '0',
+                                           'rrclient': '0', 'bfd': 'true', 'bfd_min_rx': '',
+                                           'bfd_detect_multiplier': '5', 'bfd_min_tx': ''})
+        assert res, "Expect True return value"
+        assert "neighbor 30.30.30.1 bfd 5 1000 1000" in _pushed_cmds(m)
+
+
+def test_add_peer_bare_bfd_without_offload_unchanged():
+    """No offload -> bare enable, no synthetic timers."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        res = m.set_handler("30.30.30.1", {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                                           'local_addr': '30.30.30.30', 'name': 'TOR', 'nhopself': '0',
+                                           'rrclient': '0', 'bfd': 'true'})
+        assert res, "Expect True return value"
+        pushed = _pushed_cmds(m)
+        assert "neighbor 30.30.30.1 bfd" in pushed
+        assert "bfd 3 1000 1000" not in pushed
+
+
+def test_change_bfd_hw_offload_bare_enable_merges_defaults():
+    """The NOS-12951 operator flow: bfd=true on an ESTABLISHED neighbor."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        assert m.set_handler("10.10.10.1", {"bfd": "true"})
+        pushed = _pushed_cmds(m)
+        assert "neighbor 10.10.10.1 bfd 3 1000 1000" in pushed
+        assert "no neighbor 10.10.10.1 bfd profile" in pushed
+
+
+def test_change_bfd_hw_offload_partial_timers_merge():
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_min_rx": "100"})
+        assert "neighbor 10.10.10.1 bfd 3 100 1000" in _pushed_cmds(m)
+
+
+def test_change_bfd_hw_offload_partial_tx_and_multiplier_merge():
+    """Explicit bfd_min_tx and bfd_detect_multiplier are honored while the
+    absent bfd_min_rx takes the offload default."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_min_tx": "100",
+                                            "bfd_detect_multiplier": "5"})
+        assert "neighbor 10.10.10.1 bfd 5 1000 100" in _pushed_cmds(m)
+
+
+def test_change_bfd_hw_offload_empty_string_fields_take_defaults():
+    """A field cleared to an empty string (nhcli field delete leaves '' in the
+    row on some paths) must take the offload default, not render an empty
+    token that vtysh rejects."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_min_rx": "",
+                                            "bfd_min_tx": "100",
+                                            "bfd_detect_multiplier": ""})
+        assert "neighbor 10.10.10.1 bfd 3 1000 100" in _pushed_cmds(m)
+
+
+def test_change_bfd_hw_offload_profile_wins():
+    """bfd_profile still takes precedence under offload; no synthetic timers."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.hw_bfd_offload_active = True
+        assert m.set_handler("10.10.10.1", {"bfd": "true", "bfd_profile": "fast-failover"})
+        pushed = _pushed_cmds(m)
+        assert "neighbor 10.10.10.1 bfd profile fast-failover" in pushed
+        assert "bfd 3 1000 1000" not in pushed
+# -----------------------------------------------------------------------------
+# per-peer graceful-shutdown / graceful-restart
+# -----------------------------------------------------------------------------
+@pytest.mark.parametrize("field,frr_cmd", [
+    ("graceful_shutdown", "graceful-shutdown"),
+    ("graceful_restart", "graceful-restart"),
+    ("graceful_restart_disable", "graceful-restart-disable"),
+    ("graceful_restart_helper", "graceful-restart-helper"),
+])
+def test_add_peer_graceful_knob_renders(field, frr_cmd):
+    """A peer created with a graceful knob set renders the matching FRR line."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        data = {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                'local_addr': '30.30.30.30', 'name': 'TOR',
+                'nhopself': '0', 'rrclient': '0', field: 'true'}
+        assert m.set_handler("30.30.30.1", data), "Expect True return value"
+        assert "neighbor 30.30.30.1 %s" % frr_cmd in _pushed_cmds(m)
+
+
+def test_add_peer_graceful_absent_or_false():
+    """No graceful line is rendered when the fields are missing or false."""
+    for constant in load_constant_files():
+        base = {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                'local_addr': '30.30.30.30', 'name': 'TOR',
+                'nhopself': '0', 'rrclient': '0'}
+        m = constructor(constant)
+        assert m.set_handler("30.30.30.1", dict(base))
+        assert "graceful" not in _pushed_cmds(m)
+
+        m = constructor(constant)
+        data = dict(base)
+        data.update({'graceful_shutdown': 'false', 'graceful_restart': 'false',
+                     'graceful_restart_disable': 'false', 'graceful_restart_helper': 'false'})
+        assert m.set_handler("30.30.30.1", data)
+        assert "graceful" not in _pushed_cmds(m)
+
+
+def test_add_peer_graceful_restart_only_one_mode_rendered():
+    """The instance template is if/elif, so a config that somehow carries two GR
+    modes still renders exactly one line — FRR keeps a single per-peer mode."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        data = {'asn': '65200', 'holdtime': '180', 'keepalive': '60',
+                'local_addr': '30.30.30.30', 'name': 'TOR',
+                'nhopself': '0', 'rrclient': '0',
+                'graceful_restart': 'true', 'graceful_restart_helper': 'true'}
+        assert m.set_handler("30.30.30.1", data)
+        pushed = _pushed_cmds(m)
+        assert "neighbor 30.30.30.1 graceful-restart\n" in pushed + "\n"
+        assert "graceful-restart-helper" not in pushed
+
+
+@pytest.mark.parametrize("value,expected", [
+    ("true", "neighbor 10.10.10.1 graceful-shutdown"),
+    ("false", "no neighbor 10.10.10.1 graceful-shutdown"),
+])
+def test_update_peer_graceful_shutdown(value, expected):
+    """Toggling graceful_shutdown on an existing peer issues the command at
+    runtime — no peer recreation, no config_reload."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"graceful_shutdown": value})
+        pushed = _pushed_cmds(m)
+        assert expected in pushed
+        if value == "true":
+            assert "no neighbor 10.10.10.1 graceful-shutdown" not in pushed
+
+
+def test_update_peer_graceful_restart_mode_switch_order():
+    """Switching GR mode must apply the new mode BEFORE clearing the old one.
+
+    Unsetting the mode a peer is currently in returns it to PEER_GLOBAL_INHERIT
+    with a real action (local_Peer_GR_FSM in bgpd/bgpd.c); once the new mode is
+    applied the stale 'no' is a PEER_INVALID -> BGP_GR_NO_OPERATION no-op.
+    """
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"graceful_restart": "false",
+                                            "graceful_restart_helper": "true"})
+        pushed = _pushed_cmds(m)
+        apply_idx = pushed.index("neighbor 10.10.10.1 graceful-restart-helper")
+        clear_idx = pushed.index("no neighbor 10.10.10.1 graceful-restart")
+        assert apply_idx < clear_idx, "new GR mode must be applied before the old is cleared"
+
+
+def test_update_peer_graceful_restart_clear_all():
+    """Setting every GR mode false returns the peer to global-inherit."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"graceful_restart": "false",
+                                            "graceful_restart_disable": "false",
+                                            "graceful_restart_helper": "false"})
+        pushed = _pushed_cmds(m)
+        for cmd in ("graceful-restart", "graceful-restart-disable", "graceful-restart-helper"):
+            assert "no neighbor 10.10.10.1 %s" % cmd in pushed
+
+
+def test_update_peer_graceful_restart_absent_leaf_is_not_cleared():
+    """Intentional gap (same idiom as change_bfd): only fields present in the
+    row are written to FRR. After graceful_restart was true, a remaining-hash
+    that has graceful_restart_disable=false (HDEL of graceful_restart) emits
+    'no ... graceful-restart-disable' but does not unset the stale GR mode.
+    Operators who need to revert a peer write the leaf false, not HDEL it.
+    """
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"graceful_restart": "true"})
+        m.cfg_mgr.reset_mock()
+        assert m.set_handler("10.10.10.1", {"graceful_restart_disable": "false"})
+        pushed = _pushed_cmds(m)
+        assert "no neighbor 10.10.10.1 graceful-restart-disable" in pushed
+        assert not any(line.strip() == "no neighbor 10.10.10.1 graceful-restart"
+                       for line in pushed.splitlines())
+
+
+@patch('bgpcfgd.managers_bgp.log_err')
+def test_update_peer_graceful_restart_mutually_exclusive(mocked_log_err):
+    """YANG rejects two GR modes, but CONFIG_DB can be written directly, so the
+    daemon must refuse rather than push a contradictory sequence."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        m.cfg_mgr.reset_mock()
+        assert m.set_handler("10.10.10.1", {"graceful_restart": "true",
+                                            "graceful_restart_helper": "true"})
+        assert "graceful" not in _pushed_cmds(m)
+        mocked_log_err.assert_called_with(
+            "Peer 'default|10.10.10.1': graceful_restart, graceful_restart_disable and "
+            "graceful_restart_helper are mutually exclusive; got "
+            "['graceful_restart', 'graceful_restart_helper']")
+
+
+@patch('bgpcfgd.managers_bgp.log_err')
+def test_update_peer_graceful_is_actionable(mocked_log_err):
+    """A graceful-only update must not fall through to the 'no actionable
+    attribute' error branch."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"graceful_shutdown": "true"})
+        mocked_log_err.assert_not_called()
+
+
+def test_update_peer_full_row_with_graceful():
+    """The CONFIG_DB subscriber delivers the full BGP_NEIGHBOR row on every
+    HSET, so graceful knobs must be honored alongside admin_status."""
+    for constant in load_constant_files():
+        m = constructor(constant)
+        assert m.set_handler("10.10.10.1", {"admin_status": "up",
+                                            "graceful_shutdown": "true"})
+        pushed = _pushed_cmds(m)
+        assert "neighbor 10.10.10.1 graceful-shutdown" in pushed
+        assert "no neighbor 10.10.10.1 shutdown" in pushed
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))

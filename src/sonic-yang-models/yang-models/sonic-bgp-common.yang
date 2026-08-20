@@ -47,7 +47,62 @@ module sonic-bgp-common {
         "SONiC";
 
     description
+<<<<<<< HEAD
         "SONIC BGP common YANG attributes for Neighbors and Peer group";
+=======
+        "BGP common attributes for neighbors and peer groups";
+
+    revision 2026-08-10 {
+        description
+            "Extend the per-peer graceful_shutdown / graceful_restart / graceful_restart_disable / graceful_restart_helper leaves to bgpcfgd (separated) mode for BGP_NEIGHBOR, so the same CONFIG_DB drives FRR under either mode. No schema change; description text only. BGP_PEER_GROUP remains frrcfgd-only because bgpcfgd has no BGP_PEER_GROUP consumer.";
+    }
+
+    revision 2026-07-28 {
+        description
+            "Add per-peer graceful_shutdown, graceful_restart, graceful_restart_disable and graceful_restart_helper leaves to sonic-bgp-cmn so BGP_NEIGHBOR_LIST and BGP_PEER_GROUP_LIST (frrcfgd mode) can drive per-neighbor / per-peer-group BGP graceful-shutdown and graceful-restart, overriding the global BGP_GLOBALS settings. The three graceful-restart mode leaves are mutually exclusive, matching FRR's single per-peer graceful-restart mode.";
+    }
+
+    revision 2026-07-23 {
+        description
+            "Restrict per-peer bfd_min_rx and bfd_min_tx to 100 or 1000 ms for async BFD-for-BGP; hardware BFD offload only supports these timer values. Also require a bfd_profile, or all of bfd_detect_multiplier / bfd_min_rx / bfd_min_tx, whenever bfd is enabled (FRR's inline BFD needs all three; no session left at an unset default). Aligns with sonic-bfd-profile async timer restriction.";
+    }
+
+    revision 2026-07-22 {
+        description
+            "Add bgp_afi_safi typedef (and the bgp_afi_safi_global / bgp_afi_safi_device_global
+             restrictions) and use it for the afi_safi list keys, which were previously an
+             unconstrained 'type string'. Constraining the key rejects non-canonical
+             spellings such as 'ipv4-unicast' at validation time and lets YANG-derived
+             CLIs offer the valid values as completion candidates.";
+    }
+
+    revision 2026-06-02 {
+        description
+            "Extract BFD leaves into sonic-bgp-cmn-bfd grouping and use it from sonic-bgp-cmn-neigh so BGP_NEIGHBOR_TEMPLATE_LIST (bgpcfgd mode), BGP_INTERNAL_NEIGHBOR_LIST, BGP_VOQ_CHASSIS_NEIGHBOR_LIST and BGP_MONITORS_LIST expose the same BFD config the bgpcfgd templates already render.";
+    }
+
+    revision 2026-04-29 {
+        description
+            "Add bfd_profile leafref into sonic-bfd-profile/BFD_PROFILE/name; align bfd_min_rx and bfd_min_tx ranges with BFD_PROFILE timer ranges.";
+    }
+
+    revision 2026-04-23 {
+        description
+            "Add bgp_origin_type typedef for BGP origin attribute in aggregate addresses.";
+    }
+
+    revision 2026-04-22 {
+        description
+            "Add BGP address-family level add-path configuration parameters supported by FRR to
+             sonic-bgp-cmn-af grouping: add tx_best_selected enum to bgp_tx_addpaths_type,
+             add bgp_tx_add_paths_max_best_selected (uint8, 1..6, default 1).";
+    }
+
+    revision 2025-12-09 {
+        description
+            "Add BFD custom timer parameters: bfd_detect_multiplier, bfd_min_rx, bfd_min_tx";
+    }
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
 
     revision 2021-02-26 {
         description
@@ -297,6 +352,39 @@ module sonic-bgp-common {
         leaf override_capability {
             type boolean;
             description "Override capability negotiation result";
+        }
+
+        leaf graceful_shutdown {
+            type boolean;
+            description
+                "Gracefully shut down this BGP peer (RFC 8326): attach the GRACEFUL_SHUTDOWN community and lower LOCAL_PREF so peers deprefer these paths while the session stays up. Overrides the global graceful-shutdown for this peer. Honored under BGP_NEIGHBOR in both modes: frrcfgd / unified mode (DEVICE_METADATA frr_mgmt_framework_config true) and bgpcfgd / separated mode. Under BGP_PEER_GROUP it is frrcfgd-only, because bgpcfgd does not consume the BGP_PEER_GROUP table.";
+        }
+
+        leaf graceful_restart {
+            type boolean;
+            must "current() = 'false' or not(../graceful_restart_disable = 'true' or ../graceful_restart_helper = 'true')" {
+                error-message "graceful_restart, graceful_restart_disable and graceful_restart_helper are mutually exclusive; FRR keeps a single per-peer graceful-restart mode, so at most one may be true";
+            }
+            description
+                "Enable BGP graceful restart (restarter and helper) for this peer, overriding the global graceful-restart setting. Honored under BGP_NEIGHBOR in both modes: frrcfgd / unified mode (DEVICE_METADATA frr_mgmt_framework_config true) and bgpcfgd / separated mode. Under BGP_PEER_GROUP it is frrcfgd-only, because bgpcfgd does not consume the BGP_PEER_GROUP table.";
+        }
+
+        leaf graceful_restart_disable {
+            type boolean;
+            must "current() = 'false' or not(../graceful_restart = 'true' or ../graceful_restart_helper = 'true')" {
+                error-message "graceful_restart, graceful_restart_disable and graceful_restart_helper are mutually exclusive; FRR keeps a single per-peer graceful-restart mode, so at most one may be true";
+            }
+            description
+                "Disable BGP graceful restart for this peer, overriding the global graceful-restart setting. Honored under BGP_NEIGHBOR in both modes: frrcfgd / unified mode (DEVICE_METADATA frr_mgmt_framework_config true) and bgpcfgd / separated mode. Under BGP_PEER_GROUP it is frrcfgd-only, because bgpcfgd does not consume the BGP_PEER_GROUP table.";
+        }
+
+        leaf graceful_restart_helper {
+            type boolean;
+            must "current() = 'false' or not(../graceful_restart = 'true' or ../graceful_restart_disable = 'true')" {
+                error-message "graceful_restart, graceful_restart_disable and graceful_restart_helper are mutually exclusive; FRR keeps a single per-peer graceful-restart mode, so at most one may be true";
+            }
+            description
+                "Enable graceful-restart helper-only mode for this peer. Honored under BGP_NEIGHBOR in both modes: frrcfgd / unified mode (DEVICE_METADATA frr_mgmt_framework_config true) and bgpcfgd / separated mode. Under BGP_PEER_GROUP it is frrcfgd-only, because bgpcfgd does not consume the BGP_PEER_GROUP table.";
         }
 
         leaf peer_port {

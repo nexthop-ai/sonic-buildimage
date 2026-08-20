@@ -14,6 +14,40 @@
   neighbor {{ neighbor_addr }} shutdown
 {% endif %}
 !
+<<<<<<< HEAD
+=======
+{# Per-peer graceful control knobs, overriding the BGP_GLOBALS setting #}
+{% if 'graceful_shutdown' in bgp_session and bgp_session['graceful_shutdown'] == 'true' %}
+  neighbor {{ neighbor_addr }} graceful-shutdown
+{% endif %}
+{# FRR keeps a single per-peer graceful-restart mode, so only one of the three
+   may be rendered; YANG rejects a config with more than one set to true. #}
+{% if 'graceful_restart' in bgp_session and bgp_session['graceful_restart'] == 'true' %}
+  neighbor {{ neighbor_addr }} graceful-restart
+{% elif 'graceful_restart_disable' in bgp_session and bgp_session['graceful_restart_disable'] == 'true' %}
+  neighbor {{ neighbor_addr }} graceful-restart-disable
+{% elif 'graceful_restart_helper' in bgp_session and bgp_session['graceful_restart_helper'] == 'true' %}
+  neighbor {{ neighbor_addr }} graceful-restart-helper
+{% endif %}
+!
+{% if 'bfd' in bgp_session and bgp_session['bfd'] == 'true' %}
+{%   if 'bfd_profile' in bgp_session %}
+  neighbor {{ neighbor_addr }} bfd
+  neighbor {{ neighbor_addr }} bfd profile {{ bgp_session['bfd_profile'] }}
+{%   elif hw_bfd_offload_active %}
+  neighbor {{ neighbor_addr }} bfd {{ bgp_session['bfd_detect_multiplier'] | default('3', true) }} {{ bgp_session['bfd_min_rx'] | default('1000', true) }} {{ bgp_session['bfd_min_tx'] | default('1000', true) }}
+{%   elif 'bfd_detect_multiplier' in bgp_session and 'bfd_min_rx' in bgp_session and 'bfd_min_tx' in bgp_session %}
+  neighbor {{ neighbor_addr }} bfd {{ bgp_session['bfd_detect_multiplier'] }} {{ bgp_session['bfd_min_rx'] }} {{ bgp_session['bfd_min_tx'] }}
+{%   else %}
+  neighbor {{ neighbor_addr }} bfd
+{%   endif %}
+{%   if 'bfd_check_ctrl_plane_failure' in bgp_session and bgp_session['bfd_check_ctrl_plane_failure'] == 'true' %}
+  neighbor {{ neighbor_addr }} bfd check-control-plane-failure
+{%   endif %}
+{% endif %}
+!
+{# Address family handling: IPv4 neighbors in ipv4 AF, IPv6 and interface neighbors in ipv6 AF #}
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
 {% if neighbor_addr | ipv4 %}
   address-family ipv4
     neighbor {{ neighbor_addr }} peer-group PEER_V4

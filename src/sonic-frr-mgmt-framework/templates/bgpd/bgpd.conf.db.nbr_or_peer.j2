@@ -101,3 +101,15 @@
 {% if 'override_capability' in nbr_or_peer and nbr_or_peer['override_capability'] == 'true' %}
  neighbor {{name_or_ip}} override-capability
 {% endif %}
+{% if 'graceful_shutdown' in nbr_or_peer and nbr_or_peer['graceful_shutdown'] == 'true' %}
+ neighbor {{name_or_ip}} graceful-shutdown
+{% endif %}
+{# FRR keeps a single per-peer graceful-restart mode, so only one of the three
+   may be rendered; YANG rejects a config with more than one set to true. #}
+{% if 'graceful_restart' in nbr_or_peer and nbr_or_peer['graceful_restart'] == 'true' %}
+ neighbor {{name_or_ip}} graceful-restart
+{% elif 'graceful_restart_disable' in nbr_or_peer and nbr_or_peer['graceful_restart_disable'] == 'true' %}
+ neighbor {{name_or_ip}} graceful-restart-disable
+{% elif 'graceful_restart_helper' in nbr_or_peer and nbr_or_peer['graceful_restart_helper'] == 'true' %}
+ neighbor {{name_or_ip}} graceful-restart-helper
+{% endif %}

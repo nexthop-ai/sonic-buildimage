@@ -42,6 +42,21 @@
     "BGP_PEERGROUP_ALL_VALID": {
         "desc": "Configure BGP peer group table."
     },
+    "BGP_PER_PEER_GRACEFUL_SHUTDOWN_VALID": {
+        "desc": "A neighbor and a peer-group can be drained with graceful_shutdown while the VRF-level graceful_shutdown stays off."
+    },
+    "BGP_NEIGHBOR_GRACEFUL_RESTART_MODE_CONFLICT_INVALID": {
+        "desc": "Setting both graceful_restart and graceful_restart_helper on a neighbor must be rejected; FRR keeps a single per-peer graceful-restart mode.",
+        "eStr": ["are mutually exclusive"]
+    },
+    "BGP_NEIGHBOR_GRACEFUL_RESTART_AND_DISABLE_CONFLICT_INVALID": {
+        "desc": "Setting both graceful_restart and graceful_restart_disable on a neighbor must be rejected; FRR keeps a single per-peer graceful-restart mode.",
+        "eStr": ["are mutually exclusive"]
+    },
+    "BGP_PEER_GROUP_GRACEFUL_RESTART_MODE_CONFLICT_INVALID": {
+        "desc": "Setting both graceful_restart_disable and graceful_restart_helper on a peer-group must be rejected; FRR keeps a single per-peer graceful-restart mode.",
+        "eStr": ["are mutually exclusive"]
+    },
     "BGP_GLOBAL_NEG_VRF_NOT_EXIST": {
         "desc": "Referring non-existing VRF table.",
         "eStrKey": "InvalidValue"

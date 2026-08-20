@@ -1886,6 +1886,29 @@ class BGPConfigDaemon:
                    ('dont_negotiate_capability',            '{no:no-prefix}neighbor {} dont-capability-negotiate', ['true', 'false']),
                    ('enforce_multihop',                     '{no:no-prefix}neighbor {} enforce-multihop', ['true', 'false']),
                    ('override_capability',                  '{no:no-prefix}neighbor {} override-capability', ['true', 'false']),
+                   ('graceful_shutdown',                    '{no:no-prefix}neighbor {} graceful-shutdown', ['true', 'false']),
+                   # The three graceful-restart leaves map onto FRR's single per-peer GR mode
+                   # (PEER_GR / PEER_DISABLE / PEER_HELPER), so YANG rejects more than one being
+                   # true. On a mode switch, frrcfgd emits the new-mode SET before the stale-mode
+                   # UNSET because these keys appear in that order in cmn_key_map and each
+                   # key-map entry is processed independently in list order. (Within a single
+                   # entry, run_command() appends deletes before updates — that is not what
+                   # orders a GR mode switch.)
+                   #
+                   # That order matters for FRR: unsetting the *current* mode returns the peer
+                   # to PEER_GLOBAL_INHERIT (see PEER_* + NO_PEER_* rows in bgp_peer_gr_init()
+                   # in bgpd/bgpd.c), which would briefly drop GR overrides. Unsetting a mode
+                   # the peer has already left is instead a true no-op: e.g. from PEER_GR,
+                   # NO_PEER_HELPER_CMD / NO_PEER_DISABLE_CMD map to next_state PEER_INVALID
+                   # (commented as "ignore" in bgp_neighbor_graceful_restart() in
+                   # bgpd/bgp_fsm.c), which returns BGP_GR_NO_OPERATION; bgp_vty_return() in
+                   # bgpd/bgp_vty.c treats that as success; bgp_peer_gr_action() (bgpd/bgp_gr_helper.c)
+                   # never runs, so the newly applied mode is not clobbered and no GR
+                   # action/session reset is triggered by the stale unset. Re-check this FSM
+                   # table when bumping the sonic-frr submodule.
+                   ('graceful_restart',                     '{no:no-prefix}neighbor {} graceful-restart', ['true', 'false']),
+                   ('graceful_restart_disable',             '{no:no-prefix}neighbor {} graceful-restart-disable', ['true', 'false']),
+                   ('graceful_restart_helper',              '{no:no-prefix}neighbor {} graceful-restart-helper', ['true', 'false']),
                    ('peer_port',                            '{no:no-prefix}neighbor {} port {}'),
                    ('strict_capability_match',              '{no:no-prefix}neighbor {} strict-capability-match', ['true', 'false'])
     ]

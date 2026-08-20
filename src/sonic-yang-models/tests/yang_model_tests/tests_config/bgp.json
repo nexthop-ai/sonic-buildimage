@@ -341,6 +341,10 @@
                     "dont_negotiate_capability": false,
                     "enforce_multihop": false,
                     "override_capability": false,
+                    "graceful_shutdown": true,
+                    "graceful_restart": true,
+                    "graceful_restart_disable": false,
+                    "graceful_restart_helper": false,
                     "peer_port": 0,
                     "shutdown_message": "BGP PeerGroup Shutdown Message",
                     "strict_capability_match": false,
@@ -375,6 +379,8 @@
                     "dont_negotiate_capability": false,
                     "enforce_multihop": false,
                     "override_capability": false,
+                    "graceful_shutdown": false,
+                    "graceful_restart_helper": true,
                     "peer_port": 0,
                     "shutdown_message": "BGP PeerGroup Shutdown Message",
                     "strict_capability_match": false,
@@ -485,6 +491,8 @@
                     "dont_negotiate_capability": false,
                     "enforce_multihop": false,
                     "override_capability": false,
+                    "graceful_shutdown": true,
+                    "graceful_restart_disable": true,
                     "peer_port": 0,
                     "shutdown_message": "BGP PeerGroup Shutdown Message",
                     "strict_capability_match": false,
@@ -519,6 +527,8 @@
                     "dont_negotiate_capability": false,
                     "enforce_multihop": false,
                     "override_capability": false,
+                    "graceful_shutdown": false,
+                    "graceful_restart_helper": true,
                     "peer_port": 0,
                     "shutdown_message": "BGP PeerGroup Shutdown Message",
                     "strict_capability_match": false,
@@ -549,6 +559,7 @@
             }
         }
     },
+<<<<<<< HEAD
 
     "BGP_NEIGHBOR_VNET_VALID": {
         "sonic-vxlan:sonic-vxlan": {
@@ -568,12 +579,37 @@
                     "vxlan_tunnel": "vtep1",
                     "vni": "10000"
                 }]
+=======
+    "BGP_PER_PEER_GRACEFUL_SHUTDOWN_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001,
+                    "graceful_shutdown": false
+                }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                {
+                    "vrf_name": "default",
+                    "peer_group_name": "PG_DRAIN",
+                    "asn": 65003,
+                    "graceful_shutdown": true
+                }
+                ]
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
             }
         },
         "sonic-bgp-neighbor:sonic-bgp-neighbor": {
             "sonic-bgp-neighbor:BGP_NEIGHBOR": {
                 "BGP_NEIGHBOR_LIST": [
                 {
+<<<<<<< HEAD
                     "vrf_name": "Vnet1",
                     "neighbor": "10.0.0.0",
                     "asn": 65100,
@@ -589,20 +625,104 @@
                     "afi_safi": "ipv4_unicast",
                     "admin_status": "up"
                 }]
+=======
+                    "vrf_name": "default",
+                    "neighbor": "20.0.0.1",
+                    "asn": 65003,
+                    "graceful_shutdown": true
+                }
+                ]
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
             }
         }
     },
 
+<<<<<<< HEAD
     "BGP_NEIGHBOR_NEG_VNET_NOT_EXIST": {
+=======
+    "BGP_NEIGHBOR_GRACEFUL_RESTART_MODE_CONFLICT_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001
+                }
+                ]
+            }
+        },
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
         "sonic-bgp-neighbor:sonic-bgp-neighbor": {
             "sonic-bgp-neighbor:BGP_NEIGHBOR": {
                 "BGP_NEIGHBOR_LIST": [
                 {
+<<<<<<< HEAD
                     "vrf_name": "Vnet1",
                     "neighbor": "10.0.0.0",
                     "asn": 65100,
                     "name": "overlay-peer"
                 }]
+=======
+                    "vrf_name": "default",
+                    "neighbor": "20.0.0.1",
+                    "asn": 65003,
+                    "graceful_restart": true,
+                    "graceful_restart_helper": true
+                }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_GRACEFUL_RESTART_AND_DISABLE_CONFLICT_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001
+                }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                {
+                    "vrf_name": "default",
+                    "neighbor": "20.0.0.2",
+                    "asn": 65003,
+                    "graceful_restart": true,
+                    "graceful_restart_disable": true
+                }
+                ]
+            }
+        }
+    },
+
+    "BGP_PEER_GROUP_GRACEFUL_RESTART_MODE_CONFLICT_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001
+                }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                {
+                    "vrf_name": "default",
+                    "peer_group_name": "PG1",
+                    "asn": 65003,
+                    "graceful_restart_disable": true,
+                    "graceful_restart_helper": true
+                }
+                ]
+>>>>>>> ea6e4f2d8 (NOS-9006: Adding SONiC YANG/model support for neighbor and peer-group BGP graceful control knobs (#7327))
             }
         }
     },
