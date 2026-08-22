@@ -1,0 +1,55 @@
+From: Aviral Kapoor <aviral@nexthop.ai>
+Date: Thu, 20 Aug 2026 05:21:15 +0000
+Subject: [PATCH] bgpd: convert OpenState notifications to info
+
+A NOTIFICATION received in OpenSent is a normal protocol outcome
+(collision resolution or connection rejected), not a local FSM error.
+Log it at INFO and keep ERR for packets that should not be on the wire
+before an OPEN (KEEPALIVE/UPDATE).
+
+Signed-off-by: Aviral Kapoor <aviral@nexthop.ai>
+---
+ bgpd/bgp_fsm.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/bgpd/bgp_fsm.c b/bgpd/bgp_fsm.c
+index 29829cfe7b..753beef65d 100644
+--- a/bgpd/bgp_fsm.c
++++ b/bgpd/bgp_fsm.c
+@@ -2308,6 +2308,25 @@ bgp_fsm_event_error(struct peer_connection *connection)
+ 				    bgp_fsm_error_subcode(connection->status));
+ }
+ 
++/* A NOTIFICATION received in OpenSent is a normal protocol outcome, not a
++   local error: the peer resolved a connection collision (Cease/Connection
++   Collision Resolution) or is refusing the session (Cease/Connection
++   Rejected).  bgp_notify_receive() already logs the message with its code and
++   subcode, so log at INFO here and keep the ERR level for packets that really
++   should not be on the wire before an OPEN (KEEPALIVE/UPDATE). */
++static enum bgp_fsm_state_progress
++bgp_fsm_notify_error(struct peer_connection *connection)
++{
++	struct peer *peer = connection->peer;
++
++	zlog_info("%s [FSM] NOTIFICATION received in state %s, resetting session",
++		  peer->host,
++		  lookup_msg(bgp_status_msg, connection->status, NULL));
++
++	return bgp_stop_with_notify(connection, BGP_NOTIFY_FSM_ERR,
++				    bgp_fsm_error_subcode(connection->status));
++}
++
+ /* Hold timer expire.  This is error of BGP connection. So cut the
+    peer and change to Idle status. */
+ static enum bgp_fsm_state_progress
+@@ -2748,7 +2767,7 @@ static const struct {
+ 		{bgp_fsm_open, OpenConfirm}, /* Receive_OPEN_message         */
+ 		{bgp_fsm_event_error, Idle}, /* Receive_KEEPALIVE_message    */
+ 		{bgp_fsm_event_error, Idle}, /* Receive_UPDATE_message       */
+-		{bgp_fsm_event_error, Idle}, /* Receive_NOTIFICATION_message */
++		{bgp_fsm_notify_error, Idle}, /* Receive_NOTIFICATION_message */
+ 		{bgp_fsm_exception, Idle},   /* Clearing_Completed           */
+ 	},
+ 	{
+-- 
+2.43.0
