@@ -652,6 +652,65 @@ def get_sonic_version_file():
 
     return SONIC_VERSION_YAML_PATH
 
+<<<<<<< HEAD
+=======
+def get_vendor_sai_info():
+    OCP_SAI_VERSION = "ocp_sai_version"
+    VENDOR_SAI_VERSION = "vendor_sai_version"
+    VENDOR_SDK_VERSION = "vendor_sdk_version"
+
+    keys_list = [OCP_SAI_VERSION, VENDOR_SAI_VERSION, VENDOR_SDK_VERSION]
+    sai_vers_dict = dict.fromkeys(keys_list, "Unknown")
+
+    try:
+        platform_info = get_platform_info()
+        if platform_info['asic_type'] == 'broadcom':
+            # xgs uses docker-syncd-brcm, while dnx uses docker-syncd-brcm-dnx
+            image_cmd = "docker image ls docker-syncd-brcm*:latest --format '{{json .Repository}}'"
+            results = subprocess.getstatusoutput(image_cmd)
+            if results[0] != 0 or results[1] == "":
+                return sai_vers_dict
+
+            # cmd returns either '"docker-syncd-brcm"' or '"docker-syncd-brcm-dnx"'
+            image_name = results[1].strip('"')
+
+            # Use 'docker run' so that even when syncd is not running, 'docker run' will still
+            # run. Also, it will not go thru the normal entrypoint sequence.
+            # '--network none' keeps this off the default bridge: attaching brings docker0 up,
+            # which zebra then picks up as a connected route and router-id candidate. The
+            # script only reads version strings out of the local libsai, so it needs no network.
+            version_cmd = (f'docker run --rm --network none '
+                           f'--entrypoint {SAI_VERSION_GET_FILE} {image_name}')
+            results = subprocess.getstatusoutput(version_cmd)
+            if results[0] != 0: # failure
+                return sai_vers_dict
+
+            output = results[1]
+            lines = output.splitlines()
+            # need to parse the following output
+            #
+            #OCP SAI Version: 1.15.0
+            #BRCM SAI Version: 12.3.6.2
+            #BRCM SDK Version: sdk-6.5.31-SP10
+            #
+            map_brcm_to_vendor = {
+                'OCP SAI Version' : OCP_SAI_VERSION,
+                'BRCM SAI Version' : VENDOR_SAI_VERSION,
+                'BRCM SDK Version' : VENDOR_SDK_VERSION
+            }
+            for line in lines:
+                words = line.split(':')
+                key, value = words[0], words[1]
+                for expected in map_brcm_to_vendor.keys():
+                    if key == expected:
+                        sai_vers_dict[map_brcm_to_vendor[key]] = value.strip()
+    except Exception:
+        pass
+
+    return sai_vers_dict
+
+
+>>>>>>> fb61f71bd (NOS-15426: run the get_sai_version helper container with --network none (#8665))
 
 # Get hardware information
 def get_platform_info(config_db=None):
