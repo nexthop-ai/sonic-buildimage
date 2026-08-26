@@ -558,13 +558,17 @@ version = "1.0.0"
 dependencies = [
  "clap",
  "injectorpp",
+ "libc",
  "log",
  "mio",
  "nix",
  "scopeguard",
  "serde_json",
  "swss-common",
+<<<<<<< HEAD
  "syslog-tracing",
+=======
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
  "tempfile",
  "thiserror",
  "tracing",
@@ -602,6 +606,7 @@ dependencies = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "syslog-tracing"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -613,6 +618,8 @@ dependencies = [
 ]
 
 [[package]]
+=======
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
 name = "tempfile"
 version = "3.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

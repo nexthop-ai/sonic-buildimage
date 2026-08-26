@@ -154,7 +154,11 @@ pub fn get_group_and_process_list(process_file: &str) -> Result<(Vec<String>, Ve
 }
 
 /// Generate alerting message
+<<<<<<< HEAD
 pub fn generate_alerting_message(process_name: &str, status: &str, dead_minutes: u64, priority: Level) {
+=======
+pub fn generate_alerting_message(process_name: &str, status: &str, dead_minutes: u64, priority: log::Level) {
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
     let namespace_prefix = std::env::var("NAMESPACE_PREFIX").unwrap_or_default();
     let namespace_id = std::env::var("NAMESPACE_ID").unwrap_or_default();
 
@@ -169,12 +173,16 @@ pub fn generate_alerting_message(process_name: &str, status: &str, dead_minutes:
         process_name, status, namespace, dead_minutes
     );
 
+<<<<<<< HEAD
     match priority {
         Level::Error => error!("{}", message),
         Level::Warn  => warn!("{}", message),
         Level::Info  => info!("{}", message),
         _            => error!("{}", message),
     }
+=======
+    log::log!(priority, "{}", message);
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
 }
 
 /// Read auto-restart state from ConfigDB
@@ -256,6 +264,7 @@ pub fn get_current_time() -> f64 {
 
 /// Main function with testable parameters
 pub fn main_with_args(args: Option<Vec<String>>) -> Result<()> {
+<<<<<<< HEAD
     // Initialize syslog via libc openlog/syslog. libc defers the /dev/log socket
     // open until the first syslog() call and reconnects transparently on error,
     // so there is no startup race and no reconnect logic needed in application code.
@@ -273,6 +282,11 @@ pub fn main_with_args(args: Option<Vec<String>>) -> Result<()> {
         .without_time()
         .try_init()
         .ok(); // ignore "already initialized" in test contexts
+=======
+    // Route logging through libc syslog(3); see the libc_syslog module for
+    // why (rsyslogd owns /dev/log and may not have created it yet).
+    crate::libc_syslog::init("supervisor-proc-exit-listener-rs", log::LevelFilter::Info);
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
 
     // Parse command line arguments
     let parsed_args = if let Some(args) = args {
@@ -517,7 +531,11 @@ pub fn main_with_parsed_args_and_stdin<S: Read + AsRawFd, P: Poller>(args: Args,
                     let new_dead_minutes = current_dead_minutes + elapsed_mins as f64;
                     process_info.insert("dead_minutes".to_string(), new_dead_minutes);
 
+<<<<<<< HEAD
                     generate_alerting_message(process_name, "not running", new_dead_minutes as u64, Level::Error);
+=======
+                    generate_alerting_message(process_name, "not running", new_dead_minutes as u64, log::Level::Error);
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
                 }
             }
         }
@@ -529,7 +547,11 @@ pub fn main_with_parsed_args_and_stdin<S: Read + AsRawFd, P: Poller>(args: Args,
                 let threshold = get_heartbeat_alert_interval(process, &heartbeat_intervals);
                 if threshold > 0.0 && elapsed_secs >= threshold {
                     let elapsed_mins = (elapsed_secs / 60.0) as u64;
+<<<<<<< HEAD
                     generate_alerting_message(process, "stuck", elapsed_mins, Level::Warn);
+=======
+                    generate_alerting_message(process, "stuck", elapsed_mins, log::Level::Warn);
+>>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
                 }
             }
         }
