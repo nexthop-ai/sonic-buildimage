@@ -6,10 +6,6 @@ use sonic_supervisord_utilities_rs::{
     proc_exit_listener::*,
 };
 use swss_common::ConfigDBConnector;
-<<<<<<< HEAD
-=======
-use log::Level;
->>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
 use std::io::Write;
 use tempfile::NamedTempFile;
 use std::time::Duration;
@@ -201,11 +197,7 @@ fn test_alerting_message_generation() {
     generate_alerting_message("orchagent", "not running", 5, Level::Error);
     generate_alerting_message("portsyncd", "stuck", 10, Level::Warn);
     generate_alerting_message("test", "status", 0, Level::Info);
-<<<<<<< HEAD
-    generate_alerting_message("", "", 999, Level::Warn); // Edge case
-=======
     generate_alerting_message("", "", 999, Level::Error);
->>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
 }
 
 #[test]
@@ -288,13 +280,8 @@ fn test_function_robustness() {
     // Test that functions handle edge cases without panicking
 
     // Test generate_alerting_message with various inputs
-<<<<<<< HEAD
-    generate_alerting_message("test", "status", 0, Level::Info);
-    generate_alerting_message("", "", 999, Level::Warn);
-=======
     generate_alerting_message("test", "status", 0, Level::Error);
     generate_alerting_message("", "", 999, Level::Debug);
->>>>>>> 3622f50bb (NOS-8250: [supervisord-rs] make proc-exit-listener syslog resilient to /dev/log races (#6552))
     generate_alerting_message("very_long_process_name_that_should_work", "some status", 60, Level::Warn);
     
     // Test get_current_time multiple calls
