@@ -32,8 +32,17 @@
       "at24",
       "i2c-dev",
       "i2c-xiic",
+<<<<<<< HEAD
       "spi-xilinx",
       "optoe"
+=======
+      "tmp464",
+      "xdpe1a2g7b",
+      "isl68137",
+      "spi-xilinx",
+      "q54sj108a2",
+      "pmbus"
+>>>>>>> 2860a3cb8 (NOS-13836: Migrate IBV drivers to upstream -- sonic-buildimage changes (#8550))
     ],
     "pddf_kos": [
       "pddf_spi_module",
@@ -57,6 +66,7 @@
     "custom_kos": [
       "pddf_custom_fpga_algo",
       "nh_pmbus_core",
+<<<<<<< HEAD
       "nh_isl68137",
       "nh_tda38740",
       "nh_adm1266",
@@ -128,6 +138,30 @@
     "i2c": {
       "CONTROLLERS": [
         {"dev_name": "pcie-0", "dev": "PCIE0"}
+=======
+      "nh_adm1266"
+    ],
+    "num_ports": 66,
+    "nexthop_thermal_xcvr_setpoint_margin": 8,
+    "nexthop_thermal_xcvr_setpoint_override": null,
+    "nexthop_thermal_xcvr_pid_domain": "main",
+    "pddf_dev_types": {
+      "description": " - Below is the list of supported PDDF device types (chip names) for various components. If any component uses some other driver, we will create the client using 'echo <dev-address> <dev-type> > <path>/new_device' method",
+      "MULTIFPGAPCIE": [
+        "multifpgapci"
+      ],
+      "PORT_MODULE": [
+        "pddf_xcvr"
+      ],
+      "FAN": [
+        "fan_multifpgapci"
+      ],
+      "PSU": [
+        "psu_pmbus"
+      ],
+      "CPLDMUX": [
+        "multifpgapci_mux"
+>>>>>>> 2860a3cb8 (NOS-13836: Migrate IBV drivers to upstream -- sonic-buildimage changes (#8550))
       ]
     }
   },
