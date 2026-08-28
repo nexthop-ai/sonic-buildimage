@@ -1,19 +1,24 @@
 {
   "PLATFORM": {
     "num_psus": 4,
-    "num_temps": 19,
-    "num_asic_temps": 0,
+    "num_temps": 20,
+    "num_asic_temps": 185,
     "num_nexthop_fpga_asic_temp_sensors": 2,
     "num_voltage_sensors": 70,
     "num_current_sensors": 23,
-    "num_components": 28,
+    "num_components": 29,
     "num_fantrays": 8,
     "num_fans_pertray": 2,
+    "num_dcdcs": 13,
+    "num_dpms": 3,
     "std_kos": [
       "at24",
       "optoe",
       "i2c-dev",
       "i2c-xiic",
+      "tmp464",
+      "xdpe1a2g7b",
+      "isl68137",
       "spi-xilinx"
     ],
     "pddf_kos": [
@@ -38,10 +43,7 @@
     "custom_kos": [
       "pddf_custom_fpga_algo",
       "nh_pmbus_core",
-      "nh_tmp464",
-      "nh_adm1266",
-      "nh_tda38740",
-      "nh_isl68137"
+      "nh_adm1266"
     ],
     "num_ports": 129,
     "nexthop_thermal_xcvr_setpoint_margin": 8,
@@ -101,41 +103,6 @@
       ]
     }
   },
-  "HWMON0": {
-    "dev_info": {
-      "device_type": "HWMON",
-      "device_name": "HWMON_CPU",
-      "device_parent": "PCIE0"
-    },
-    "i2c": {
-      "path_info": {
-        "sysfs_base_path": "{{hwmon_cpu_sysfs_path}}"
-      }
-    }
-  },
-  "TEMP1": {
-    "dev_info": {
-      "device_type": "TEMP_SENSOR",
-      "device_name": "CPU_TEMP",
-      "device_parent": "PCIE0",
-      "virt_parent": "HWMON0",
-      "high_threshold": 95,
-      "high_crit_threshold": 125,
-      "nexthop_thermal_setpoint_margin": 10,
-      "nexthop_thermal_pid_domain": "main"
-    },
-    "dev_attr": {
-      "display_name": "CPU"
-    },
-    "i2c": {
-      "attr_list": [
-        {
-          "attr_name": "temp1_input",
-          "drv_attr_name": "temp1_input"
-        }
-      ]
-    }
-  },
   "WATCHDOG": {
     "dev_info": {
       "device_type": "WATCHDOG",
@@ -143,7 +110,12 @@
     },
     "dev_attr": {
       "event_driven_power_cycle_control_reg_offset": "0x28",
-      "watchdog_counter_reg_offset": "0x1E0"
+      "watchdog_counter_reg_offset": "0x1E0",
+      "use_watchdog_msi": {
+        "msi_domain": 0,
+        "hw_irq": 0,
+        "watchdog_counter_msi_reg": "0x1D8"
+      }
     }
   },
   "MULTIFPGAPCIESYSTEM0": {
@@ -272,7 +244,6 @@
       ]
     },
     "use_msi": {
-      "min_fpga_version": "0x1",
       "num_msi_vectors": 1,
       "msi_domains": [
         {
@@ -932,7 +903,6 @@
       ]
     },
     "use_msi": {
-      "min_fpga_version": "0x0",
       "num_msi_vectors": 3,
       "msi_domains": [
         {
@@ -956,11 +926,7 @@
           "interrupt_enable_reg": "180",
           "interrupt_status_reg": "184"
         }
-      ],
-      "watchdog": {
-        "msi_domain": 0,
-        "hw_irq": 0
-      }
+      ]
     },
     "spi_controllers": [
       "SWITCHCARD_SPI_CONTROLLER0"
@@ -1080,39 +1046,47 @@
           "dev": "CPLDMUX3"
         },
         {
+          "chn": "7",
+          "dev": "MEZZCARD0-EEPROM"
+        },
+        {
+          "chn": "8",
+          "dev": "MEZZCARD1-EEPROM"
+        },
+        {
           "chn": "0",
           "dev": "FAN-CTRL"
         },
         {
-          "chn": "18",
+          "chn": "26",
           "dev": "PORT1"
         },
         {
-          "chn": "19",
+          "chn": "27",
           "dev": "PORT2"
         },
         {
-          "chn": "20",
+          "chn": "28",
           "dev": "PORT3"
         },
         {
-          "chn": "21",
+          "chn": "29",
           "dev": "PORT4"
         },
         {
-          "chn": "22",
+          "chn": "30",
           "dev": "PORT5"
         },
         {
-          "chn": "23",
+          "chn": "31",
           "dev": "PORT6"
         },
         {
-          "chn": "25",
+          "chn": "33",
           "dev": "PORT7"
         },
         {
-          "chn": "24",
+          "chn": "32",
           "dev": "PORT8"
         },
         {
@@ -1148,67 +1122,67 @@
           "dev": "PORT16"
         },
         {
-          "chn": "50",
+          "chn": "42",
           "dev": "PORT17"
         },
         {
-          "chn": "51",
+          "chn": "43",
           "dev": "PORT18"
         },
         {
-          "chn": "52",
+          "chn": "44",
           "dev": "PORT19"
         },
         {
-          "chn": "53",
+          "chn": "45",
           "dev": "PORT20"
         },
         {
-          "chn": "54",
+          "chn": "46",
           "dev": "PORT21"
         },
         {
-          "chn": "55",
+          "chn": "47",
           "dev": "PORT22"
         },
         {
-          "chn": "56",
+          "chn": "48",
           "dev": "PORT23"
         },
         {
-          "chn": "57",
+          "chn": "49",
           "dev": "PORT24"
         },
         {
-          "chn": "66",
+          "chn": "50",
           "dev": "PORT25"
         },
         {
-          "chn": "67",
+          "chn": "51",
           "dev": "PORT26"
         },
         {
-          "chn": "68",
+          "chn": "52",
           "dev": "PORT27"
         },
         {
-          "chn": "69",
+          "chn": "53",
           "dev": "PORT28"
         },
         {
-          "chn": "70",
+          "chn": "54",
           "dev": "PORT29"
         },
         {
-          "chn": "71",
+          "chn": "55",
           "dev": "PORT30"
         },
         {
-          "chn": "72",
+          "chn": "56",
           "dev": "PORT31"
         },
         {
-          "chn": "73",
+          "chn": "57",
           "dev": "PORT32"
         },
         {
@@ -1244,99 +1218,99 @@
           "dev": "PORT104"
         },
         {
-          "chn": "26",
+          "chn": "18",
           "dev": "PORT105"
         },
         {
-          "chn": "27",
+          "chn": "19",
           "dev": "PORT106"
         },
         {
-          "chn": "28",
+          "chn": "20",
           "dev": "PORT107"
         },
         {
-          "chn": "29",
+          "chn": "21",
           "dev": "PORT108"
         },
         {
-          "chn": "30",
+          "chn": "22",
           "dev": "PORT109"
         },
         {
-          "chn": "31",
+          "chn": "23",
           "dev": "PORT110"
         },
         {
-          "chn": "32",
+          "chn": "24",
           "dev": "PORT111"
         },
         {
-          "chn": "33",
+          "chn": "25",
           "dev": "PORT112"
         },
         {
-          "chn": "42",
+          "chn": "58",
           "dev": "PORT113"
         },
         {
-          "chn": "43",
+          "chn": "59",
           "dev": "PORT114"
         },
         {
-          "chn": "44",
+          "chn": "60",
           "dev": "PORT115"
         },
         {
-          "chn": "45",
+          "chn": "61",
           "dev": "PORT116"
         },
         {
-          "chn": "46",
+          "chn": "62",
           "dev": "PORT117"
         },
         {
-          "chn": "47",
+          "chn": "63",
           "dev": "PORT118"
         },
         {
-          "chn": "48",
+          "chn": "64",
           "dev": "PORT119"
         },
         {
-          "chn": "49",
+          "chn": "65",
           "dev": "PORT120"
         },
         {
-          "chn": "58",
+          "chn": "66",
           "dev": "PORT121"
         },
         {
-          "chn": "59",
+          "chn": "67",
           "dev": "PORT122"
         },
         {
-          "chn": "60",
+          "chn": "68",
           "dev": "PORT123"
         },
         {
-          "chn": "61",
+          "chn": "69",
           "dev": "PORT124"
         },
         {
-          "chn": "62",
+          "chn": "70",
           "dev": "PORT125"
         },
         {
-          "chn": "63",
+          "chn": "71",
           "dev": "PORT126"
         },
         {
-          "chn": "64",
+          "chn": "72",
           "dev": "PORT127"
         },
         {
-          "chn": "65",
+          "chn": "73",
           "dev": "PORT128"
         },
         {
@@ -1688,7 +1662,6 @@
       ]
     },
     "use_msi": {
-      "min_fpga_version": "0x0",
       "num_msi_vectors": 3,
       "msi_domains": [
         {
@@ -1712,11 +1685,7 @@
           "interrupt_enable_reg": "180",
           "interrupt_status_reg": "184"
         }
-      ],
-      "watchdog": {
-        "msi_domain": 0,
-        "hw_irq": 0
-      }
+      ]
     }
   },
   "COMPONENT3": {
@@ -1993,6 +1962,2596 @@
       }
     ]
   },
+  "ASIC_TEMP1": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP1",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP2": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP2",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP3": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP3",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP4": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP4",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP5": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP5",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon4",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP6": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP6",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon5",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP7": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP7",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon6",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP8": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP8",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon7",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP9": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP9",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon8",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP10": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP10",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP11": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP11",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP12": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP12",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP13": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP13",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP14": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP14",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP15": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP15",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP16": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP16",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP17": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP17",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP18": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP18",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP19": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP19",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP20": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP20",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP21": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP21",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP22": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP22",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP23": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP23",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP24": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP24",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP25": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP25",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP26": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP26",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP27": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP27",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP28": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP28",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP29": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP29",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP30": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP30",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP31": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP31",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP32": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP32",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP33": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP33",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP34": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP34",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP35": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP35",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP36": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP36",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP37": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP37",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP38": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP38",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP39": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP39",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP40": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP40",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP41": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP41",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP42": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP42",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP43": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP43",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP44": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP44",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP45": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP45",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP46": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP46",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP47": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP47",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP48": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP48",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP49": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP49",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP50": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP50",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP51": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP51",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP52": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP52",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP53": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP53",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP54": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP54",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP55": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP55",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP56": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP56",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP57": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP57",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt0.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP58": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP58",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP59": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP59",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP60": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP60",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP61": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP61",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP62": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP62",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP63": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP63",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP64": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP64",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP65": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP65",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP66": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP66",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP67": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP67",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP68": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP68",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP69": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP69",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP70": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP70",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP71": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP71",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP72": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP72",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP73": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP73",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt1.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP74": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP74",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP75": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP75",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP76": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP76",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP77": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP77",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP78": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP78",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP79": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP79",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP80": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP80",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP81": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP81",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP82": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP82",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP83": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP83",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP84": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP84",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP85": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP85",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP86": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP86",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP87": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP87",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP88": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP88",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP89": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP89",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt2.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP90": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP90",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP91": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP91",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP92": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP92",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP93": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP93",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP94": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP94",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP95": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP95",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP96": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP96",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP97": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP97",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP98": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP98",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP99": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP99",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP100": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP100",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP101": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP101",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP102": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP102",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP103": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP103",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP104": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP104",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP105": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP105",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt3.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP106": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP106",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP107": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP107",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP108": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP108",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP109": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP109",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP110": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP110",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP111": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP111",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP112": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP112",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP113": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP113",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP114": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP114",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP115": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP115",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP116": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP116",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP117": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP117",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP118": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP118",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP119": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP119",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP120": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP120",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP121": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP121",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt4.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP122": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP122",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP123": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP123",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP124": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP124",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP125": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP125",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP126": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP126",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP127": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP127",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP128": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP128",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP129": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP129",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP130": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP130",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP131": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP131",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP132": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP132",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP133": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP133",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP134": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP134",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP135": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP135",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP136": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP136",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP137": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP137",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt5.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP138": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP138",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP139": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP139",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP140": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP140",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP141": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP141",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP142": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP142",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP143": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP143",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP144": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP144",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP145": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP145",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP146": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP146",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP147": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP147",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP148": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP148",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP149": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP149",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP150": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP150",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP151": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP151",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP152": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP152",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP153": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP153",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt6.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP154": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP154",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon0.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP155": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP155",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon0.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP156": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP156",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon0.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP157": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP157",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon0.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP158": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP158",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP159": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP159",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP160": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP160",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP161": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP161",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP162": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP162",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon2.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP163": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP163",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon2.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP164": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP164",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon2.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP165": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP165",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon2.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP166": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP166",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP167": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP167",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP168": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP168",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP169": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP169",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC pt7.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP170": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP170",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon1.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP171": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP171",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon1.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP172": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP172",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon1.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP173": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP173",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon1.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP174": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP174",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon3.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP175": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP175",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon3.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP176": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP176",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon3.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP177": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP177",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon3.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP178": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP178",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon4.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP179": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP179",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon4.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP180": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP180",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon4.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP181": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP181",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon4.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP182": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP182",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon6.remote0",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP183": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP183",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon6.remote1",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP184": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP184",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon6.remote2",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
+  "ASIC_TEMP185": {
+    "dev_info": {
+      "device_type": "ASIC_TEMP_SENSOR",
+      "device_name": "ASIC_TEMP185",
+      "device_parent": "None",
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 115.0
+    },
+    "dev_attr": {
+      "display_name": "ASIC core.pvtmon6.remote3",
+      "temp1_high_threshold": 105,
+      "temp1_high_crit_threshold": 112
+    }
+  },
   "NEXTHOP-FPGA-ASIC-TEMP-SENSOR0": {
     "dev_info": {
       "device_type": "NEXTHOP_FPGA_ASIC_TEMP_SENSOR",
@@ -2072,6 +4631,80 @@
       ]
     }
   },
+  "COMPONENT9": {
+    "comp_attr": {
+      "name": "MGMT_SWITCH",
+      "type": "mgmt_switch",
+      "description": "Management switch",
+      "boot_type": "cold"
+    },
+    "attr_list": [
+      {
+        "attr_name": "version",
+        "get_cmd": "read_mgmt_switch_version.py"
+      },
+      {
+        "attr_name": "model",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "serial",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "revision",
+        "get_cmd": "echo 'N/A'"
+      },
+      {
+        "attr_name": "update",
+        "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py {{model_name}} MGMT_SWITCH {}"
+      }
+    ]
+  },
+  "MEZZCARD0-EEPROM": {
+    "dev_info": {
+      "device_type": "EEPROM",
+      "device_name": "MEZZCARD0-EEPROM",
+      "device_parent": "MULTIFPGAPCIE2"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x64",
+        "dev_addr": "0x50",
+        "dev_type": "24c64"
+      },
+      "dev_attr": {
+        "access_mode": "BLOCK"
+      },
+      "attr_list": [
+        {
+          "attr_name": "eeprom"
+        }
+      ]
+    }
+  },
+  "MEZZCARD1-EEPROM": {
+    "dev_info": {
+      "device_type": "EEPROM",
+      "device_name": "MEZZCARD1-EEPROM",
+      "device_parent": "MULTIFPGAPCIE2"
+    },
+    "i2c": {
+      "topo_info": {
+        "parent_bus": "0x65",
+        "dev_addr": "0x50",
+        "dev_type": "24c64"
+      },
+      "dev_attr": {
+        "access_mode": "BLOCK"
+      },
+      "attr_list": [
+        {
+          "attr_name": "eeprom"
+        }
+      ]
+    }
+  },
   "FAN-CTRL": {
     "dev_info": {
       "device_type": "FAN",
@@ -2134,7 +4767,7 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x250{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x250"{% endif %},
           "attr_mask": "0x000000ff",
           "attr_len": "4"
         },
@@ -2184,7 +4817,7 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x250{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x250"{% endif %},
           "attr_mask": "0x000000ff",
           "attr_len": "4"
         },
@@ -2234,8 +4867,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x254{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x0000ff00{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x254"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x0000ff00"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2284,8 +4917,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x254{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x0000ff00{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x254"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x0000ff00"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2334,8 +4967,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x258{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x00ff0000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x258"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x00ff0000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2384,8 +5017,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x258{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x00ff0000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x258"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x00ff0000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2434,8 +5067,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x25c{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0xff000000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x25c"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0xff000000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2484,8 +5117,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xc4{% else %}0x25c{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0xff000000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xc4"{% else %}"0x25c"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0xff000000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2534,7 +5167,7 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x240{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x240"{% endif %},
           "attr_mask": "0x000000ff",
           "attr_len": "4"
         },
@@ -2584,7 +5217,7 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x240{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x240"{% endif %},
           "attr_mask": "0x000000ff",
           "attr_len": "4"
         },
@@ -2634,8 +5267,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x244{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x0000ff00{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x244"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x0000ff00"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2684,8 +5317,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x244{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x0000ff00{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x244"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x0000ff00"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2734,8 +5367,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x248{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x00ff0000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x248"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x00ff0000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2784,8 +5417,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x248{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0x00ff0000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x248"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0x00ff0000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2834,8 +5467,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x24c{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0xff000000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x24c"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0xff000000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         },
         {
@@ -2884,8 +5517,8 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA1",
-          "attr_offset": "{% if fan_duty_packed_in_one_word %}0xb0{% else %}0x24c{% endif %}",
-          "attr_mask": "{% if fan_duty_packed_in_one_word %}0xff000000{% else %}0x000000ff{% endif %}",
+          "attr_offset": {% if fan_duty_packed_in_one_word %}"0xb0"{% else %}"0x24c"{% endif %},
+          "attr_mask": {% if fan_duty_packed_in_one_word %}"0xff000000"{% else %}"0x000000ff"{% endif %},
           "attr_len": "4"
         }
       ]
@@ -2968,6 +5601,14 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -3152,7 +5793,7 @@
       ]
     }
   },
-  "COMPONENT9": {
+  "COMPONENT10": {
     "comp_attr": {
       "name": "PSU1",
       "type": "psu",
@@ -3162,7 +5803,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "cat /sys/bus/i2c/devices/89-0058/psu_fw_version"
       },
       {
         "attr_name": "model",
@@ -3259,6 +5900,14 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -3443,7 +6092,7 @@
       ]
     }
   },
-  "COMPONENT10": {
+  "COMPONENT11": {
     "comp_attr": {
       "name": "PSU2",
       "type": "psu",
@@ -3453,7 +6102,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "cat /sys/bus/i2c/devices/90-0058/psu_fw_version"
       },
       {
         "attr_name": "model",
@@ -3550,6 +6199,14 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -3734,7 +6391,7 @@
       ]
     }
   },
-  "COMPONENT11": {
+  "COMPONENT12": {
     "comp_attr": {
       "name": "PSU3",
       "type": "psu",
@@ -3744,7 +6401,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "cat /sys/bus/i2c/devices/91-0058/psu_fw_version"
       },
       {
         "attr_name": "model",
@@ -3841,6 +6498,14 @@
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
           "attr_offset": "0x99",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
           "attr_mask": "0x0",
           "attr_cmpval": "0x00"
         },
@@ -4025,7 +6690,7 @@
       ]
     }
   },
-  "COMPONENT12": {
+  "COMPONENT13": {
     "comp_attr": {
       "name": "PSU4",
       "type": "psu",
@@ -4035,7 +6700,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "cat /sys/bus/i2c/devices/92-0058/psu_fw_version"
       },
       {
         "attr_name": "model",
@@ -4117,7 +6782,7 @@
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
           "attr_offset": "0x8c",
-          "attr_mask": "0x0",
+          "attr_mask": "0x4",
           "attr_cmpval": "0x0",
           "attr_len": "1"
         },
@@ -4146,7 +6811,7 @@
           "attr_devaddr": "0x0",
           "attr_devtype": "multifpgapci",
           "attr_devname": "SWITCHCARD_FPGA0",
-          "attr_offset": "0x88",
+          "attr_offset": "0x8c",
           "attr_mask": "0x5",
           "attr_cmpval": "0x0",
           "attr_len": "1"
@@ -4185,7 +6850,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x6f",
+        "parent_bus": "0x77",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4205,7 +6870,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x6f",
+        "parent_bus": "0x77",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4284,7 +6949,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x70",
+        "parent_bus": "0x78",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4304,7 +6969,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x70",
+        "parent_bus": "0x78",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4383,7 +7048,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x71",
+        "parent_bus": "0x79",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4403,7 +7068,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x71",
+        "parent_bus": "0x79",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4482,7 +7147,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x72",
+        "parent_bus": "0x7a",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4502,7 +7167,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x72",
+        "parent_bus": "0x7a",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4581,7 +7246,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x73",
+        "parent_bus": "0x7b",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4601,7 +7266,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x73",
+        "parent_bus": "0x7b",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4680,7 +7345,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x74",
+        "parent_bus": "0x7c",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4700,7 +7365,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x74",
+        "parent_bus": "0x7c",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4779,7 +7444,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x76",
+        "parent_bus": "0x7e",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4799,7 +7464,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x76",
+        "parent_bus": "0x7e",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -4878,7 +7543,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x75",
+        "parent_bus": "0x7d",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -4898,7 +7563,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x75",
+        "parent_bus": "0x7d",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -5769,7 +8434,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8f",
+        "parent_bus": "0x87",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -5789,7 +8454,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8f",
+        "parent_bus": "0x87",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -5868,7 +8533,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x90",
+        "parent_bus": "0x88",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -5888,7 +8553,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x90",
+        "parent_bus": "0x88",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -5967,7 +8632,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x91",
+        "parent_bus": "0x89",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -5987,7 +8652,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x91",
+        "parent_bus": "0x89",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6066,7 +8731,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x92",
+        "parent_bus": "0x8a",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6086,7 +8751,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x92",
+        "parent_bus": "0x8a",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6165,7 +8830,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x93",
+        "parent_bus": "0x8b",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6185,7 +8850,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x93",
+        "parent_bus": "0x8b",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6264,7 +8929,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x94",
+        "parent_bus": "0x8c",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6284,7 +8949,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x94",
+        "parent_bus": "0x8c",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6363,7 +9028,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x95",
+        "parent_bus": "0x8d",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6383,7 +9048,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x95",
+        "parent_bus": "0x8d",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6462,7 +9127,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x96",
+        "parent_bus": "0x8e",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6482,7 +9147,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x96",
+        "parent_bus": "0x8e",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6561,7 +9226,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9f",
+        "parent_bus": "0x8f",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6581,7 +9246,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9f",
+        "parent_bus": "0x8f",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6660,7 +9325,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa0",
+        "parent_bus": "0x90",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6680,7 +9345,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa0",
+        "parent_bus": "0x90",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6759,7 +9424,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa1",
+        "parent_bus": "0x91",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6779,7 +9444,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa1",
+        "parent_bus": "0x91",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6858,7 +9523,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa2",
+        "parent_bus": "0x92",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6878,7 +9543,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa2",
+        "parent_bus": "0x92",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -6957,7 +9622,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa3",
+        "parent_bus": "0x93",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -6977,7 +9642,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa3",
+        "parent_bus": "0x93",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -7056,7 +9721,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa4",
+        "parent_bus": "0x94",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -7076,7 +9741,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa4",
+        "parent_bus": "0x94",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -7155,7 +9820,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa5",
+        "parent_bus": "0x95",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -7175,7 +9840,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa5",
+        "parent_bus": "0x95",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -7254,7 +9919,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa6",
+        "parent_bus": "0x96",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -7274,7 +9939,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0xa6",
+        "parent_bus": "0x96",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -14481,7 +17146,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x77",
+        "parent_bus": "0x6f",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -14501,7 +17166,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x77",
+        "parent_bus": "0x6f",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -14580,7 +17245,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x78",
+        "parent_bus": "0x70",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -14600,7 +17265,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x78",
+        "parent_bus": "0x70",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -14679,7 +17344,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x79",
+        "parent_bus": "0x71",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -14699,7 +17364,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x79",
+        "parent_bus": "0x71",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -14778,7 +17443,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7a",
+        "parent_bus": "0x72",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -14798,7 +17463,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7a",
+        "parent_bus": "0x72",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -14877,7 +17542,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7b",
+        "parent_bus": "0x73",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -14897,7 +17562,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7b",
+        "parent_bus": "0x73",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -14976,7 +17641,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7c",
+        "parent_bus": "0x74",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -14996,7 +17661,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7c",
+        "parent_bus": "0x74",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15075,7 +17740,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7d",
+        "parent_bus": "0x75",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15095,7 +17760,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7d",
+        "parent_bus": "0x75",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15174,7 +17839,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7e",
+        "parent_bus": "0x76",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15194,7 +17859,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x7e",
+        "parent_bus": "0x76",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15273,7 +17938,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x87",
+        "parent_bus": "0x97",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15293,7 +17958,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x87",
+        "parent_bus": "0x97",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15372,7 +18037,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x88",
+        "parent_bus": "0x98",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15392,7 +18057,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x88",
+        "parent_bus": "0x98",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15471,7 +18136,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x89",
+        "parent_bus": "0x99",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15491,7 +18156,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x89",
+        "parent_bus": "0x99",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15570,7 +18235,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8a",
+        "parent_bus": "0x9a",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15590,7 +18255,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8a",
+        "parent_bus": "0x9a",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15669,7 +18334,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8b",
+        "parent_bus": "0x9b",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15689,7 +18354,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8b",
+        "parent_bus": "0x9b",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15768,7 +18433,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8c",
+        "parent_bus": "0x9c",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15788,7 +18453,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8c",
+        "parent_bus": "0x9c",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15867,7 +18532,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8d",
+        "parent_bus": "0x9d",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15887,7 +18552,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8d",
+        "parent_bus": "0x9d",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -15966,7 +18631,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8e",
+        "parent_bus": "0x9e",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -15986,7 +18651,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x8e",
+        "parent_bus": "0x9e",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16065,7 +18730,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x97",
+        "parent_bus": "0x9f",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16085,7 +18750,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x97",
+        "parent_bus": "0x9f",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16164,7 +18829,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x98",
+        "parent_bus": "0xa0",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16184,7 +18849,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x98",
+        "parent_bus": "0xa0",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16263,7 +18928,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x99",
+        "parent_bus": "0xa1",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16283,7 +18948,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x99",
+        "parent_bus": "0xa1",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16362,7 +19027,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9a",
+        "parent_bus": "0xa2",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16382,7 +19047,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9a",
+        "parent_bus": "0xa2",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16461,7 +19126,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9b",
+        "parent_bus": "0xa3",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16481,7 +19146,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9b",
+        "parent_bus": "0xa3",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16560,7 +19225,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9c",
+        "parent_bus": "0xa4",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16580,7 +19245,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9c",
+        "parent_bus": "0xa4",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16659,7 +19324,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9d",
+        "parent_bus": "0xa5",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16679,7 +19344,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9d",
+        "parent_bus": "0xa5",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16758,7 +19423,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9e",
+        "parent_bus": "0xa6",
         "dev_addr": "0x50",
         "dev_type": "optoe3"
       },
@@ -16778,7 +19443,7 @@
     },
     "i2c": {
       "topo_info": {
-        "parent_bus": "0x9e",
+        "parent_bus": "0xa6",
         "dev_addr": "0x8",
         "dev_type": "pddf_xcvr"
       },
@@ -16822,6 +19487,49 @@
           "attr_mask": "0x1f",
           "attr_cmpval": "0x80000000",
           "attr_len": "1"
+        }
+      ]
+    }
+  },
+  "LOC_LED": {
+    "dev_info": {
+      "device_type": "LED",
+      "device_name": "LOC_LED"
+    },
+    "dev_attr": {
+      "index": "0"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "blue_blink",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "CPUCARD_FPGA",
+          "bits": "13:10",
+          "descr": "blue_blink",
+          "value": "0x5",
+          "swpld_addr": "0x48",
+          "swpld_addr_offset": "0x0"
+        },
+        {
+          "attr_name": "blue",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "CPUCARD_FPGA",
+          "bits": "13:10",
+          "descr": "blue",
+          "value": "0x1",
+          "swpld_addr": "0x48",
+          "swpld_addr_offset": "0x0"
+        },
+        {
+          "attr_name": "off",
+          "attr_devtype": "multifpgapci",
+          "attr_devname": "CPUCARD_FPGA",
+          "bits": "13:10",
+          "descr": "off",
+          "value": "0x0",
+          "swpld_addr": "0x48",
+          "swpld_addr_offset": "0x0"
         }
       ]
     }
@@ -16927,49 +19635,6 @@
           "descr": "off",
           "value": "0x0",
           "swpld_addr": "0x9c",
-          "swpld_addr_offset": "0x0"
-        }
-      ]
-    }
-  },
-  "LOC_LED": {
-    "dev_info": {
-      "device_type": "LED",
-      "device_name": "LOC_LED"
-    },
-    "dev_attr": {
-      "index": "0"
-    },
-    "i2c": {
-      "attr_list": [
-        {
-          "attr_name": "blue_blink",
-          "attr_devtype": "multifpgapci",
-          "attr_devname": "CPUCARD_FPGA",
-          "bits": "13:10",
-          "descr": "blue_blink",
-          "value": "0x5",
-          "swpld_addr": "0x48",
-          "swpld_addr_offset": "0x0"
-        },
-        {
-          "attr_name": "blue",
-          "attr_devtype": "multifpgapci",
-          "attr_devname": "CPUCARD_FPGA",
-          "bits": "13:10",
-          "descr": "blue",
-          "value": "0x1",
-          "swpld_addr": "0x48",
-          "swpld_addr_offset": "0x0"
-        },
-        {
-          "attr_name": "off",
-          "attr_devtype": "multifpgapci",
-          "attr_devname": "CPUCARD_FPGA",
-          "bits": "13:10",
-          "descr": "off",
-          "value": "0x0",
-          "swpld_addr": "0x48",
           "swpld_addr_offset": "0x0"
         }
       ]
@@ -22939,7 +25604,7 @@
       "topo_info": {
         "parent_bus": "0x63",
         "dev_addr": "0x48",
-        "dev_type": "nh_tmp464"
+        "dev_type": "tmp464"
       },
       "attr_list": [
         {
@@ -22955,13 +25620,14 @@
       ]
     }
   },
-  "TEMP2": {
+  "TEMP1": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "TMP464",
-      "nexthop_thermal_pid_domain": null
+      "nexthop_thermal_pid_domain": null,
+      "nexthop_thermal_sw_reboot_threshold": 122.0
     },
     "dev_attr": {
       "display_name": "Switch Card Rear"
@@ -22983,7 +25649,7 @@
       ]
     }
   },
-  "TEMP3": {
+  "TEMP2": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH2",
@@ -23011,13 +25677,14 @@
       ]
     }
   },
-  "TEMP4": {
+  "TEMP3": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH3",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "TMP464",
-      "nexthop_thermal_pid_domain": "asic"
+      "nexthop_thermal_pid_domain": "asic",
+      "nexthop_thermal_sw_reboot_threshold": 122.0
     },
     "dev_attr": {
       "display_name": "ASIC Diode 0"
@@ -23039,13 +25706,14 @@
       ]
     }
   },
-  "TEMP5": {
+  "TEMP4": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH4",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "TMP464",
-      "nexthop_thermal_pid_domain": "asic"
+      "nexthop_thermal_pid_domain": "asic",
+      "nexthop_thermal_sw_reboot_threshold": 122.0
     },
     "dev_attr": {
       "display_name": "ASIC Diode 1"
@@ -23067,13 +25735,14 @@
       ]
     }
   },
-  "TEMP6": {
+  "TEMP5": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "TMP464-CH5",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "TMP464",
-      "nexthop_thermal_pid_domain": "asic"
+      "nexthop_thermal_pid_domain": "asic",
+      "nexthop_thermal_sw_reboot_threshold": 122.0
     },
     "dev_attr": {
       "display_name": "ASIC Diode 2"
@@ -23109,7 +25778,7 @@
       }
     }
   },
-  "COMPONENT13": {
+  "COMPONENT14": {
     "comp_attr": {
       "name": "DPM1",
       "type": "dpm",
@@ -23637,7 +26306,7 @@
       "virt_parent": "DPM1"
     },
     "dev_attr": {
-      "display_name": "POS1V15_SWT_DPM1"
+      "display_name": "POS1V05_SWT_DPM1"
     },
     "i2c": {
       "attr_list": [
@@ -23748,7 +26417,7 @@
       }
     }
   },
-  "COMPONENT14": {
+  "COMPONENT15": {
     "comp_attr": {
       "name": "DPM2",
       "type": "dpm",
@@ -24317,7 +26986,7 @@
       }
     }
   },
-  "COMPONENT15": {
+  "COMPONENT16": {
     "comp_attr": {
       "name": "DPM3",
       "type": "dpm",
@@ -24882,11 +27551,11 @@
       "topo_info": {
         "parent_bus": "0x5d",
         "dev_addr": "0x70",
-        "dev_type": "nh_xdpe1a2g5b"
+        "dev_type": "xdpe1a2g5b"
       }
     }
   },
-  "COMPONENT16": {
+  "COMPONENT17": {
     "comp_attr": {
       "name": "DCDC0",
       "type": "dcdc",
@@ -24896,7 +27565,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "sudo xdpe_user_data_version --bus 93 --address 0x70"
       },
       {
         "attr_name": "model",
@@ -24912,7 +27581,7 @@
       },
       {
         "attr_name": "update",
-        "get_cmd": "echo 'N/A'"
+        "cmd": "/var/platform/fwpackage/fwpackage/update_firmware.py {{model_name}} DCDC0 {}"
       }
     ]
   },
@@ -24930,23 +27599,23 @@
       "attr_list": [
         {
           "attr_name": "volt1_input",
-          "drv_attr_name": "in3_input"
+          "drv_attr_name": "in2_input"
         },
         {
           "attr_name": "volt1_high_threshold",
-          "drv_attr_name": "in3_max"
+          "drv_attr_name": "in2_max"
         },
         {
           "attr_name": "volt1_low_threshold",
-          "drv_attr_name": "in3_min"
+          "drv_attr_name": "in2_min"
         },
         {
           "attr_name": "volt1_crit_high_threshold",
-          "drv_attr_name": "in3_crit"
+          "drv_attr_name": "in2_crit"
         },
         {
           "attr_name": "volt1_crit_low_threshold",
-          "drv_attr_name": "in3_lcrit"
+          "drv_attr_name": "in2_lcrit"
         }
       ]
     }
@@ -24978,14 +27647,15 @@
       ]
     }
   },
-  "TEMP7": {
+  "TEMP6": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC0-RAIL1-CH1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC0",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC0"
@@ -25017,11 +27687,11 @@
       "topo_info": {
         "parent_bus": "0x61",
         "dev_addr": "0x60",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT17": {
+  "COMPONENT18": {
     "comp_attr": {
       "name": "DCDC1",
       "type": "dcdc",
@@ -25031,7 +27701,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/97-0060/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 97 --address 0x60"
       },
       {
         "attr_name": "model",
@@ -25175,14 +27845,15 @@
       ]
     }
   },
-  "TEMP8": {
+  "TEMP7": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC1-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC1",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC1"
@@ -25214,11 +27885,11 @@
       "topo_info": {
         "parent_bus": "0x62",
         "dev_addr": "0x60",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT18": {
+  "COMPONENT19": {
     "comp_attr": {
       "name": "DCDC2",
       "type": "dcdc",
@@ -25228,7 +27899,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/98-0060/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 98 --address 0x60"
       },
       {
         "attr_name": "model",
@@ -25372,14 +28043,15 @@
       ]
     }
   },
-  "TEMP9": {
+  "TEMP8": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC2-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC2",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC2"
@@ -25411,11 +28083,11 @@
       "topo_info": {
         "parent_bus": "0x61",
         "dev_addr": "0x61",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT19": {
+  "COMPONENT20": {
     "comp_attr": {
       "name": "DCDC3",
       "type": "dcdc",
@@ -25425,7 +28097,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/97-0061/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 97 --address 0x61"
       },
       {
         "attr_name": "model",
@@ -25569,14 +28241,15 @@
       ]
     }
   },
-  "TEMP10": {
+  "TEMP9": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC3-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC3",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC3"
@@ -25608,11 +28281,11 @@
       "topo_info": {
         "parent_bus": "0x61",
         "dev_addr": "0x62",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT20": {
+  "COMPONENT21": {
     "comp_attr": {
       "name": "DCDC4",
       "type": "dcdc",
@@ -25622,7 +28295,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/97-0062/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 97 --address 0x62"
       },
       {
         "attr_name": "model",
@@ -25766,14 +28439,15 @@
       ]
     }
   },
-  "TEMP11": {
+  "TEMP10": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC4-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC4",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC4"
@@ -25805,11 +28479,11 @@
       "topo_info": {
         "parent_bus": "0x62",
         "dev_addr": "0x61",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT21": {
+  "COMPONENT22": {
     "comp_attr": {
       "name": "DCDC5",
       "type": "dcdc",
@@ -25819,7 +28493,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/98-0061/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 98 --address 0x61"
       },
       {
         "attr_name": "model",
@@ -25963,14 +28637,15 @@
       ]
     }
   },
-  "TEMP12": {
+  "TEMP11": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC5-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC5",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC5"
@@ -26002,11 +28677,11 @@
       "topo_info": {
         "parent_bus": "0x62",
         "dev_addr": "0x62",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT22": {
+  "COMPONENT23": {
     "comp_attr": {
       "name": "DCDC6",
       "type": "dcdc",
@@ -26016,7 +28691,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/98-0062/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 98 --address 0x62"
       },
       {
         "attr_name": "model",
@@ -26160,14 +28835,15 @@
       ]
     }
   },
-  "TEMP13": {
+  "TEMP12": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC6-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC6",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC6"
@@ -26199,11 +28875,11 @@
       "topo_info": {
         "parent_bus": "0x61",
         "dev_addr": "0x63",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT23": {
+  "COMPONENT24": {
     "comp_attr": {
       "name": "DCDC7",
       "type": "dcdc",
@@ -26213,7 +28889,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/97-0063/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 97 --address 0x63"
       },
       {
         "attr_name": "model",
@@ -26357,14 +29033,15 @@
       ]
     }
   },
-  "TEMP14": {
+  "TEMP13": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC7-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC7",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC7"
@@ -26396,11 +29073,11 @@
       "topo_info": {
         "parent_bus": "0x62",
         "dev_addr": "0x63",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT24": {
+  "COMPONENT25": {
     "comp_attr": {
       "name": "DCDC8",
       "type": "dcdc",
@@ -26410,7 +29087,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/98-0063/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 98 --address 0x63"
       },
       {
         "attr_name": "model",
@@ -26554,14 +29231,15 @@
       ]
     }
   },
-  "TEMP15": {
+  "TEMP14": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC8-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC8",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC8"
@@ -26593,11 +29271,11 @@
       "topo_info": {
         "parent_bus": "0x61",
         "dev_addr": "0x72",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT25": {
+  "COMPONENT26": {
     "comp_attr": {
       "name": "DCDC9",
       "type": "dcdc",
@@ -26607,7 +29285,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/97-0072/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 97 --address 0x72"
       },
       {
         "attr_name": "model",
@@ -26690,14 +29368,15 @@
       ]
     }
   },
-  "TEMP16": {
+  "TEMP15": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC9-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC9",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC9"
@@ -26729,11 +29408,11 @@
       "topo_info": {
         "parent_bus": "0x62",
         "dev_addr": "0x72",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT26": {
+  "COMPONENT27": {
     "comp_attr": {
       "name": "DCDC10",
       "type": "dcdc",
@@ -26743,7 +29422,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/98-0072/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 98 --address 0x72"
       },
       {
         "attr_name": "model",
@@ -26826,14 +29505,15 @@
       ]
     }
   },
-  "TEMP17": {
+  "TEMP16": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC10-RAIL1",
       "device_parent": "MULTIFPGAPCIE2",
       "virt_parent": "DCDC10",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC10"
@@ -26865,11 +29545,11 @@
       "topo_info": {
         "parent_bus": "0xa8",
         "dev_addr": "0x62",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT27": {
+  "COMPONENT28": {
     "comp_attr": {
       "name": "DCDC11",
       "type": "dcdc",
@@ -26879,7 +29559,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/168-0062/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 168 --address 0x62"
       },
       {
         "attr_name": "model",
@@ -27025,14 +29705,15 @@
       ]
     }
   },
-  "TEMP18": {
+  "TEMP17": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC11-RAIL1",
       "device_parent": "CPLDMUX2",
       "virt_parent": "DCDC11",
       "nexthop_thermal_pid_domain": "main",
-      "nexthop_thermal_setpoint_override": 95.0
+      "nexthop_thermal_setpoint_override": 95.0,
+      "nexthop_thermal_sw_reboot_threshold": 125.0
     },
     "dev_attr": {
       "display_name": "DCDC0_MEZZ0"
@@ -27064,11 +29745,11 @@
       "topo_info": {
         "parent_bus": "0xac",
         "dev_addr": "0x62",
-        "dev_type": "nh_raa228244"
+        "dev_type": "raa228244"
       }
     }
   },
-  "COMPONENT28": {
+  "COMPONENT29": {
     "comp_attr": {
       "name": "DCDC12",
       "type": "dcdc",
@@ -27078,7 +29759,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "cat /sys/bus/i2c/devices/172-0062/hwmon/hwmon*/mfr_revision"
+        "get_cmd": "sudo mfr_revision_major_minor --bus 172 --address 0x62"
       },
       {
         "attr_name": "model",
@@ -27224,7 +29905,7 @@
       ]
     }
   },
-  "TEMP19": {
+  "TEMP18": {
     "dev_info": {
       "device_type": "TEMP_SENSOR",
       "device_name": "DCDC12-RAIL1",
@@ -27384,6 +30065,77 @@
       "spi_device_driver": "spi-nor",
       "max_speed_hz": 0,
       "chip_select": 0
+    }
+  },
+  "HWMON0": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON0",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_cpu_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP19": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "CPU_TEMP",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON0",
+      "high_threshold": 95.0,
+      "high_crit_threshold": 125.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0
+    },
+    "dev_attr": {
+      "display_name": "CPU"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        }
+      ]
+    }
+  },
+  "HWMON1": {
+    "dev_info": {
+      "device_type": "HWMON",
+      "device_name": "HWMON1",
+      "device_parent": "PCIE0"
+    },
+    "i2c": {
+      "path_info": {
+        "sysfs_base_path": "{{hwmon_nvme_sysfs_path}}"
+      }
+    }
+  },
+  "TEMP20": {
+    "dev_info": {
+      "device_type": "TEMP_SENSOR",
+      "device_name": "HWMON_NVME",
+      "device_parent": "PCIE0",
+      "virt_parent": "HWMON1",
+      "high_threshold": 90.0,
+      "high_crit_threshold": 102.0,
+      "nexthop_thermal_pid_domain": "main",
+      "nexthop_thermal_setpoint_margin": 10.0,
+      "nexthop_thermal_sw_reboot_threshold": 95.0
+    },
+    "dev_attr": {
+      "display_name": "NVMe"
+    },
+    "i2c": {
+      "attr_list": [
+        {
+          "attr_name": "temp1_input",
+          "drv_attr_name": "temp1_input"
+        }
+      ]
     }
   },
   "MGMT_LINK_CHECK": {}
