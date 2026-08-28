@@ -151,10 +151,54 @@
       ]
     }
   },
+<<<<<<< HEAD
   "HWMON0": {
     "dev_info": {"device_type": "HWMON", "device_name": "HWMON_CPU", "device_parent": "PCIE0"},
     "i2c": {
       "path_info": {"sysfs_base_path": "{{hwmon_cpu_sysfs_path}}"}
+=======
+  "WATCHDOG": {
+    "dev_info": {
+      "device_type": "WATCHDOG",
+      "device_parent": "MULTIFPGAPCIE1"
+    },
+    "dev_attr": {
+      "event_driven_power_cycle_control_reg_offset": "0x28",
+      "event_driven_power_cycle_control_bit": 4,
+      "watchdog_counter_reg_offset": "0x1E0",
+      "use_watchdog_msi": {% if SWITCHCARD_FPGA_MEETS_MIN_VERSION_0x07 %}{
+        "msi_domain": 0,
+        "hw_irq": 0,
+        "watchdog_counter_msi_reg": "0x1D8"
+      }{% else %}{}{% endif %}
+    }
+  },
+  "MULTIFPGAPCIESYSTEM0": {
+    "dev_info": {
+      "device_type": "MULTIFPGAPCIESYSTEM",
+      "device_name": "MULTIFPGAPCIESYSTEM0",
+      "device_parent": null
+    },
+    "dev_attr": {
+      "PCI_DEVICE_IDS": [
+        {
+          "vendor": "0x10ee",
+          "device": "0x7011"
+        },
+        {
+          "vendor": "0x20a4",
+          "device": "0x7011"
+        },
+        {
+          "vendor": "0x10ee",
+          "device": "0x7015"
+        },
+        {
+          "vendor": "0x20a4",
+          "device": "0x7015"
+        }
+      ]
+>>>>>>> 26d075494 (NOS-14680: Update watchdog PDDF configuration to use CPU FPGA Watchdog as HW watchdog (#8513))
     }
   },
   "MULTIFPGAPCIE0": {

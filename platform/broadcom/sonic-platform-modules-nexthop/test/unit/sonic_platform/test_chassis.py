@@ -63,7 +63,52 @@ class TestChassis:
         assert hasattr(chassis, "get_change_event")
         assert callable(getattr(chassis, "get_change_event"))
 
+<<<<<<< HEAD
     def test_chassis_get_watchdog(self, chassis_module):
+=======
+    @pytest.mark.parametrize("with_pddf_data", [True, False])
+    def test_chassis_always_has_a_presence_monitor(self, chassis_module, with_pddf_data):
+        """Without PDDF data the monitor polls presence, so it is built either way."""
+        pddf_data = mock_pddf_data({}) if with_pddf_data else None
+        chassis = chassis_module.Chassis(pddf_data=pddf_data)
+
+        assert chassis._presence_monitor is not None
+
+    @staticmethod
+    def _watchdog_pddf_data(use_watchdog_msi=None):
+        dev_attr = {
+            "event_driven_power_cycle_control_reg_offset": "0x28",
+            "event_driven_power_cycle_control_bit": 4,
+            "watchdog_counter_reg_offset": "0x1E0",
+        }
+        if use_watchdog_msi is not None:
+            dev_attr["use_watchdog_msi"] = use_watchdog_msi
+        return mock_pddf_data(
+            {
+                "WATCHDOG": {
+                    "dev_info": {"device_parent": "FAKE_MULTIFPGAPCIE1"},
+                    "dev_attr": dev_attr,
+                },
+                "FAKE_MULTIFPGAPCIE1": {
+                    "dev_info": {"device_bdf": "FAKE_ADDR"},
+                },
+            }
+        )
+
+    def test_chassis_get_watchdog_simple(self, chassis_module):
+        # An empty use_watchdog_msi block (or none at all) selects the
+        # 1-counter WatchdogSimple.
+        chassis = chassis_module.Chassis(pddf_data=self._watchdog_pddf_data(use_watchdog_msi={}))
+        actual_watchdog = chassis.get_watchdog()
+        assert type(actual_watchdog).__name__ == "WatchdogSimple"
+        assert actual_watchdog.fpga_pci_addr == "FAKE_ADDR"
+        assert actual_watchdog.event_driven_power_cycle_control_reg_offset == 0x28
+        assert actual_watchdog.event_driven_power_cycle_control_bit == 4
+        assert actual_watchdog.watchdog_counter_powercycle_reg == 0x1E0
+
+    def test_chassis_get_watchdog_msi(self, chassis_module):
+        # A populated use_watchdog_msi block selects the 2-counter Watchdog.
+>>>>>>> 26d075494 (NOS-14680: Update watchdog PDDF configuration to use CPU FPGA Watchdog as HW watchdog (#8513))
         chassis = chassis_module.Chassis(
             pddf_data=mock_pddf_data(
                 {
@@ -83,7 +128,32 @@ class TestChassis:
         actual_watchdog = chassis.get_watchdog()
         assert actual_watchdog.fpga_pci_addr == "FAKE_ADDR"
         assert actual_watchdog.event_driven_power_cycle_control_reg_offset == 0x28
+<<<<<<< HEAD
         assert actual_watchdog.watchdog_counter_reg_offset == 0x1E0
+=======
+        assert actual_watchdog.event_driven_power_cycle_control_bit == 4
+        assert actual_watchdog.watchdog_counter_powercycle_reg == 0x1E0
+        assert actual_watchdog.watchdog_counter_msi_reg == 0x1D8
+>>>>>>> 26d075494 (NOS-14680: Update watchdog PDDF configuration to use CPU FPGA Watchdog as HW watchdog (#8513))
+
+    @pytest.mark.parametrize(
+        "missing_attr",
+        [
+            "event_driven_power_cycle_control_reg_offset",
+            "event_driven_power_cycle_control_bit",
+            "watchdog_counter_reg_offset",
+        ],
+    )
+    def test_chassis_get_watchdog_requires_every_dev_attr(
+        self, chassis_module, missing_attr
+    ):
+        """None of these falls back to a default; use_watchdog_msi is the only optional one."""
+        pddf_data = self._watchdog_pddf_data()
+        del pddf_data.data["WATCHDOG"]["dev_attr"][missing_attr]
+        chassis = chassis_module.Chassis(pddf_data=pddf_data)
+
+        with pytest.raises(KeyError, match=missing_attr):
+            chassis.get_watchdog()
 
     def test_chassis_get_watchdog_pddf_data_is_empty(self, chassis_module):
         # Initialize chasis with an empty pddf_data

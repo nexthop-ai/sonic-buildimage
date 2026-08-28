@@ -8,11 +8,11 @@
     "version": "0xe"
   },
   {
-    "name": "fan_duty_packed_in_one_word",
-    "bdf_var": "switchcard_fpga_1_bdf",
+    "name": "SWITCHCARD_FPGA_MEETS_MIN_VERSION_0x87",
+    "bdf_var": "switchcard_fpga_0_bdf",
     "reg_offset": "0x0",
-    "mask": "0xfff",
-    "comparison": "LESS_THAN_OR_EQUAL",
-    "version": "0x304"
+    "mask": "0xff",
+    "comparison": "GREATER_THAN_OR_EQUAL",
+    "version": "0x87"
   }
 ]

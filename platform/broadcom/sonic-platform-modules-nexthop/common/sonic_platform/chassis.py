@@ -250,12 +250,38 @@ class Chassis(PddfChassis):
             event_driven_power_cycle_control_reg_offset = int(
                 watchdog_dev_attr["event_driven_power_cycle_control_reg_offset"], 16
             )
+<<<<<<< HEAD
             watchdog_counter_reg_offset = int(watchdog_dev_attr["watchdog_counter_reg_offset"], 16)
             self._watchdog = Watchdog(
                 fpga_pci_addr=fpga_pci_addr,
                 event_driven_power_cycle_control_reg_offset=event_driven_power_cycle_control_reg_offset,
                 watchdog_counter_reg_offset=watchdog_counter_reg_offset,
             )
+=======
+            event_driven_power_cycle_control_bit = watchdog_dev_attr[
+                "event_driven_power_cycle_control_bit"
+            ]
+            watchdog_counter_powercycle_reg = int(watchdog_dev_attr["watchdog_counter_reg_offset"], 16)
+
+            watchdog_msi = watchdog_dev_attr.get("use_watchdog_msi") or {}
+            if watchdog_msi:
+                _logger.log_info("Using 2-counter Watchdog (MSI + power cycle registers)")
+                self._watchdog = Watchdog(
+                    fpga_pci_addr=fpga_pci_addr,
+                    event_driven_power_cycle_control_reg_offset=event_driven_power_cycle_control_reg_offset,
+                    event_driven_power_cycle_control_bit=event_driven_power_cycle_control_bit,
+                    watchdog_counter_powercycle_reg=watchdog_counter_powercycle_reg,
+                    watchdog_counter_msi_reg=int(watchdog_msi["watchdog_counter_msi_reg"], 16),
+                )
+            else:
+                _logger.log_info("Using 1-counter WatchdogSimple (power cycle register only)")
+                self._watchdog = WatchdogSimple(
+                    fpga_pci_addr=fpga_pci_addr,
+                    event_driven_power_cycle_control_reg_offset=event_driven_power_cycle_control_reg_offset,
+                    event_driven_power_cycle_control_bit=event_driven_power_cycle_control_bit,
+                    watchdog_counter_powercycle_reg=watchdog_counter_powercycle_reg,
+                )
+>>>>>>> 26d075494 (NOS-14680: Update watchdog PDDF configuration to use CPU FPGA Watchdog as HW watchdog (#8513))
 
         return self._watchdog
 
