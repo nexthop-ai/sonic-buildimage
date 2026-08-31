@@ -93,7 +93,7 @@ index 73849dcf39..faa7337c00 100644
  #include "bgpd/bgp_debug.h"
  #include "bgpd/bgp_errors.h"
  #include "bgpd/bgp_mpath.h"
-@@ -369,6 +371,108 @@ static int bgp_interface_link_params(ZAPI_CALLBACK_ARGS)
+@@ -300,6 +302,108 @@ static int bgp_interface_link_params(ZAPI_CALLBACK_ARGS)
  	return 0;
  }
  
@@ -202,9 +202,9 @@ index 73849dcf39..faa7337c00 100644
  static int bgp_interface_address_add(ZAPI_CALLBACK_ARGS)
  {
  	struct connected *ifc;
-@@ -398,6 +502,8 @@ static int bgp_interface_address_add(ZAPI_CALLBACK_ARGS)
- 
- 		hook_call(bgp_ifp_addr_add, bgp, ifc->ifp);
+@@ -327,6 +431,8 @@ static int bgp_interface_address_add(ZAPI_CALLBACK_ARGS)
+ 	if (if_is_operative(ifc->ifp)) {
+ 		bgp_connected_add(bgp, ifc);
  
 +		bgp_nexthop_resolve_deferred(bgp);
 +
