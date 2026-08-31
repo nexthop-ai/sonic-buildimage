@@ -282,12 +282,28 @@ shown after this list.
     "patches": [
       {"type": "unofficial",
        "diff": {"url": "file://src/sonic-frr/patch/<patch-name>.patch",
-                "hashes": [{"alg": "SHA-256", "content": "<hex>"}]}}
+                "hashes": [{"alg": "SHA-256", "content": "<hex>"}]},
+       "resolves": [
+         {"type": "security",
+          "id": "CVE-YYYY-NNNNN",
+          "references": ["https://nvd.nist.gov/vuln/detail/CVE-YYYY-NNNNN"]}
+       ]}
     ],
     "notes": "patch-set sha1: <hex>"
   }
 }
 ```
+
+`resolves[]` appears when a patch says which vulnerability it fixes —
+by naming it in the patch filename, or in a `Fixes:` or `Subject:`
+header. A CVE mentioned in passing elsewhere in the patch is not
+recorded, because that is not the patch claiming to fix anything.
+
+This matters for the forked-upstream pattern above. `ancestors[]`
+honestly reports the older upstream version SONiC started from, so a
+scanner reads that version and reports issues that a carried patch has
+already fixed. Without `resolves[]` nothing in the SBOM distinguishes
+those from the ones still outstanding.
 
 ## License resolution
 
@@ -363,8 +379,13 @@ For standalone vuln scanning outside a build, the same script
 auto-fetches into `~/.cache/sonic-sbom/`.
 
 The aggregator additionally caches per-file scanner output under
-`target/sbom-tools/syft-cache/<tool>-<sha256>.json`, keyed by SHA-256
-of the input archive. A SONiC platform with multiple ASIC variants
+`target/sbom-tools/syft-cache/<tool>-<version>-<sha256>.json`, keyed by
+SHA-256 of the input archive. The `<version>` is `SCANNER_CACHE_VERSION`
+in `build_sbom.py`, bumped whenever a change alters what a scan returns
+for unchanged input — the archive's digest cannot notice that we now
+read it differently. Entries under a superseded version are left in
+place rather than pruned; `make reset` clears them with the rest of
+`target/`. A SONiC platform with multiple ASIC variants
 (e.g. broadcom, broadcom-dnx, broadcom-legacy-th) invokes
 `build_sbom.py` once per variant; without the cache, syft would
 re-scan the ~28 docker `.gz` files that are identical across variants
@@ -400,6 +421,14 @@ python3 scripts/sbom_diff.py old-host.cdx.json new-host.cdx.json
 The diff ignores timestamps and aggregator-internal metadata. It
 compares version, hashes, licenses, pedigree.ancestors, and patch
 hashes.
+
+Each SBOM carries a `serialNumber` derived from its own contents, so
+two identical builds produce the same one and any change produces a
+different one. CycloneDX suggests a fresh identifier per generation;
+that is deliberately not done here, because it would retire the
+guarantee above. The vulnerability report records the serial number of
+the SBOM it was produced from, which is what ties the two documents
+together once they have been copied away from the build tree.
 
 ## Attestation and signing
 
@@ -484,13 +513,43 @@ rejects YAML). `vex/README.md` documents the schema, status taxonomy,
 and triage workflow. Curated statements live at the top level and are
 checked in; the `vex/auto/` subdirectory is **gitignored** and
 regenerated on every SBOM build by `scripts/sbom_extract_vex_from_patches.py`,
-which scans `src/**/*.patch` for CVE markers and emits `not_affected`
-statements per patch-mentioned CVE. The regeneration is wired into
-`scripts/build_sbom.sh` so the auto-VEX set always reflects the
+which reads the patches SONiC maintains for CVE markers and emits a
+`fixed` statement per CVE a patch declares. The regeneration is wired
+into `scripts/build_sbom.sh` so the auto-VEX set always reflects the
 current state of `src/*/patches/` — a patch that introduces or
 removes a CVE marker is reflected on the very next build.
 Re-invocations against an unchanged patch set short-circuit;
 changing any tracked patch forces a rescan on the next build.
+
+Which patches count is `sbom_cve_refs.patch_dirs()`, the same
+function that decides what goes in a component's
+`pedigree.patches[]` — so the SBOM and the VEX statements describe
+one patch set rather than two that happen to agree. It is the
+directories SONiC keeps its own patches in (`src/<pkg>.patch/`,
+`src/<pkg>/patch/`, `src/<pkg>/patches/`,
+`src/sonic-linux-kernel/patches-sonic/`), and within each, only the
+entries its `series` lists. Notably **not** the patches carried by
+the upstream sources the build unpacks: a Debian source under
+`src/<pkg>/<pkg>-<version>/` brings its own `debian/patches/`, and
+those fixes are Debian's and already present in the version we ship.
+Reading them produced statements claiming "Fixed by SONiC local
+patch" for changes SONiC did not make — 13 of 17 statements on one
+broadcom build.
+
+The status is `fixed`, not `not_affected`: the patch changed the
+vulnerable code, so the artifact carries the fix even though its
+version string still matches the vulnerable range. `not_affected`
+would assert the code is untouched and merely unreachable, which is
+a different claim. Both statuses suppress the finding in grype; the
+report records the difference as `analysis.state` `resolved` versus
+`not_affected`.
+
+A finding a VEX statement covers is **kept in the vulnerability
+report**, carrying an `analysis` block that records the suppression and
+its justification. Dropping it would leave the finding simply absent —
+with the component, its version and its pedigree all unchanged — which
+is indistinguishable from a scan that failed. The `--fail-on` gate
+still considers only findings that were not suppressed.
 
 ```json
 {
@@ -504,16 +563,20 @@ changing any tracked patch forces a rescan on the next build.
     "products": [{"@id": "pkg:deb/sonic/<name>@<version>"}],
     "status": "not_affected",
     "justification": "vulnerable_code_not_in_execute_path",
-    "impact_statement": "Fixed by SONiC patch <path>",
+    "impact_statement": "Why this CVE does not apply to this build",
     "references": ["<upstream-commit-or-advisory-URL>"]
   }]
 }
 ```
 
-Auto-extracted entries use a generic `pkg:generic/<source-tree>` PURL
-because the extractor doesn't know which downstream debs the patch
-ships in; promoting them to curated files with concrete PURLs
-improves suppression rate.
+The example above is the curated shape. Auto-extracted entries use a
+generic `pkg:generic/<source-tree>` PURL because the extractor
+doesn't know which downstream debs the patch ships in. That PURL
+carries no version, so an auto statement covers every version of
+that component in the document, not just the one built from the
+patch it came from — the impact statement says so, and promoting the
+entry to a curated file with a concrete PURL both bounds the claim
+and improves the suppression rate.
 
 ## Verification
 
@@ -542,9 +605,48 @@ for components built from a sonic-net submodule,
 `pkg:deb/sonic/<name>@<version>?arch=<arch>` for patched-upstream
 Debian sources.
 
+The graph is rooted at the image component, so a walk can start from
+the top rather than from a package you already knew to look for.
+
 ```bash
 SBOM=target/sonic-<machine>.bin.cdx.json
 
+# Which containers does the image install?
+jq -r --arg root "$(jq -r .metadata.component."bom-ref" $SBOM)" \
+   '.dependencies[] | select(.ref == $root) | .dependsOn[]
+    | select(startswith("pkg:oci/"))' $SBOM
+
+# Which containers ship a given package? (the question you ask first
+# when a finding lands: where does this actually run?)
+jq -r --arg pkg "pkg:deb/debian/libc6@2.41-12" \
+   '.dependencies[] | select(.dependsOn[]? == $pkg) | .ref' $SBOM
+
+# What is inside one container?
+jq -r --arg c "pkg:oci/docker-fpm-frr@..." \
+   '.dependencies[] | select(.ref == $c) | .dependsOn[]' $SBOM
+```
+
+A component can appear under several containers — shared libraries
+usually do — and its `sonic:scope` property lists every scope it was
+observed in, space-separated. A component the build could not place is
+left out of the containment edges rather than attached to the image on
+the assumption that it must be somewhere; the aggregator logs how many
+those were.
+
+Only the containers the installer actually ships are rooted under the
+image. Every docker the build saves emits a fragment, test containers
+included, so `target/` routinely holds fragments for containers that
+are in no `.bin`.
+
+The finished graph is checked before the document is written: every
+`dependsOn` target has to resolve to a component in the document or to
+the root, nothing may depend on itself, and no container may be rooted
+under an image that does not install it. Failures are warnings, so
+they surface in the build log and fail the build under `SBOM_STRICT=y`.
+Nothing downstream does this — `grype` reads `components[]` and ignores
+the graph — so an unchecked document would ship its mistakes silently.
+
+```bash
 # What does sonic-swss depend on?
 #   Returns 10 sibling SONiC fragments (libteam-*, libnexthopgroup-*,
 #   sonic-sairedis, sonic-dash-api, sonic-stp, sonic-swss-common)
@@ -653,7 +755,7 @@ Files that exist for this design.
 | `slave.mk` | Defines the `sbom_emit_fragment` helper, calls it from each `SONIC_*` artifact recipe, invokes `build_sbom.sh` between rootfs assembly and `.bin` wrap, and exposes the recipe context (installer docker/deb/wheel lists) to the aggregator. |
 | `build_image.sh` | Emits the `.cdx.json` sibling after the `.bin` is wrapped. |
 | `scripts/install_sbom_tool.sh` | Auto-fetches syft, grype, cyclonedx-cli with SHA-256 verify into `target/sbom-tools/`. |
-| `scripts/build_sbom.py` | Aggregator. Walks fragments, runs the scanner, parses lockfiles, resolves licenses, dedupes, builds the CycloneDX `dependencies[]` graph (kernel-module → kernel-image edges, declared `.deb` build/runtime deps, recipe-emit-{rust,go,python} → owning `.deb` edges), and writes the SBOM + SPDX + provenance. |
+| `scripts/build_sbom.py` | Aggregator. Walks fragments, runs the scanner, parses lockfiles, resolves licenses, dedupes, builds and validates the CycloneDX `dependencies[]` graph (containment: image → the containers it installs → packages; kernel-module → kernel-image edges; declared `.deb` build/runtime deps; recipe-emit-{rust,go,python} → owning `.deb` edges), and writes the SBOM + SPDX + provenance. |
 | `scripts/build_sbom.sh` | Thin shim that execs `build_sbom.py`. |
 | `scripts/sbom_fragment.py` | Per-recipe fragment generator. Knows the four ancestor patterns, the vendor-supplier URL table, and the per-`.deb` language-dep harvesters (Rust via `rust-audit-info`, Go via `go version -m`, Python via `*.dist-info/METADATA` walk). |
 | `scripts/sbom_resolve_licenses.py` | DEP-5 parser + licensecheck fallback + SPDX translation. |
@@ -663,6 +765,7 @@ Files that exist for this design.
 | `scripts/sbom_diff.py` | Reproducibility comparison between two SBOMs. |
 | `scripts/sbom_vuln_scan.py` | Standalone CVE scanner (invokes grype, applies VEX). |
 | `scripts/sbom_vuln_diff.py` | Standalone drift analysis between two vuln reports. |
+| `scripts/sbom_cve_refs.py` | Which patches the build applies, and the CVEs each claims to fix. Shared by `sbom_fragment.py` and `sbom_extract_vex_from_patches.py` so the SBOM and the VEX statements cannot disagree about either. |
 | `scripts/sbom_extract_vex_from_patches.py` | Auto-VEX from CVE markers in patch metadata. |
 | `vex/` | OpenVEX statements (curated at top level, auto in `vex/auto/`). |
 | `vex/README.md` | VEX schema and triage workflow. |

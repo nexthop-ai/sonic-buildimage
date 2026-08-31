@@ -24,9 +24,10 @@ What this script emits per fragment:
       artifact filename and recipe context.
     - Source provenance: git submodule URL + commit SHA when SRC_PATH
       is a submodule.
-    - Patch enumeration: SHA-256 per patch file when a sibling
-      <SRC_PATH>.patch/, <SRC_PATH>/patch/, or <SRC_PATH>/patches/ is
-      found.
+    - Patch enumeration: SHA-256 per patch file, over every directory
+      sbom_cve_refs.patch_dirs() finds for SRC_PATH — the same set the
+      VEX extractor reads, so the two cannot disagree about which
+      patches the build applies.
     - Aggregate patch-set SHA-1 over (series + *.patch), matching the
       scheme used internally by src/sonic-frr/Makefile.
     - Upstream ancestor (pedigree.ancestors[]) when detectable:
@@ -56,6 +57,12 @@ import sys
 import tempfile
 import time
 from typing import Any, Optional
+
+# Invoked from make with an arbitrary working directory, so locate the
+# sibling module relative to this file rather than relying on cwd.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import sbom_cve_refs  # noqa: E402  (needs the path set above)
 
 
 def warn(msg: str) -> None:
@@ -341,74 +348,83 @@ def lookup_upstream_debian_source(src_path: str) -> Optional[dict]:
 # ----------------------------------------------------------------------------
 
 
-def find_patch_dir(src_path: str) -> Optional[str]:
-    """Locate a patch series directory adjacent to or under src_path."""
-    if not src_path:
-        return None
-    candidates = [
-        src_path + ".patch",   # src/scapy.patch, src/sonic-swss.patch, ...
-        os.path.join(src_path, "patch"),     # src/openssh/patch, src/sonic-frr/patch
-        os.path.join(src_path, "patches"),   # src/bash/patches, src/sonic-mgmt-common/patches
-    ]
-    # Linux kernel uses a uniquely-named subdir.
-    if os.path.basename(src_path.rstrip("/")) == "sonic-linux-kernel":
-        candidates.insert(0, os.path.join(src_path, "patches-sonic"))
-    for c in candidates:
-        if os.path.isfile(os.path.join(c, "series")):
-            return c
-    return None
+def find_patch_dirs(src_path: str) -> list:
+    """The patch directories src_path applies patches from.
+
+    Lives in sbom_cve_refs alongside the patch reader, because
+    sbom_extract_vex_from_patches.py needs the same answer: it sweeps
+    the tree for these directories rather than for every directory
+    holding a *.patch, so the VEX statements and this pedigree cannot
+    disagree about which patches the build applies.
+    """
+    return sbom_cve_refs.patch_dirs(src_path)
 
 
 def enumerate_patches(patch_dir: str) -> list:
-    """Read series file, hash each patch."""
+    """Hash every patch the directory applies, and read its CVE claims.
+
+    The patch set comes from sbom_cve_refs.applied_patches, which the
+    VEX extractor uses too. This used to require a `series` file and
+    return nothing without one, so the five directories whose recipes
+    apply patches directly got no pedigree at all — including
+    src/thrift/patch, whose 0002-cve-2017-1000487.patch is the one
+    patch in the tree that names a CVE in its filename.
+    """
     out = []
-    series = os.path.join(patch_dir, "series")
-    if not os.path.isfile(series):
-        return out
-    try:
-        with open(series) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                # Series lines can carry options after the filename.
-                fname = line.split()[0]
-                pf = os.path.join(patch_dir, fname)
-                if not os.path.isfile(pf):
-                    continue
-                h = hashlib.sha256()
-                with open(pf, "rb") as pfh:
-                    h.update(pfh.read())
-                out.append({
-                    "name": fname,
-                    "path": os.path.relpath(pf),
-                    "sha256": h.hexdigest(),
-                })
-    except Exception as e:
-        warn(f"failed to read patch series in {patch_dir}: {e}")
+    for fname in sbom_cve_refs.applied_patches(patch_dir):
+        pf = os.path.join(patch_dir, fname)
+        try:
+            with open(pf, "rb") as pfh:
+                blob = pfh.read()
+        except OSError as e:
+            warn(f"could not read patch {pf}: {e}")
+            continue
+        h = hashlib.sha256()
+        h.update(blob)
+        # Read the CVEs off the same bytes we just hashed. Only the
+        # high-confidence ones are kept: those are the patch declaring
+        # what it fixes, which is what pedigree records. A CVE merely
+        # mentioned in passing is not a claim and must not read like
+        # one.
+        high, _low = sbom_cve_refs.cves_in_text(
+            fname, blob.decode("utf-8", errors="replace")
+        )
+        out.append({
+            "name": fname,
+            "path": os.path.relpath(pf),
+            "sha256": h.hexdigest(),
+            "cves": sorted(high),
+        })
     return out
 
 
-def patchset_hash(patch_dir: str) -> Optional[str]:
-    """Aggregate SHA-256 over series + *.patch contents (FRR-style)."""
-    series = os.path.join(patch_dir, "series")
-    if not os.path.isfile(series):
-        return None
+def patchset_hash(patch_dirs: list) -> Optional[str]:
+    """Aggregate SHA-256 over series + applied *.patch contents.
+
+    Unchanged byte-for-byte for a component with a single patch
+    directory and a `series`: its own bytes go in first, then each
+    patch in series order. Directories without one hash just the
+    patches they apply, so a recipe that patches without quilt still
+    gets an identity instead of None. Several directories hash in the
+    order patch_dirs returns them.
+    """
     h = hashlib.sha256()
+    any_applied = False
     try:
-        with open(series, "rb") as f:
-            h.update(f.read())
-        # Hash the patch files in series order.
-        with open(series) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                fname = line.split()[0]
-                pf = os.path.join(patch_dir, fname)
-                if os.path.isfile(pf):
-                    with open(pf, "rb") as pfh:
-                        h.update(pfh.read())
+        for patch_dir in patch_dirs:
+            series = os.path.join(patch_dir, "series")
+            if os.path.isfile(series):
+                with open(series, "rb") as f:
+                    h.update(f.read())
+            applied = sbom_cve_refs.applied_patches(patch_dir)
+            if not applied:
+                continue
+            any_applied = True
+            for fname in applied:
+                with open(os.path.join(patch_dir, fname), "rb") as pfh:
+                    h.update(pfh.read())
+        if not any_applied:
+            return None
         return h.hexdigest()
     except Exception:
         return None
@@ -895,13 +911,43 @@ def extract_rust_deps_from_deb(deb_path: str, deb_filename: str) -> list:
     ]
 
 
+def _patch_entry(p: dict) -> dict:
+    """One CycloneDX pedigree patch record.
+
+    A patch that names the CVEs it fixes records them in resolves[].
+    Without that the SBOM says a component was patched but not what the
+    patch was for, so a scanner matching CVEs against the unpatched
+    upstream version in pedigree.ancestors has no way to tell that we
+    already fixed one — and every consumer has to rediscover it.
+    """
+    entry: dict[str, Any] = {
+        "type": "unofficial",
+        "diff": {
+            "url": f"file://{p['path']}",
+            "hashes": [{"alg": "SHA-256", "content": p["sha256"]}],
+        },
+    }
+    if p.get("cves"):
+        entry["resolves"] = [
+            {
+                "type": "security",
+                "id": cve,
+                "references": [
+                    f"https://nvd.nist.gov/vuln/detail/{cve}"
+                ],
+            }
+            for cve in p["cves"]
+        ]
+    return entry
+
+
 def build_fragment(artifact: str, recipe_type: str) -> dict:
     meta = parse_artifact_name(artifact)
     src_path = os.environ.get("SRC_PATH", "")
     submodule = detect_submodule(src_path) if src_path else None
-    patch_dir = find_patch_dir(src_path) if src_path else None
-    patches = enumerate_patches(patch_dir) if patch_dir else []
-    ps_hash = patchset_hash(patch_dir) if patch_dir else None
+    patch_dirs = find_patch_dirs(src_path) if src_path else []
+    patches = [p for d in patch_dirs for p in enumerate_patches(d)]
+    ps_hash = patchset_hash(patch_dirs) if patch_dirs else None
 
     bom_ref = build_purl(meta, submodule)
 
@@ -1006,14 +1052,7 @@ def build_fragment(artifact: str, recipe_type: str) -> dict:
             pedigree["ancestors"] = ancestors
         if patches:
             pedigree["patches"] = [
-                {
-                    "type": "unofficial",
-                    "diff": {
-                        "url": f"file://{p['path']}",
-                        "hashes": [{"alg": "SHA-256", "content": p["sha256"]}],
-                    },
-                }
-                for p in patches
+                _patch_entry(p) for p in patches
             ]
         if ps_hash:
             pedigree["notes"] = f"patch-set sha256: {ps_hash}"
