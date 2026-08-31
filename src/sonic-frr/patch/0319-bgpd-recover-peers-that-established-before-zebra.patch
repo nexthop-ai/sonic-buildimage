@@ -1,0 +1,493 @@
+From b810b3f5e380e36548618d4c68cfce35e8f0daa1 Mon Sep 17 00:00:00 2001
+From: Ravindra Bikkina <rbikkina@nexthop.ai>
+Date: Thu, 27 Aug 2026 05:33:42 +0000
+Subject: [PATCH] bgpd: recover peers that established before zebra
+
+peer->nexthop is resolved once, in bgp_getsockname(), when the TCP
+connection comes up. Until zebra has handed over the interface table
+there is nothing for bgp_zebra_nexthop_set() to resolve against, and
+rather than failing the connection it reports success with a NULL ifp:
+
+	if (!ifp) {
+		...
+		return zclient_num_connects ? false : true;
+	}
+	nexthop->ifp = ifp;
+
+That is the only assignment of nexthop->ifp in bgpd and nothing
+re-derives it for a live session, so a peer that reaches Established
+inside that window keeps ifp == NULL for as long as the session lasts.
+
+bgp_mp_reach_parse() then rejects every MP_REACH_NLRI carrying a
+link-local next-hop, which for a directly connected IPv6 peer (RFC 2545)
+is every update it sends. The NLRI is dropped as an RFC 7606
+treat-as-withdraw before bgp_update() is reached, so it is never
+policy-checked, never stored in the Adj-RIB-In and never counted. The
+session stays Established and outwardly healthy while reporting zero
+received prefixes, indefinitely.
+
+Seen after a bgp restart under load, where the zclient_connect() event
+was starved for ~11s and both IPv6 sessions came up inside the gap.
+Neither a soft-in nor a route refresh recovered it on their own,
+because the drop happens before the Adj-RIB-In.
+
+Re-resolve the interface for Established peers still holding a NULL ifp
+when zebra delivers an interface address.
+
+The same call also fills in nexthop->v6_local and peer->shared_network,
+which decide the outgoing next-hop encoding, so what is already in the
+Adj-RIB-Out was advertised with stale attributes and has to be
+re-announced alongside the inbound refresh. Peers that never negotiated
+route refresh cannot be recovered in place and are reset with a CEASE
+instead, which is the only other way to re-learn.
+
+A partial result - interface found, but not yet the link-local address
+the outgoing next-hop needs - deliberately does not latch: the function
+returns v6_ll_avail rather than "resolved" and can set ifp while still
+failing, so the NULL is restored and the next address retries.
+
+peer->shared_network keys the update-group, because it decides whether
+the v6 next-hop is encoded as 32 bytes or 16, so the peer is regrouped
+before anything is re-announced - bgp_announce_route() only forces
+updates on the subgroup the peer is already in.
+
+The re-resolve itself is unconditional - v6_global/v6_local,
+shared_network and the BFD source derived from it are ifp-derived for
+IPv4 sessions too. Only the re-learning is scoped, per address family,
+to those that can carry an IPv6 next-hop: a negotiated IPv6 AF, or an
+IPv4 AF with ENHE (RFC 8950). Nothing else reaches the ifp checks in
+bgp_mp_reach_parse(), so nothing was withdrawn; shared_network does not
+key those peers' update-group and nexthop.v4 was already set from
+su_local, so a refresh or a reset there would be pure churn on a
+session that was never broken.
+---
+ bgpd/bgp_zebra.c                              | 106 +++++++++++
+ .../bgp_nexthop_ifp_late_zebra/__init__.py    |   0
+ .../bgp_nexthop_ifp_late_zebra/r1/bgpd.conf   |  16 ++
+ .../bgp_nexthop_ifp_late_zebra/r1/zebra.conf  |   4 +
+ .../bgp_nexthop_ifp_late_zebra/r2/bgpd.conf   |  12 ++
+ .../bgp_nexthop_ifp_late_zebra/r2/zebra.conf  |   7 +
+ .../bgp_nexthop_ifp_late_zebra/r3/bgpd.conf   |  12 ++
+ .../bgp_nexthop_ifp_late_zebra/r3/zebra.conf  |   4 +
+ .../test_bgp_nexthop_ifp_late_zebra.py        | 180 ++++++++++++++++++
+ 9 files changed, 341 insertions(+)
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/__init__.py
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/r1/bgpd.conf
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/r1/zebra.conf
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/r2/bgpd.conf
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/r2/zebra.conf
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/r3/bgpd.conf
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/r3/zebra.conf
+ create mode 100644 tests/topotests/bgp_nexthop_ifp_late_zebra/test_bgp_nexthop_ifp_late_zebra.py
+
+diff --git a/bgpd/bgp_zebra.c b/bgpd/bgp_zebra.c
+index 73849dcf39..faa7337c00 100644
+--- a/bgpd/bgp_zebra.c
++++ b/bgpd/bgp_zebra.c
+@@ -33,6 +33,8 @@
+ #include "bgpd/bgp_nexthop.h"
+ #include "bgpd/bgp_zebra.h"
+ #include "bgpd/bgp_fsm.h"
++#include "bgpd/bgp_packet.h"
++#include "bgpd/bgp_updgrp.h"
+ #include "bgpd/bgp_debug.h"
+ #include "bgpd/bgp_errors.h"
+ #include "bgpd/bgp_mpath.h"
+@@ -369,6 +371,108 @@ static int bgp_interface_link_params(ZAPI_CALLBACK_ARGS)
+ 	return 0;
+ }
+ 
++/* A peer can only have been wedged in an address family that can carry an IPv6
++ * next-hop: a negotiated IPv6 AF, where a link-local next-hop is mandatory for a
++ * directly connected peer (RFC 2545), or an IPv4 AF with ENHE (RFC 8950).
++ * Anything else never reaches the ifp checks in bgp_mp_reach_parse().
++ */
++static bool bgp_nexthop_af_may_wedge(struct peer *peer, afi_t afi, safi_t safi)
++{
++	if (!peer->afc_nego[afi][safi])
++		return false;
++
++	return afi == AFI_IP6 || peer_cap_enhe(peer, afi, safi);
++}
++
++static bool bgp_nexthop_peer_may_wedge(struct peer *peer)
++{
++	afi_t afi;
++	safi_t safi;
++
++	FOREACH_AFI_SAFI (afi, safi)
++		if (bgp_nexthop_af_may_wedge(peer, afi, safi))
++			return true;
++
++	return false;
++}
++
++/* peer->nexthop is resolved once, in bgp_getsockname(), when the TCP connection
++ * comes up. Before zebra has handed over the interface table there is nothing to
++ * resolve against, and bgp_zebra_nexthop_set() reports success with a NULL ifp
++ * rather than failing the connection. Nothing re-derives it afterwards, so such a
++ * peer rejects every MP_REACH_NLRI carrying a link-local next-hop - which for a
++ * directly connected IPv6 peer is every update - for the life of the session.
++ * The drop happens in the attribute parser, so a soft-in has nothing to replay
++ * and only a resend recovers the prefixes.
++ */
++static void bgp_nexthop_resolve_deferred(struct bgp *bgp)
++{
++	struct listnode *node, *nnode;
++	struct peer *peer;
++	afi_t afi;
++	safi_t safi;
++
++	for (ALL_LIST_ELEMENTS(bgp->peer, node, nnode, peer)) {
++		struct bgp_nexthop nexthop;
++		bool shared_network;
++
++		if (peer->nexthop.ifp || !peer_established(peer->connection))
++			continue;
++
++		nexthop = peer->nexthop;
++		shared_network = peer->shared_network;
++
++		/* A partial result - interface found, but not yet the link-local
++		 * address the outgoing next-hop needs - must not latch, or the
++		 * ifp test above would skip this peer for every later address.
++		 */
++		if (!bgp_zebra_nexthop_set(peer->connection->su_local,
++					   peer->connection->su_remote,
++					   &peer->nexthop, peer)) {
++			peer->nexthop = nexthop;
++			peer->shared_network = shared_network;
++			continue;
++		}
++
++		/* The re-resolve above is what every peer needed; only a peer
++		 * that could have been wedged has anything to re-learn. For the
++		 * rest, shared_network does not key their update-group and
++		 * nexthop.v4 was already correct, so a resend is pure waste - and
++		 * a reset would tear down a session that was never broken.
++		 */
++		if (!bgp_nexthop_peer_may_wedge(peer))
++			continue;
++
++		if (!CHECK_FLAG(peer->cap, PEER_CAP_REFRESH_RCV)) {
++			zlog_info("%pBP resolved to interface %s, resetting to re-learn prefixes",
++				  peer, peer->nexthop.ifp->name);
++			peer_set_last_reset(peer, PEER_DOWN_CEASE_CONFIG_CHANGE);
++			peer_notify_config_change(peer->connection);
++			continue;
++		}
++
++		zlog_info("%pBP resolved to interface %s, refreshing prefixes", peer,
++			  peer->nexthop.ifp->name);
++
++		/* The outgoing next-hop encoding changed along with the
++		 * interface, so what is already advertised has to be re-sent as
++		 * well as what was dropped inbound. shared_network keys the
++		 * update-group - it decides whether the v6 next-hop is encoded
++		 * as 32 bytes or 16 - so the peer has to be regrouped first, or
++		 * the re-announcement goes out with the old encoding.
++		 */
++		update_group_adjust_peer_afs(peer);
++
++		FOREACH_AFI_SAFI (afi, safi) {
++			if (!bgp_nexthop_af_may_wedge(peer, afi, safi))
++				continue;
++			bgp_route_refresh_send(peer, afi, safi, 0, 0, 0,
++					       BGP_ROUTE_REFRESH_NORMAL);
++			bgp_announce_route(peer, afi, safi, true);
++		}
++	}
++}
++
+ static int bgp_interface_address_add(ZAPI_CALLBACK_ARGS)
+ {
+ 	struct connected *ifc;
+@@ -398,6 +502,8 @@ static int bgp_interface_address_add(ZAPI_CALLBACK_ARGS)
+ 
+ 		hook_call(bgp_ifp_addr_add, bgp, ifc->ifp);
+ 
++		bgp_nexthop_resolve_deferred(bgp);
++
+ 		/* If we have learnt of any neighbors on this interface,
+ 		 * check to kick off any BGP interface-based neighbors,
+ 		 * but only if this is a link-local address.
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/__init__.py b/tests/topotests/bgp_nexthop_ifp_late_zebra/__init__.py
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/r1/bgpd.conf b/tests/topotests/bgp_nexthop_ifp_late_zebra/r1/bgpd.conf
+new file mode 100644
+index 0000000000..bfec478a92
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/r1/bgpd.conf
+@@ -0,0 +1,16 @@
++!
++router bgp 65001
++ bgp router-id 10.0.0.1
++ no bgp ebgp-requires-policy
++ neighbor 2001:db8:1::2 remote-as external
++ neighbor 2001:db8:1::2 timers 3 9
++ neighbor 2001:db8:1::2 timers connect 5
++ neighbor 2001:db8:2::3 remote-as external
++ neighbor 2001:db8:2::3 timers 3 9
++ neighbor 2001:db8:2::3 timers connect 5
++ neighbor 2001:db8:2::3 dont-capability-negotiate
++ address-family ipv6 unicast
++  neighbor 2001:db8:1::2 activate
++  neighbor 2001:db8:2::3 activate
++ exit-address-family
++!
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/r1/zebra.conf b/tests/topotests/bgp_nexthop_ifp_late_zebra/r1/zebra.conf
+new file mode 100644
+index 0000000000..d2f00ecc20
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/r1/zebra.conf
+@@ -0,0 +1,4 @@
++!
++interface r1-eth0
++ ipv6 address 2001:db8:1::1/64
++!
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/r2/bgpd.conf b/tests/topotests/bgp_nexthop_ifp_late_zebra/r2/bgpd.conf
+new file mode 100644
+index 0000000000..764967bc65
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/r2/bgpd.conf
+@@ -0,0 +1,12 @@
++!
++router bgp 65002
++ bgp router-id 10.0.0.2
++ no bgp ebgp-requires-policy
++ neighbor 2001:db8:1::1 remote-as external
++ neighbor 2001:db8:1::1 timers 3 9
++ neighbor 2001:db8:1::1 timers connect 5
++ address-family ipv6 unicast
++  neighbor 2001:db8:1::1 activate
++  redistribute connected
++ exit-address-family
++!
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/r2/zebra.conf b/tests/topotests/bgp_nexthop_ifp_late_zebra/r2/zebra.conf
+new file mode 100644
+index 0000000000..8b69909f95
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/r2/zebra.conf
+@@ -0,0 +1,7 @@
++!
++interface lo
++ ipv6 address 2001:db8:f::1/128
++!
++interface r2-eth0
++ ipv6 address 2001:db8:1::2/64
++!
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/r3/bgpd.conf b/tests/topotests/bgp_nexthop_ifp_late_zebra/r3/bgpd.conf
+new file mode 100644
+index 0000000000..882558e1ed
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/r3/bgpd.conf
+@@ -0,0 +1,12 @@
++!
++router bgp 65003
++ bgp router-id 10.0.0.3
++ no bgp ebgp-requires-policy
++ neighbor 2001:db8:2::1 remote-as external
++ neighbor 2001:db8:2::1 timers 3 9
++ neighbor 2001:db8:2::1 timers connect 5
++ neighbor 2001:db8:2::1 dont-capability-negotiate
++ address-family ipv6 unicast
++  neighbor 2001:db8:2::1 activate
++ exit-address-family
++!
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/r3/zebra.conf b/tests/topotests/bgp_nexthop_ifp_late_zebra/r3/zebra.conf
+new file mode 100644
+index 0000000000..699e5ee8cd
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/r3/zebra.conf
+@@ -0,0 +1,4 @@
++!
++interface r3-eth0
++ ipv6 address 2001:db8:2::3/64
++!
+diff --git a/tests/topotests/bgp_nexthop_ifp_late_zebra/test_bgp_nexthop_ifp_late_zebra.py b/tests/topotests/bgp_nexthop_ifp_late_zebra/test_bgp_nexthop_ifp_late_zebra.py
+new file mode 100644
+index 0000000000..51f4f98800
+--- /dev/null
++++ b/tests/topotests/bgp_nexthop_ifp_late_zebra/test_bgp_nexthop_ifp_late_zebra.py
+@@ -0,0 +1,180 @@
++#!/usr/bin/env python
++# SPDX-License-Identifier: ISC
++
++"""
++A peer that reaches Established before bgpd has ever talked to zebra has no
++interface for its nexthop, so it treats every update carrying a link-local
++next-hop as a withdrawal. Check that the prefixes are re-learned once zebra
++delivers the interface addresses, instead of the session staying up empty.
++
++r2 negotiates route refresh and is recovered in place. r3 does not, and is
++expected to be reset instead - the only other way to re-learn.
++"""
++
++import json
++import os
++import sys
++
++import pytest
++
++CWD = os.path.dirname(os.path.realpath(__file__))
++sys.path.append(os.path.join(CWD, "../"))
++
++# pylint: disable=C0413
++from lib import topotest
++from lib.topogen import Topogen, TopoRouter, get_topogen
++
++pytestmark = [pytest.mark.bgpd]
++
++R1_TO_R2 = "2001:db8:1::1"
++R2_ADDR = "2001:db8:1::2"
++R1_TO_R3 = "2001:db8:2::1"
++R3_ADDR = "2001:db8:2::3"
++REDISTRIBUTED_PREFIX = "2001:db8:f::1/128"
++
++
++def build_topo(tgen):
++    for routern in range(1, 4):
++        tgen.add_router("r{}".format(routern))
++
++    switch = tgen.add_switch("s1")
++    switch.add_link(tgen.gears["r1"])
++    switch.add_link(tgen.gears["r2"])
++
++    switch = tgen.add_switch("s2")
++    switch.add_link(tgen.gears["r1"])
++    switch.add_link(tgen.gears["r3"])
++
++
++def setup_module(mod):
++    tgen = Topogen(build_topo, mod.__name__)
++    tgen.start_topology()
++
++    for rname, router in tgen.routers().items():
++        router.load_config(
++            TopoRouter.RD_ZEBRA, os.path.join(CWD, "{}/zebra.conf".format(rname))
++        )
++        router.load_config(
++            TopoRouter.RD_BGP, os.path.join(CWD, "{}/bgpd.conf".format(rname))
++        )
++
++    tgen.gears["r1"].net.daemons["zebra"] = 0
++    tgen.start_router()
++
++    # r1's bgpd has no zebra to configure its peering addresses, and no
++    # interface to derive a router-id from - the latter is in r1/bgpd.conf.
++    tgen.gears["r1"].run("ip -6 addr add {}/64 dev r1-eth0".format(R1_TO_R2))
++    tgen.gears["r1"].run("ip -6 addr add {}/64 dev r1-eth1".format(R1_TO_R3))
++
++
++def teardown_module(mod):
++    tgen = get_topogen()
++    tgen.stop_topology()
++
++
++def _neighbor(router, addr):
++    return json.loads(router.vtysh_cmd("show bgp neighbors {} json".format(addr)))[addr]
++
++
++def test_session_establishes_without_zebra():
++    """The sessions come up, and r1 accepts nothing over them."""
++    tgen = get_topogen()
++
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    r1 = tgen.gears["r1"]
++    r2 = tgen.gears["r2"]
++
++    # Assert the advertisement first: r1 reporting zero prefixes is trivially
++    # true in the moment before r2 has sent anything.
++    def _r2_advertised():
++        output = json.loads(
++            r2.vtysh_cmd(
++                "show bgp ipv6 unicast neighbors {} advertised-routes json".format(
++                    R1_TO_R2
++                )
++            )
++        )
++        return topotest.json_cmp(
++            output, {"advertisedRoutes": {REDISTRIBUTED_PREFIX: {}}}
++        )
++
++    _, result = topotest.run_and_expect(_r2_advertised, None, count=60, wait=1)
++    assert result is None, "r2 never advertised {} to r1".format(REDISTRIBUTED_PREFIX)
++
++    def _established_with_no_prefixes():
++        output = json.loads(r1.vtysh_cmd("show bgp ipv6 unicast summary json"))
++        return topotest.json_cmp(
++            output, {"peers": {R2_ADDR: {"state": "Established", "pfxRcd": 0}}}
++        )
++
++    _, result = topotest.run_and_expect(
++        _established_with_no_prefixes, None, count=60, wait=1
++    )
++    assert result is None, "r1 did not reach Established with an empty table"
++
++    def _r3_established_once():
++        return topotest.json_cmp(
++            _neighbor(r1, R3_ADDR),
++            {"bgpState": "Established", "connectionsEstablished": 1},
++        )
++
++    _, result = topotest.run_and_expect(_r3_established_once, None, count=60, wait=1)
++    assert result is None, "r3 session did not come up exactly once"
++
++
++def test_prefixes_relearned_once_zebra_starts():
++    """Starting zebra resolves the interface and pulls the prefixes back."""
++    tgen = get_topogen()
++
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    r1 = tgen.gears["r1"]
++    r1.startDaemons(["zebra"])
++
++    def _prefix_learned():
++        output = json.loads(
++            r1.vtysh_cmd("show bgp ipv6 unicast {} json".format(REDISTRIBUTED_PREFIX))
++        )
++        return topotest.json_cmp(output, {"prefix": REDISTRIBUTED_PREFIX})
++
++    _, result = topotest.run_and_expect(_prefix_learned, None, count=60, wait=1)
++    assert result is None, "r1 did not re-learn {} after zebra started".format(
++        REDISTRIBUTED_PREFIX
++    )
++
++
++def test_peer_without_route_refresh_is_reset():
++    """r3 cannot be refreshed in place, so it is reset instead."""
++    tgen = get_topogen()
++
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    r1 = tgen.gears["r1"]
++
++    def _r3_reconnected():
++        neighbor = _neighbor(r1, R3_ADDR)
++        if neighbor.get("connectionsEstablished", 0) < 2:
++            return "r3 not reset yet: {}".format(
++                neighbor.get("connectionsEstablished")
++            )
++        # The reset cause distinguishes our CEASE from an unrelated hold-timer
++        # expiry, which would also bump connectionsEstablished.
++        return topotest.json_cmp(
++            neighbor,
++            {
++                "bgpState": "Established",
++                "lastResetDueTo": "Cease: other config change",
++            },
++        )
++
++    _, result = topotest.run_and_expect(_r3_reconnected, None, count=60, wait=1)
++    assert result is None, "r3 was not reset and re-established after zebra started"
++
++
++if __name__ == "__main__":
++    args = ["-s"] + sys.argv[1:]
++    sys.exit(pytest.main(args))
