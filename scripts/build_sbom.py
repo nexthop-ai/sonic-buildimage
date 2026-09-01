@@ -61,7 +61,12 @@ import os
 import re
 import subprocess
 import sys
+import uuid
 from typing import Any, Optional
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import sbom_purl  # noqa: E402  (needs the path set above)
 
 
 def warn(msg: str) -> None:
@@ -162,6 +167,30 @@ def split_env_list(name: str) -> list:
     return [x.strip() for x in os.environ.get(name, "").split() if x.strip()]
 
 
+def serial_number_for(doc: dict) -> str:
+    """A stable identifier for this BOM document, derived from it.
+
+    The point of a serial number is to let anything produced against
+    this BOM — a vulnerability report, a VEX statement, another BOM that
+    includes it — say which document it came from, rather than pointing
+    at a filename that means nothing once the file has moved.
+
+    CycloneDX says a BOM SHOULD get a fresh serial number on every
+    generation. We deliberately do not: README.sbom.md guarantees that
+    two byte-identical builds of the same source produce byte-identical
+    SBOMs, which is why SOURCE_DATE_EPOCH is threaded all the way into
+    the container. A random identifier would quietly retire that
+    guarantee. Deriving it from the content keeps both properties —
+    different documents get different serial numbers, and the same
+    document gets the same one every time.
+    """
+    payload = {k: v for k, v in doc.items() if k != "serialNumber"}
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    return uuid.uuid5(uuid.NAMESPACE_URL, digest).urn
+
+
 def now_iso() -> str:
     epoch = os.environ.get("SOURCE_DATE_EPOCH")
     if epoch:
@@ -195,11 +224,17 @@ def file_sha256(path: str) -> Optional[str]:
         return None
 
 
-def run(cmd: list, timeout: int = 600) -> tuple:
-    """Returns (returncode, stdout, stderr)."""
+def run(cmd: list, timeout: int = 600, env: Optional[dict] = None) -> tuple:
+    """Returns (returncode, stdout, stderr).
+
+    env, when given, is overlaid on the current environment rather than
+    replacing it — a scanner still needs PATH, HOME and its own cache
+    variables to work.
+    """
     try:
         r = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout, check=False
+            cmd, capture_output=True, text=True, timeout=timeout, check=False,
+            env={**os.environ, **env} if env else None,
         )
         return r.returncode, r.stdout, r.stderr
     except subprocess.TimeoutExpired:
@@ -520,11 +555,11 @@ def observation_components_for_scope(
 
     if distro and distro[0]:
         deb_ns = distro[0]
-        deb_qual = f"&distro={distro[0]}-{distro[1]}" if distro[1] else ""
+        deb_distro = f"{distro[0]}-{distro[1]}" if distro[1] else ""
         deb_supplier = distro[0].capitalize()
     else:
         deb_ns = "debian"
-        deb_qual = ""
+        deb_distro = ""
         deb_supplier = supplier
 
     for vfile in find_post_versions(target_path, scope, "deb", arch):
@@ -533,8 +568,9 @@ def observation_components_for_scope(
             if key in seen:
                 continue
             seen.add(key)
-            deb_purl = (
-                f"pkg:deb/{deb_ns}/{name}@{ver}?arch={arch}{deb_qual}"
+            deb_purl = sbom_purl.build(
+                "deb", name, ver, namespace=deb_ns,
+                qualifiers={"arch": arch, "distro": deb_distro},
             )
             comp: dict[str, Any] = {
                 "bom-ref": deb_purl,
@@ -558,12 +594,13 @@ def observation_components_for_scope(
             if key in seen:
                 continue
             seen.add(key)
+            py_purl = sbom_purl.build("pypi", norm, ver)
             comp = {
-                "bom-ref": f"pkg:pypi/{norm}@{ver}",
+                "bom-ref": py_purl,
                 "type": "library",
                 "name": norm,
                 "version": ver,
-                "purl": f"pkg:pypi/{norm}@{ver}",
+                "purl": py_purl,
                 "supplier": {"name": "PyPI"},
                 "properties": [
                     {"name": "sonic:fragment_kind", "value": "observation"},
@@ -588,6 +625,14 @@ def install_scanner(tool: str) -> Optional[str]:
         warn(f"install_sbom_tool.sh {tool} failed (rc={rc}): {err.strip()}")
         return None
     return out.strip() or None
+
+
+# Bumped whenever a change alters what a scan returns for unchanged
+# input. The cache is keyed by the SHA-256 of the scanned file, so
+# without this an entry written before the file components were
+# dropped would be replayed forever — the input did not change, only
+# our reading of it.
+SCANNER_CACHE_VERSION = "v2"
 
 
 def _scanner_cache_dir() -> str:
@@ -618,7 +663,8 @@ def _scanner_cache_lookup(
     sha = file_sha256(fs_path)
     if not sha:
         return None, None
-    cache_file = os.path.join(_scanner_cache_dir(), f"{tool}-{sha}.json")
+    cache_file = os.path.join(
+        _scanner_cache_dir(), f"{tool}-{SCANNER_CACHE_VERSION}-{sha}.json")
     if os.path.isfile(cache_file):
         try:
             with open(cache_file) as f:
@@ -635,7 +681,8 @@ def _scanner_cache_store(tool: str, sha: str, components: list) -> None:
     poison subsequent variants."""
     if not sha or not components:
         return
-    cache_file = os.path.join(_scanner_cache_dir(), f"{tool}-{sha}.json")
+    cache_file = os.path.join(
+        _scanner_cache_dir(), f"{tool}-{SCANNER_CACHE_VERSION}-{sha}.json")
     try:
         tmp = cache_file + ".tmp"
         with open(tmp, "w") as f:
@@ -645,8 +692,19 @@ def _scanner_cache_store(tool: str, sha: str, components: list) -> None:
         warn(f"could not write scanner cache {cache_file}: {e}")
 
 
-def run_scanner(scanner_bin: str, tool: str, scan_target: str) -> list:
+def run_scanner(scanner_bin: str, tool: str, scan_target: str,
+                scope: str = "") -> list:
     """Run scanner against a target; return components[] from output.
+
+    ``scope`` records where the scan looked — "host-image" or
+    "dockers/<name>" — and is stamped onto every component that comes
+    back. syft is invoked once per container and once for the host
+    rootfs, so it already knows which filesystem a package came from;
+    without stamping it here the results are appended to one flat list
+    and that knowledge is lost, which is what left the containment
+    graph empty. Stamping happens after the cache, never before: the
+    cache is keyed by the digest of the scanned file, and the same
+    archive can be reached under more than one name.
 
     scan_target may carry a syft scheme prefix (e.g. 'oci-archive:').
     SONiC's docker .gz files are gzipped OCI archives, and syft's
@@ -675,7 +733,7 @@ def run_scanner(scanner_bin: str, tool: str, scan_target: str) -> list:
     if scheme != "dir" and os.path.isfile(fs_path):
         cache_sha, cached = _scanner_cache_lookup(tool, fs_path)
         if cached is not None:
-            return cached
+            return _scoped(cached, scope)
 
     # syft's oci-archive reader doesn't handle gzip-wrapped tar.
     # Stream-decompress to a temp file for the duration of the scan.
@@ -695,20 +753,43 @@ def run_scanner(scanner_bin: str, tool: str, scan_target: str) -> list:
         scan_target = f"{scheme}:{tmp_path}"
 
     try:
+        scanner_env = None
         if tool == "syft":
             cmd = [scanner_bin, scan_target, "-o", "cyclonedx-json", "-q"]
+            # syft defaults to file.metadata.selection=owned-by-package,
+            # which emitted a `type: file` component — a path and two
+            # digests — for every file on the image. That was 57,332 of
+            # the 65,870 components in a broadcom .bin SBOM, 24.8 MB of
+            # its 54 MB, and none of it was usable: a file component has
+            # no purl, no version and no CPE, so no vulnerability feed
+            # can match it, and the CycloneDX encoder drops syft's
+            # file-ownership relationships, so nothing said which
+            # package a file belonged to either.
+            #
+            # Turning the cataloger off rather than filtering afterwards
+            # also skips hashing every file on the image, which is the
+            # expensive part of the scan.
+            scanner_env = {"SYFT_FILE_METADATA_SELECTION": "none"}
         elif tool == "trivy":
             cmd = [scanner_bin, "fs", "--format", "cyclonedx", "--quiet",
                    scan_target]
         else:
             return []
-        result = _run_scanner_inner(cmd, tool, scan_target)
+        result = _run_scanner_inner(cmd, tool, scan_target, scanner_env)
         if cache_sha and result:
             _scanner_cache_store(tool, cache_sha, result)
-        return result
+        return _scoped(result, scope)
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.unlink(tmp_path)
+
+
+def _scoped(comps: list, scope: str) -> list:
+    """Stamp sonic:scope onto every component in a scan result."""
+    if scope:
+        for c in comps:
+            _add_scope(c, scope)
+    return comps
 
 
 def _is_gzip(path: str) -> bool:
@@ -720,8 +801,9 @@ def _is_gzip(path: str) -> bool:
         return False
 
 
-def _run_scanner_inner(cmd: list, tool: str, scan_target: str) -> list:
-    rc, out, err = run(cmd, timeout=900)
+def _run_scanner_inner(cmd: list, tool: str, scan_target: str,
+                       env: Optional[dict] = None) -> list:
+    rc, out, err = run(cmd, timeout=900, env=env)
     if rc != 0:
         warn(f"{tool} scan of {scan_target} failed (rc={rc}): "
              f"{err.strip()[:200]}")
@@ -732,6 +814,12 @@ def _run_scanner_inner(cmd: list, tool: str, scan_target: str) -> list:
         warn(f"could not parse {tool} output for {scan_target}: {e}")
         return []
     comps = doc.get("components") or []
+    # Belt and braces for the file components the syft config above
+    # already suppresses: trivy is a supported scanner too and has its
+    # own defaults, and a future scanner release could change its mind.
+    # A `type: file` component cannot carry a finding, so there is no
+    # arrangement under which we want one.
+    comps = [c for c in comps if c.get("type") != "file"]
     for c in comps:
         c.setdefault("properties", []).append(
             {"name": "sonic:fragment_kind", "value": "scanner"}
@@ -745,13 +833,6 @@ def _run_scanner_inner(cmd: list, tool: str, scan_target: str) -> list:
 # ---------------------------------------------------------------------------
 # Merge with recipe-emit-wins dedupe
 # ---------------------------------------------------------------------------
-
-
-def _component_arch(c: dict) -> str:
-    for p in c.get("properties") or []:
-        if p.get("name") == "sonic:arch":
-            return p.get("value") or ""
-    return ""
 
 
 # Suffixes that get added downstream of the recipe's filename version
@@ -782,7 +863,7 @@ def _dedupe_keys(c: dict) -> list:
     """All keys a component should match against during dedupe.
 
     Returns the explicit PURL/bom-ref plus two normalized
-    (name, version, arch) tuples — one with raw version (catches exact
+    (name, version) tuples — one with raw version (catches exact
     matches) and one with epoch+suffix stripped (catches the case where
     recipe-emit uses the filename version `10.0p1-7` and the eventual
     installed deb is `1:10.0p1-7+fips`). The two-key approach means:
@@ -790,6 +871,30 @@ def _dedupe_keys(c: dict) -> list:
       - Different upstream versions of the same package stay distinct
         (e.g. bash 5.2.15 in bookworm vs 5.2.37 in trixie).
       - Only the build-system suffix drift collapses.
+
+    Architecture is deliberately not part of the key. It used to be,
+    read from the `sonic:arch` property, and it silently defeated the
+    whole (name, version) key: only recipe-emit and observation
+    fragments carry that property, so every syft component compared as
+    architecture "" and never matched the recipe fragment describing
+    the same .deb. That is what left one package in the SBOM twice
+    under two package URLs.
+
+    Restoring it is not a matter of reading the architecture from
+    somewhere else, because no producer here knows it. The recipe takes
+    it from the .deb's filename, which says `amd64` for a
+    `symcrypt-openssl` whose control file says `all`; the observation
+    stamps CONFIGURED_ARCH on everything, which says `amd64` for
+    `Architecture: all` packages like ifupdown2 and initramfs-tools;
+    only syft reads dpkg. Three guesses that disagree cannot be a
+    component of identity.
+
+    Nor is it needed for one. A CycloneDX document produced here
+    describes a single image built for a single target architecture,
+    and dpkg will not install one name at one version twice within it.
+    If SONiC ever emits a multi-arch SBOM, the prerequisite is all
+    three producers reading dpkg's own `Architecture:` field — not
+    reinstating a key two of them fill in by guessing.
     """
     keys = []
     purl = c.get("purl")
@@ -800,16 +905,15 @@ def _dedupe_keys(c: dict) -> list:
         keys.append(("bom-ref", bom_ref))
     name = (c.get("name") or "").lower()
     version = c.get("version") or ""
-    arch = _component_arch(c)
     if name and version:
-        keys.append(("nva", name, version, arch))
+        keys.append(("nv", name, version))
         # Always emit the normalized key, even when normalize is a no-op,
         # so that a recipe-emit component (whose filename version usually
         # IS the normalized form) shares a key with the observation
         # component (whose dpkg version carries the +fips/+sonic/epoch
         # noise). Without this, the two never see each other.
         norm = _normalize_version(version) or version
-        keys.append(("nva-norm", name, norm, arch))
+        keys.append(("nv-norm", name, norm))
     return keys
 
 
@@ -845,7 +949,50 @@ def _is_kernel_image(name: str) -> bool:
     return True
 
 
-def build_dependency_graph(components: list) -> list:
+def container_name(docker_filename: str) -> str:
+    """'docker-fpm-frr[-dbg].gz' -> 'docker-fpm-frr'.
+
+    The container component, its sonic:scope label and the scanner
+    invocation all have to agree on this, and they each used to spell
+    it out separately.
+    """
+    return docker_filename.replace(".gz", "").replace("-dbg", "")
+
+
+def _scope_values(c: dict) -> set:
+    """Every scope a component was observed in.
+
+    Multi-valued because containment genuinely is: libc is in every
+    container, and recording only the first one seen would make the
+    other twenty look as though they did not ship it.
+    """
+    for p in c.get("properties") or []:
+        if p.get("name") == "sonic:scope":
+            return set((p.get("value") or "").split())
+    return set()
+
+
+def _add_scope(c: dict, scope: str) -> None:
+    """Record that a component was observed in ``scope``.
+
+    Space-separated, matching sonic:build_depends and
+    sonic:unresolved_deps. No scope value contains a space.
+    """
+    if not scope:
+        return
+    props = c.setdefault("properties", [])
+    for p in props:
+        if p.get("name") == "sonic:scope":
+            vals = set((p.get("value") or "").split())
+            vals.add(scope)
+            p["value"] = " ".join(sorted(vals))
+            return
+    props.append({"name": "sonic:scope", "value": scope})
+
+
+def build_dependency_graph(components: list, root_ref: str = "",
+                           root_contains_all: bool = False,
+                           installed: Optional[set] = None) -> list:
     """Return a CycloneDX dependencies[] array recording the edges
     we can derive from recipe-emit metadata.
 
@@ -879,6 +1026,29 @@ def build_dependency_graph(components: list) -> list:
          bom-ref so a consumer can walk swss_*.deb -> tokio@1.x or
          sonic-gnmi_*.deb -> github.com/openconfig/gnmi@v0.10 without
          parsing properties.
+
+      4. Containment: the image -> the containers it installs, and each
+         container -> the packages inside it. Without this the document
+         had no root at all: nothing descended from the image component,
+         the container components appeared in no edge, and 7,569 of
+         8,538 packages sat with no edge in either direction. A consumer
+         could see that a package was vulnerable but not which container
+         shipped it, which is the first thing anyone triaging asks.
+
+         Placement comes from sonic:scope, which every observation and
+         scanner component now carries. A component we cannot place is
+         left unrooted rather than attached to the image on the grounds
+         that it must be somewhere — that would report a containment
+         nobody observed.
+
+    ``installed`` names the containers the image actually installs.
+    Every container fragment in target/ reaches this function —
+    slave.mk emits one for each docker it saves, including the test
+    containers that ship in no .bin — so without it the image claims
+    to contain whatever else happened to be built alongside it.
+
+    ``root_contains_all`` is for the per-container documents, where
+    every component is in the one container by construction.
     """
     # filename -> bom-ref lookup over the merged component set. The
     # same resolution path is used by all three edge classes that need
@@ -984,6 +1154,34 @@ def build_dependency_graph(components: list) -> list:
         if deb_ref and deb_ref != crate_ref:
             edges.setdefault(deb_ref, set()).add(crate_ref)
 
+    # (4) containment: image -> containers -> packages
+    if root_ref:
+        container_ref_for: dict = {}
+        for c in components:
+            if c.get("type") == "container" and c.get("bom-ref") and c.get("name"):
+                if installed is not None and c["name"] not in installed:
+                    continue
+                container_ref_for[c["name"]] = c["bom-ref"]
+
+        for cref in container_ref_for.values():
+            if cref != root_ref:
+                edges.setdefault(root_ref, set()).add(cref)
+
+        for c in components:
+            ref = c.get("bom-ref")
+            if not ref or ref == root_ref or c.get("type") == "container":
+                continue
+            if root_contains_all:
+                edges.setdefault(root_ref, set()).add(ref)
+                continue
+            for scope in _scope_values(c):
+                if scope == "host-image":
+                    edges.setdefault(root_ref, set()).add(ref)
+                elif scope.startswith("dockers/"):
+                    cref = container_ref_for.get(scope[len("dockers/"):])
+                    if cref and cref != ref:
+                        edges.setdefault(cref, set()).add(ref)
+
     deps = [
         {"ref": ref, "dependsOn": sorted(targets)}
         for ref, targets in edges.items()
@@ -992,8 +1190,47 @@ def build_dependency_graph(components: list) -> list:
     return deps
 
 
+def check_dependency_graph(deps: list, components: list, root_ref: str,
+                           installed: Optional[set] = None) -> list:
+    """Problems with a finished dependencies[] graph, as readable lines.
+
+    Nothing downstream validates this. grype reads components[] and
+    ignores the graph entirely, so a document that says the image
+    contains a container it never shipped is published, attested and
+    consumed without a single build going red. These are the three
+    ways the graph can lie that are checkable from the document alone.
+    """
+    problems = []
+    known = {c["bom-ref"] for c in components if c.get("bom-ref")}
+    if root_ref:
+        known.add(root_ref)
+    container_names = {
+        c["bom-ref"]: c.get("name")
+        for c in components
+        if c.get("type") == "container" and c.get("bom-ref")
+    }
+
+    for d in deps:
+        ref = d.get("ref")
+        if ref not in known:
+            problems.append(f"{ref} depends on things but is not in the document")
+        for tgt in d.get("dependsOn", []):
+            if tgt not in known:
+                problems.append(f"{ref} -> {tgt}, which is not in the document")
+            if tgt == ref:
+                problems.append(f"{ref} depends on itself")
+            if (installed is not None and ref == root_ref
+                    and tgt in container_names
+                    and container_names[tgt] not in installed):
+                problems.append(
+                    f"image claims to contain container "
+                    f"{container_names[tgt]}, which it does not install"
+                )
+    return problems
+
+
 def merge_components(*sources: list) -> list:
-    """Dedupe by (purl) and (name, version, arch). Sources are passed in
+    """Dedupe by (purl) and (name, version). Sources are passed in
     PRIORITY order; first occurrence wins for the base record. But for
     components dropped by dedupe, we *promote* their CPE list onto the
     winner — recipe-emit fragments carry rich SONiC provenance but no
@@ -1009,7 +1246,13 @@ def merge_components(*sources: list) -> list:
                 continue
             winner_idx = next((seen[k] for k in keys if k in seen), None)
             if winner_idx is not None:
-                _promote_cpe(out[winner_idx], c)
+                winner = out[winner_idx]
+                _promote_cpe(winner, c)
+                _promote_scope(winner, c)
+                # Promotion can rewrite the winner's identifier, and a
+                # later source may spell the package that new way.
+                for k in _promote_distro(winner, c):
+                    seen.setdefault(k, winner_idx)
                 continue
             for k in keys:
                 seen[k] = len(out)
@@ -1032,6 +1275,54 @@ def _promote_cpe(winner: dict, loser: dict) -> None:
     cpes = loser.get("cpes")
     if cpes and not winner.get("cpes"):
         winner["cpes"] = cpes
+
+
+def _promote_distro(winner: dict, loser: dict) -> list:
+    """Carry a deduped-out record's `distro=` qualifier onto the winner.
+
+    Returns the dedupe keys the winner newly answers to, so the caller
+    can register them.
+
+    The recipe-emit fragment wins the dedupe because it knows what was
+    built, but it names the package `pkg:deb/sonic/openssl` — a SONiC
+    rebuild is not the Debian package, and saying so is the point of
+    the namespace. Only syft, which read the dpkg database on a real
+    filesystem, knows which Debian release that rebuild was installed
+    on, and it records that as a `distro=` qualifier.
+
+    Before these two records merged they both survived into the
+    document, so the qualifier reached grype on the syft copy. Now that
+    they merge, dropping the loser wholesale would take the distro
+    context with it for the 56 packages that have one — openssl, krb5,
+    bash, frr among them — and grype selects an OS advisory feed with
+    it. So it moves to the winner, which is the same reasoning that
+    already moves the CPE.
+    """
+    want = sbom_purl.qualifiers_of(loser.get("purl") or "").get("distro")
+    if not want:
+        return []
+    purl = winner.get("purl")
+    if not purl or sbom_purl.qualifiers_of(purl).get("distro"):
+        return []
+    promoted = sbom_purl.with_qualifier(purl, "distro", want)
+    if promoted == purl:
+        return []
+    if winner.get("bom-ref") == purl:
+        winner["bom-ref"] = promoted
+    winner["purl"] = promoted
+    return [("purl", promoted)]
+
+
+def _promote_scope(winner: dict, loser: dict) -> None:
+    """Carry a deduped-out record's scopes onto the winner.
+
+    A recipe-emit fragment describes what was built and outranks a
+    scanner observation of the same package, but only the observation
+    knows where it ended up. Dropping the loser wholesale would discard
+    exactly the placement the containment graph is built from.
+    """
+    for scope in _scope_values(loser):
+        _add_scope(winner, scope)
 
 
 # ---------------------------------------------------------------------------
@@ -1216,7 +1507,7 @@ def _container_main(container_filename: str) -> int:
         info(f"container archive not found: {gz_path}; skipping.")
         return 0
 
-    cname = container_filename.replace(".gz", "").replace("-dbg", "")
+    cname = container_name(container_filename)
     out_path = os.path.join(
         target_path, f"{container_filename}.sbom.cdx.json"
     )
@@ -1284,7 +1575,7 @@ def _container_main(container_filename: str) -> int:
             else:
                 target_spec = gz_path
             scanner_components = run_scanner(
-                scanner_bin, scan_tool, target_spec,
+                scanner_bin, scan_tool, target_spec, scope=scope,
             )
     info(f"Scanner cross-check: {len(scanner_components)} components")
 
@@ -1350,9 +1641,23 @@ def _container_main(container_filename: str) -> int:
         ),
     }
 
-    deps = build_dependency_graph(all_components)
+    # Everything in a per-container document is in that container by
+    # construction, so the root contains all of it.
+    container_root = container_comp.get("bom-ref", cname)
+    deps = build_dependency_graph(
+        all_components,
+        root_ref=container_root,
+        root_contains_all=True,
+    )
     if deps:
         sbom["dependencies"] = sorted(deps, key=lambda d: d.get("ref", ""))
+        for problem in check_dependency_graph(
+            deps, all_components, container_root,
+        ):
+            warn(f"dependency graph: {problem}")
+
+    # Derived from the finished document, so it must be set last.
+    sbom["serialNumber"] = serial_number_for(sbom)
 
     try:
         with open(out_path, "w") as f:
@@ -1476,7 +1781,7 @@ def main() -> int:
         # The docker filename in the installer list may be e.g.
         # 'docker-fpm-frr.gz' or 'docker-fpm-frr-dbg.gz'.
         gz_path = os.path.join(target_path, docker)
-        cname = docker.replace(".gz", "").replace("-dbg", "")
+        cname = container_name(docker)
 
         # Build a container-typed parent component (use recipe fragment
         # if present, otherwise synthesize).
@@ -1541,7 +1846,8 @@ def main() -> int:
                     target_spec = fsroot
                 info(f"Scanning host rootfs: {fsroot}")
                 scanner_components.extend(
-                    run_scanner(scanner_bin, scan_tool, target_spec)
+                    run_scanner(scanner_bin, scan_tool, target_spec,
+                                scope="host-image")
                 )
             else:
                 info(f"host rootfs not found at {fsroot}; "
@@ -1557,7 +1863,8 @@ def main() -> int:
                     else:
                         target_spec = gz_path
                     scanner_components.extend(
-                        run_scanner(scanner_bin, scan_tool, target_spec)
+                        run_scanner(scanner_bin, scan_tool, target_spec,
+                                    scope=f"dockers/{container_name(docker)}")
                     )
 
     info(f"Scanner cross-check: {len(scanner_components)} components")
@@ -1627,11 +1934,32 @@ def main() -> int:
         ),
     }
 
-    # Build the dependencies[] graph: kernel modules -> kernel image.
-    deps = build_dependency_graph(all_components)
+    # Build the dependencies[] graph, rooted at the image component so
+    # the document describes one tree rather than a pile of fragments.
+    root_ref = f"sonic-{target_machine}"
+    installed = {container_name(d) for d in installer_dockers}
+    deps = build_dependency_graph(
+        all_components, root_ref=root_ref, installed=installed,
+    )
     if deps:
         sbom["dependencies"] = sorted(deps, key=lambda d: d.get("ref", ""))
-        info(f"Dependencies: {len(deps)} kernel-module edges")
+        edge_count = sum(len(d.get("dependsOn", [])) for d in deps)
+        placed = set()
+        for d in deps:
+            placed.update(d.get("dependsOn", []))
+        unplaced = sum(
+            1 for c in all_components
+            if c.get("bom-ref") and c["bom-ref"] not in placed
+        )
+        info(f"Dependencies: {len(deps)} refs, {edge_count} edges; "
+             f"{unplaced} components not placed under any parent")
+        for problem in check_dependency_graph(
+            deps, all_components, root_ref, installed,
+        ):
+            warn(f"dependency graph: {problem}")
+
+    # Derived from the finished document, so it must be set last.
+    sbom["serialNumber"] = serial_number_for(sbom)
 
     try:
         with open(out_path, "w") as f:
