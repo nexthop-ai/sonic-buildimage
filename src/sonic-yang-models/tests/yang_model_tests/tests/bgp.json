@@ -249,6 +249,65 @@
     "BGP_SENTINEL_INVALID_RANGE_IPV6": {
         "desc": "does not satisfy.",
         "eStr": "Invalid value \"fc00:f0::/129\" in \"ip_range\" element."
+<<<<<<< HEAD
+=======
+    },
+    "BGP_NEIGHBOR_V6ONLY_ETHERNET_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on Ethernet interface."
+    },
+    "BGP_NEIGHBOR_V6ONLY_PORTCHANNEL_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on PortChannel interface."
+    },
+    "BGP_NEIGHBOR_V6ONLY_VLAN_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on Vlan interface."
+    },
+    "BGP_NEIGHBOR_V6ONLY_IP_INVALID": {
+        "desc": "v6only cannot be configured for IP-based BGP neighbors.",
+        "eStr": "v6only can only be configured for interface-based BGP neighbors"
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_ETHERNET_VALID": {
+        "desc": "Configure BGP interface neighbor on Ethernet interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_PORTCHANNEL_VALID": {
+        "desc": "Configure BGP interface neighbor on PortChannel interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_VLAN_VALID": {
+        "desc": "Configure BGP interface neighbor on Vlan interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_V6ONLY_ETHERNET_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on Ethernet interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_V6ONLY_IP_INVALID": {
+        "desc": "v6only cannot be configured for IP-based BGP neighbors in BGP_NEIGHBOR_TEMPLATE_LIST.",
+        "eStr": "v6only can only be configured for interface-based BGP neighbors"
+    },
+    "BGP_NEIGHBOR_NO_HW_OFFLOAD_BFD_UNRESTRICTED": {
+        "desc": "Without hardware BFD offload (NPU switch) bfd can be enabled without profile/full timer set and with any FRR-legal interval; the offload-only musts do not apply."
+    },
+    "BGP_NEIGHBOR_NEG_NO_ASN_NO_PEER_GROUP": {
+        "desc": "Configure an address-based BGP neighbor carrying neither an asn nor a peer group.",
+        "eStr": ["A BGP neighbor must carry an asn."]
+    },
+    "BGP_NEIGHBOR_PEER_GROUP_ONLY_VALID": {
+        "desc": "With no DEVICE_METADATA to name the routing mode, an address-based BGP neighbor carrying a peer group and no asn stays valid, so subset validation still works."
+    },
+    "BGP_NEIGHBOR_INTERFACE_NO_ASN_VALID": {
+        "desc": "With no DEVICE_METADATA to name the routing mode, an interface-attached BGP neighbor carrying no asn stays valid, so subset validation still works."
+    },
+    "BGP_NEIGHBOR_INTF_NO_ASN_BGPCFGD_NEG": {
+        "desc": "Under bgpcfgd an interface-attached BGP neighbor carrying no asn is rejected; bgpcfgd renders its remote-as from asn alone.",
+        "eStr": ["A BGP neighbor must carry an asn."]
+    },
+    "BGP_NEIGHBOR_INTF_NO_ASN_FRR_VALID": {
+        "desc": "Under frrcfgd an interface-attached BGP neighbor carrying no asn stays valid."
+    },
+    "BGP_NEIGHBOR_PEER_GROUP_ONLY_BGPCFGD_NEG": {
+        "desc": "Under bgpcfgd a BGP neighbor carrying only a peer group is rejected; bgpcfgd never reads peer_group_name.",
+        "eStr": ["A BGP neighbor must carry an asn."]
+    },
+    "BGP_NEIGHBOR_TEMPLATE_NEG_NO_ASN": {
+        "desc": "Configure a template-based BGP neighbor carrying no asn.",
+        "eStr": ["A template based BGP neighbor must carry an asn."]
+>>>>>>> 6171846e8 (NOS-13498: [sonic-yang-models] require an asn (or a peer group) on both BGP neighbor lists (#8830))
     }
 }
-
