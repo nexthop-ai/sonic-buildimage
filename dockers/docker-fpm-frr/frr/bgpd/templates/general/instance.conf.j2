@@ -24,6 +24,7 @@
     neighbor {{ neighbor_addr }} activate
   exit-address-family
 {% endif %}
+<<<<<<< HEAD
 {% if bgp_session.get('address_family', 'both') in ['both', 'v6'] %}
   address-family ipv6
 {%   if 'rrclient' in bgp_session and bgp_session['rrclient'] | int != 0 %}
@@ -33,9 +34,40 @@
   exit-address-family
 {% endif %}
 {% elif neighbor_addr | ipv4 %}
-  address-family ipv4
-    neighbor {{ neighbor_addr }} peer-group PEER_V4
+=======
 !
+{# Address family handling: IPv4 neighbors in ipv4 AF, IPv6 and interface neighbors in ipv6 AF #}
+{# In BGP confederation, confed-external neighbors (ASN not equal to the local  #}
+{# member ASN and not in the confederation peers list, e.g. T3) are 'external'  #}
+{# to FRR and cannot share a peer-group with confed-internal neighbors. Send    #}
+{# them to PEER_EXTERNAL_* (same route-maps). Non-confed devices are unchanged. #}
+{% set confed_peers = [] %}
+{% if (CONFIG_DB__BGP_DEVICE_GLOBAL is defined) and ('CONFED' in CONFIG_DB__BGP_DEVICE_GLOBAL) and ('peers' in CONFIG_DB__BGP_DEVICE_GLOBAL['CONFED']) %}
+{%   set confed_peers = (CONFIG_DB__BGP_DEVICE_GLOBAL['CONFED']['peers'] | replace(';', ' ')).split() %}
+{% endif %}
+{% set is_confed_external = (CONFIG_DB__BGP_DEVICE_GLOBAL is defined) and ('CONFED' in CONFIG_DB__BGP_DEVICE_GLOBAL) and ('asn' in CONFIG_DB__BGP_DEVICE_GLOBAL['CONFED']) and ((bgp_session['asn'] | string) != (bgp_asn | string)) and ((bgp_session['asn'] | string) not in confed_peers) %}
+{% if neighbor_addr | ipv4 %}
+>>>>>>> d75664d84 (NOS-15445: [bgpcfgd] split confed-external peers into PEER_EXTERNAL peer-groups (#8861))
+  address-family ipv4
+{% if is_confed_external %}
+    neighbor {{ neighbor_addr }} peer-group PEER_EXTERNAL_V4
+{% else %}
+    neighbor {{ neighbor_addr }} peer-group PEER_V4
+{% endif %}
+!
+<<<<<<< HEAD
+=======
+{% elif neighbor_addr | ipv6 or (is_interface_neighbor is defined and is_interface_neighbor) %}
+  address-family ipv6
+{% if is_confed_external %}
+    neighbor {{ neighbor_addr }} peer-group PEER_EXTERNAL_V6
+{% else %}
+    neighbor {{ neighbor_addr }} peer-group PEER_V6
+{% endif %}
+!
+{% endif %}
+!
+>>>>>>> d75664d84 (NOS-15445: [bgpcfgd] split confed-external peers into PEER_EXTERNAL peer-groups (#8861))
 {%   if 'rrclient' in bgp_session and bgp_session['rrclient'] | int != 0 %}
     neighbor {{ neighbor_addr }} route-reflector-client
 {%   endif %}
