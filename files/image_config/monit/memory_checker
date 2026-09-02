@@ -26,6 +26,7 @@ import sys
 import syslog
 import re
 import time
+from datetime import datetime
 
 import docker
 
@@ -37,7 +38,6 @@ EVENTS_PUBLISHER_TAG = "mem-threshold-exceeded"
 CGROUP_DOCKER_MEMORY_DIR = "/sys/fs/cgroup/system.slice/docker-"
 
 # Define common error codes
-ERROR_CONTAINER_ID_NOT_FOUND = "[memory_checker] Failed to get container ID of '{}'! Exiting ..."
 ERROR_CGROUP_MEMORY_USAGE_NOT_FOUND = "[memory_checker] cgroup memory usage file '{}' of container '{}' does not exist on device! Exiting ..."
 ERROR_CONTAINER_MEMORY_USAGE_NOT_FOUND = "[memory_checker] Failed to get the memory usage of container '{}'! Exiting ..."
 ERROR_CONTAINER_CACHE_USAGE_NOT_FOUND = "[memory_checker] Failed to get the cache usage of container '{}'! Exiting ..."
@@ -57,30 +57,31 @@ def validate_container_id(container_id):
         syslog.syslog(syslog.LOG_ERR, "Invalid container_id: {}".format(container_id))
         sys.exit(INTERNAL_ERROR)
 
-def get_command_result(command):
-    """Executes the command and return the resulting output.
+CHECK_START_TIME = time.time()
 
+def exit_if_container_not_running(container_id):
+    """Exits benignly when the monitored container stopped or restarted while
+    this check was running (either way its cgroup files were removed). If the
+    container has been running since before the check began, returns so the
+    caller reports its original error.
     Args:
-        command: A string contains the command to be executed.
-
+        container_id: A string indicates the full ID of a container.
     Returns:
-        A string which contains the output of command.
+        None.
     """
-    command_stdout = ""
-
     try:
-        proc_instance = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                         universal_newlines=True)
-        command_stdout, command_stderr = proc_instance.communicate()
-        if proc_instance.returncode != 0:
-            syslog.syslog(syslog.LOG_ERR, "[memory_checker] Failed to execute the command '{}'. Return code: '{}'"
-                          .format(' '.join(command), proc_instance.returncode))
-            sys.exit(INTERNAL_ERROR)
-    except (OSError, ValueError) as err:
-        syslog.syslog(syslog.LOG_ERR, "[memory_checker] Failed to execute the command '{}'. Error: '{}'"
-                      .format(' '.join(command), err))
-        sys.exit(INTERNAL_ERROR)
+        docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        state = docker_client.containers.get(container_id).attrs["State"]
+        if state["Status"] == "running":
+            started_at = datetime.fromisoformat(state["StartedAt"])
+            if started_at.timestamp() < CHECK_START_TIME:
+                return
+    except docker.errors.NotFound:
+        pass
+    except (docker.errors.APIError, docker.errors.DockerException, KeyError, ValueError):
+        return
 
+<<<<<<< HEAD
     return command_stdout.strip()
 
 class _ContainerNotRunning:
@@ -152,6 +153,12 @@ def get_container_id(container_name):
         sys.exit(INTERNAL_ERROR)
 
     return container_id
+=======
+    syslog.syslog(syslog.LOG_INFO,
+                  "[memory_checker] Exits without checking memory usage since container '{}' is not running!"
+                  .format(container_id))
+    sys.exit(CONTAINER_NOT_RUNNING)
+>>>>>>> 328533601 (NOS-15064: [memory_checker] Resolve container ID from the running-container snapshot to avoid transient lookup race (#8983))
 
 def get_memory_usage(container_id, container_name):
     """Reads the container's memory usage from the control group subsystem's file
@@ -176,11 +183,19 @@ def get_memory_usage(container_id, container_name):
             else:
                 break
         except IOError:
+<<<<<<< HEAD
             exit_if_container_stopped(container_name, container_id)
             syslog.syslog(syslog.LOG_ERR, ERROR_CONTAINER_MEMORY_USAGE_NOT_FOUND.format(container_id))
             sys.exit(INTERNAL_ERROR)
 
     exit_if_container_stopped(container_name, container_id)
+=======
+            exit_if_container_not_running(container_id)
+            syslog.syslog(syslog.LOG_ERR, ERROR_CONTAINER_MEMORY_USAGE_NOT_FOUND.format(container_id))
+            sys.exit(INTERNAL_ERROR)
+
+    exit_if_container_not_running(container_id)
+>>>>>>> 328533601 (NOS-15064: [memory_checker] Resolve container ID from the running-container snapshot to avoid transient lookup race (#8983))
     syslog.syslog(syslog.LOG_ERR, ERROR_CGROUP_MEMORY_USAGE_NOT_FOUND.format(docker_memory_usage_file_path, container_id))
     sys.exit(INTERNAL_ERROR)
 
@@ -199,7 +214,11 @@ def get_inactive_cache_usage(container_id, container_name):
 
     docker_memory_stat_file_path = CGROUP_DOCKER_MEMORY_DIR + container_id + ".scope/memory.stat"
     if not os.path.exists(docker_memory_stat_file_path):
+<<<<<<< HEAD
         exit_if_container_stopped(container_name, container_id)
+=======
+        exit_if_container_not_running(container_id)
+>>>>>>> 328533601 (NOS-15064: [memory_checker] Resolve container ID from the running-container snapshot to avoid transient lookup race (#8983))
         syslog.syslog(syslog.LOG_ERR, ERROR_CGROUP_MEMORY_STATS_NOT_FOUND.format(docker_memory_stat_file_path, container_id))
         sys.exit(INTERNAL_ERROR)
 
@@ -215,7 +234,11 @@ def get_inactive_cache_usage(container_id, container_name):
                         sys.exit(INTERNAL_ERROR)
                     break
     except IOError as err:
+<<<<<<< HEAD
         exit_if_container_stopped(container_name, container_id)
+=======
+        exit_if_container_not_running(container_id)
+>>>>>>> 328533601 (NOS-15064: [memory_checker] Resolve container ID from the running-container snapshot to avoid transient lookup race (#8983))
         syslog.syslog(syslog.LOG_ERR, ERROR_CONTAINER_CACHE_USAGE_NOT_FOUND.format(container_id))
         sys.exit(INTERNAL_ERROR)
 
@@ -231,12 +254,13 @@ def publish_events(container_name, mem_usage_bytes, threshold_value):
     swsscommon.events_deinit_publisher(events_handle)
 
 
-def check_memory_usage(container_name, threshold_value):
+def check_memory_usage(container_name, container_id, threshold_value):
     """Checks the memory usage of a container from its cgroup subsystem and writes an alerting
     messages into the syslog if the memory usage is larger than the threshold value.
 
     Args:
         container_name: A string represtents name of a container
+        container_id: A string indicates the full ID of the container.
         threshold_value: An integer indicates the threshold value (Bytes) of memory usage.
 
     Returns:
@@ -246,7 +270,6 @@ def check_memory_usage(container_name, threshold_value):
         syslog.syslog(syslog.LOG_ERR, "[memory_checker] Invalid threshold value! Threshold value should be a positive integer.")
         sys.exit(INVALID_VALUE)
 
-    container_id = get_container_id(container_name)
     syslog.syslog(syslog.LOG_INFO, "[memory_checker] Container ID of '{}' is: '{}'."
                   .format(container_name, container_id))
 
@@ -288,35 +311,41 @@ def is_service_active(service_name):
     return status.returncode == 0
 
 
-def get_running_container_names():
-    """Retrieves names of running containers by talking to the docker daemon.
+def get_running_containers():
+    """Retrieves names and IDs of running containers by talking to the docker daemon.
 
     Args:
         None.
 
     Returns:
-        running_container_names: A list indicates names of running containers.
+        running_containers: A dict mapping names of running containers to their full IDs.
     """
     try:
         docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+<<<<<<< HEAD
         try:
             running_container_list = docker_client.containers.list(filters={"status": "running"},
                                                                    ignore_removed=True)
             running_container_names = [ container.name for container in running_container_list ]
         finally:
             docker_client.close()
+=======
+        running_container_list = docker_client.containers.list(filters={"status": "running"},
+                                                               ignore_removed=True)
+        running_containers = { container.name: container.id for container in running_container_list }
+>>>>>>> 328533601 (NOS-15064: [memory_checker] Resolve container ID from the running-container snapshot to avoid transient lookup race (#8983))
     except (docker.errors.APIError, docker.errors.DockerException) as err:
         if not is_service_active("docker"):
             syslog.syslog(syslog.LOG_INFO,
                           "[memory_checker] Docker service is not running. Error message is: '{}'".format(err))
-            return []
+            return {}
 
         syslog.syslog(syslog.LOG_ERR,
                       "Failed to retrieve the running container list from docker daemon! Error message is: '{}'"
                       .format(err))
         sys.exit(INTERNAL_ERROR)
 
-    return running_container_names
+    return running_containers
 
 
 def main():
@@ -335,9 +364,9 @@ def main():
                       .format(args.container_name))
         sys.exit(NO_ERROR)
 
-    running_container_names = get_running_container_names()
-    if args.container_name in running_container_names:
-        check_memory_usage(args.container_name, args.threshold_value)
+    running_containers = get_running_containers()
+    if args.container_name in running_containers:
+        check_memory_usage(args.container_name, running_containers[args.container_name], args.threshold_value)
     else:
         syslog.syslog(syslog.LOG_INFO,
                       "[memory_checker] Exits without checking memory usage since container '{}' is not running!"
