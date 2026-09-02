@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from enum import Enum
 from itertools import groupby
 from typing import Any, cast
+<<<<<<< HEAD
 from sonic_platform.dpm_base import (
     DpmRecord,
     DpmType,
@@ -21,6 +22,14 @@ from sonic_platform.dpm_base import (
     RebootCause,
     timestamp_as_string,
 )
+=======
+from sonic_platform_base.sonic_blackbox.blackbox_record_base import BlackBoxRecordBase
+from sonic_platform.reboot_cause_manager import RebootCause, PowerUpEntry, timestamp_as_string
+from sonic_platform.dpm import Dpm, DpmType
+from sonic_platform.rtc import RTCSyncable
+from nexthop_utils.platform_utils import wait_until
+
+>>>>>>> a15531326 (NOS-12926: Centralize Updating RTC Clocks (#8868))
 from sonic_py_common import syslogger
 
 
@@ -501,7 +510,12 @@ def trim_record_dict(dict_representation: dict[str, str]) -> dict[str, str]:
     return {k: dict_representation[k] for k in KEYS_TO_KEEP if k in dict_representation}
 
 
+<<<<<<< HEAD
 class Adm1266(DpmBase, type=DpmType.ADM1266, max_powerup_counter=65535):
+=======
+@Dpm.register_device("adm1266")
+class Adm1266(Dpm, RTCSyncable):
+>>>>>>> a15531326 (NOS-12926: Centralize Updating RTC Clocks (#8868))
     """ADM1266 device."""
 
     NVMEM_CELL_IDX = 0
@@ -577,6 +591,10 @@ class Adm1266(DpmBase, type=DpmType.ADM1266, max_powerup_counter=65535):
 
         with open(self._rtc_epoch_offset_path, "w") as file:
             file.write(str(epoch_offset_sec))
+        return True
+
+    def rtc_sync(self) -> bool:
+        return self.set_rtc_epoch_offset()
 
     def read_raw_records(self) -> list[bytes]:
         """Reads the blackbox data from the nvmem sysfs file.

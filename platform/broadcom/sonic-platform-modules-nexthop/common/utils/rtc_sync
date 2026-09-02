@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# Copyright 2026 Nexthop Systems Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+import sys
+
+from sonic_platform.chassis import Chassis
+from sonic_platform.rtc import RTCSyncable
+from sonic_py_common import syslogger
+from sonic_platform.platform import Platform
+
+SYSLOG_IDENTIFIER = "rtc_sync"
+logger = syslogger.SysLogger(SYSLOG_IDENTIFIER)
+
+
+def main():
+    """Synchronizes the RTC of all RTC-capable devices."""
+
+    try:
+        chassis: Chassis = Platform().get_chassis()
+    except Exception as e:
+        logger.log_error(f"Failed to enumerate chassis devices: {e}")
+        return 1
+
+    devices = [
+        device
+        for key in (chassis.plugin_data or {})
+        for device in chassis.get_all_devices(key)
+    ]
+
+    errors = 0
+    for device in devices:
+        if not isinstance(device, RTCSyncable):
+            continue
+        name = device.get_name()
+        logger.log_info(f"Attempting to RTC sync {name}")
+        try:
+            if not device.rtc_sync():
+                logger.log_error(f"RTC sync failed on device {name}")
+                errors += 1
+        except Exception as e:
+            logger.log_error(f"RTC sync on {name} caused exception: {e}")
+            errors += 1
+
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

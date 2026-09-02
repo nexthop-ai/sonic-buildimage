@@ -1,10 +1,10 @@
 [Unit]
-Description=Synchronize ADM1266 RTC every 5 minutes
+Description=Synchronize platform device RTCs every 5 minutes
 After=pddf-platform-init.service
 Requires=pddf-platform-init.service
 
 [Timer]
-Unit=adm1266-rtc-sync.service
+Unit=rtc-sync.service
 
 # Run every 5 minutes
 OnUnitActiveSec=5min

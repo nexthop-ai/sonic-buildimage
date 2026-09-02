@@ -1,0 +1,74 @@
+#!/bin/bash
+# Finch (NH-5210) postinst — common services only.
+
+# Generate platform-specific YANG models and CONFIG_DB defaults from templates
+YANG_TEMPLATE_DIR="/usr/local/platform-yang-templates"
+YANG_OUTPUT_DIR="/usr/local/platform-yang-models"
+CONFIG_TEMPLATE_DIR="/usr/local/platform-config-templates"
+INIT_CFG="/etc/sonic/init_cfg.json"
+SCRIPT_NAME=$(basename "$0")
+PLATFORM_SUFFIX=$(echo "$SCRIPT_NAME" | sed 's/^sonic-platform-//' | sed 's/\.postinst$//')
+PLATFORM_NAME="x86_64-${PLATFORM_SUFFIX}"
+PLATFORM_NAME=$(echo "$PLATFORM_NAME" | sed 's/nexthop-/nexthop_/')
+FEATURE_CAPABILITIES_JSON="/usr/share/sonic/device/${PLATFORM_NAME}/feature_capabilities.json"
+
+if [ -f "$FEATURE_CAPABILITIES_JSON" ] && command -v j2 >/dev/null 2>&1; then
+    # Generate YANG deviation models
+    if [ -d "$YANG_TEMPLATE_DIR" ]; then
+        mkdir -p "$YANG_OUTPUT_DIR"
+
+        for template in "$YANG_TEMPLATE_DIR"/*.yang.j2; do
+            [ -e "$template" ] || continue
+            filename=$(basename "$template" .j2)
+            output_file="$YANG_OUTPUT_DIR/$filename"
+
+            if j2 "$template" "$FEATURE_CAPABILITIES_JSON" > "$output_file" 2>/dev/null; then
+                echo "Generated: $output_file"
+            else
+                echo "Warning: Failed to generate $output_file" >&2
+            fi
+        done
+    fi
+
+    # Generate CONFIG_DB defaults and merge into init_cfg.json
+    if [ -d "$CONFIG_TEMPLATE_DIR" ] && [ -f "$INIT_CFG" ] && command -v jq >/dev/null 2>&1; then
+        for template in "$CONFIG_TEMPLATE_DIR"/*.json.j2; do
+            [ -e "$template" ] || continue
+            generated=$(j2 "$template" "$FEATURE_CAPABILITIES_JSON" 2>/dev/null)
+            if [ $? -eq 0 ] && [ -n "$generated" ] && [ "$generated" != "{}" ]; then
+                merged=$(jq -s '.[0] * .[1]' "$INIT_CFG" <(echo "$generated") 2>/dev/null)
+                if [ $? -eq 0 ] && [ -n "$merged" ]; then
+                    echo "$merged" > "$INIT_CFG"
+                    echo "Merged CONFIG_DB defaults from $(basename "$template") into $INIT_CFG"
+                else
+                    echo "Warning: Failed to merge $(basename "$template") into $INIT_CFG" >&2
+                fi
+            fi
+        done
+    fi
+fi
+
+depmod -a
+systemctl enable rename-mgmt-interface.service
+systemctl start rename-mgmt-interface.service
+systemctl enable pddf-platform-init.service
+systemctl start pddf-platform-init.service
+systemctl enable port-ledd.service
+systemctl start --no-block port-ledd.service
+systemctl enable system-ledd.service
+systemctl start --no-block system-ledd.service
+systemctl enable transceiver-init.service
+systemctl start transceiver-init.service
+systemctl enable read-mgmt-switch-version.service
+systemctl start read-mgmt-switch-version.service
+# ADM1266 RTC sync ships in sonic-platform-nexthop-common (no BMC on Finch).
+systemctl enable rtc-sync.timer
+systemctl start rtc-sync.timer
+systemctl enable reboot-cause-rotate-log.timer
+systemctl start reboot-cause-rotate-log.timer
+systemctl enable blackbox-rotate-log.timer
+systemctl start blackbox-rotate-log.timer
+systemctl enable blackbox-poll.timer
+systemctl start blackbox-poll.timer
+systemctl enable watchdog.timer
+systemctl start watchdog.timer

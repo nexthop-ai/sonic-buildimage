@@ -117,6 +117,15 @@ def fake_some_base_modules():
     pddf_thermal = Mock()
     pddf_thermal.PddfThermal = type("PddfThermal", (object,), {})
 
+    pddf_psu = Mock()
+    class _PddfPsu:
+        DEVICE_TYPE = "psu"
+        def __init__(self, *args, **kwargs):
+            pass
+        def get_name(self):
+            return "PSU"
+    pddf_psu.PddfPsu = _PddfPsu
+
     led_control_base = Mock()
     led_control_base.LedControlBase = type("LedControlBase", (object,), {})
 
@@ -132,6 +141,7 @@ def fake_some_base_modules():
         "sonic_platform_base.thermal_base": thermal_base,
         "sonic_platform_base.watchdog_base": watchdog_base,
         "sonic_platform_pddf_base.pddf_thermal": pddf_thermal,
+        "sonic_platform_pddf_base.pddf_psu": pddf_psu,
         "sonic_led.led_control_base": led_control_base,
         "sonic_py_common.interface": interface_mock,
     }
