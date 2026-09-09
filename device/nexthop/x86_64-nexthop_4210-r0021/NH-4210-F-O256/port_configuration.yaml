@@ -4630,85 +4630,6 @@ device:
     0:
         PC_TX_TAPS:
 ...
----
-bcm_device:
-    0:
-        global:
-            pktio_mode: 1
-            sai_mmu_custom_config : 1
-            sai_ip_counter_cstats: 1
-            vlan_flooding_l2mc_num_reserved: 0
-            ipv6_lpm_128b_enable: 1
-            shared_block_mask_section: uc_bc
-            skip_protocol_default_entries: 1
-            # LTSW uses value 1 for ALPM combined mode
-            l3_alpm_template: 1
-            l3_alpm_hit_skip: 1
-            sai_feat_tail_timestamp : 0
-            sai_port_phy_time_sync_en : 1
-            sai_field_group_auto_prioritize: 1
-            #l3_intf_vlan_split_egress for MTU at L3IF
-            l3_intf_vlan_split_egress : 1
-            pfc_deadlock_seq_control : 0
-            sai_pfc_dlr_init_capability: 2
-            #srv6:0x10 ipinip:0x2
-            sai_tunnel_support: 0x12
-            bcm_tunnel_term_compatible_mode: 1
-            l3_ecmp_member_first_lkup_mem_size: 32768
-            #enable port queue drop stats
-            sai_stats_support_mask: 0x884
-            #disable vxlan tunnel stats
-            sai_stats_disable_mask: 0x200
-            #For PPIU Mode, Set resources for counters in global mode counters like ACL, etc
-            global_flexctr_ing_action_num_reserved: 20
-            global_flexctr_ing_pool_num_reserved: 8
-            global_flexctr_ing_op_profile_num_reserved: 20
-            global_flexctr_ing_group_num_reserved: 2
-            global_flexctr_egr_action_num_reserved: 8
-            global_flexctr_egr_pool_num_reserved: 5
-            global_flexctr_egr_op_profile_num_reserved: 10
-            global_flexctr_egr_group_num_reserved: 1
-            l3_alpm_large_vrf_mode: 1
-            l3_ecmp_member_secondary_mem_size: 8192
-            stat_custom_receive0_management_mode: 1
-            sai_tunnel_ipinip_multi_vrf_support: 1
-...
----
-device:
-    0:
-        DEVICE_CONFIG:
-            AUTOLOAD_BOARD_SETTINGS: 0
-...
----
-device:
-    '*':
-        TM_THD_CONFIG:
-            MIRROR_ON_DROP_RESERVATION: 0
-            SKIP_BUFFER_RESERVATION: 1
-            THRESHOLD_MODE: LOSSY_AND_LOSSLESS
-
-        TM_SCHEDULER_CONFIG:
-            NUM_MC_Q: NUM_MC_Q_4
-...
----
-device:
-    0:
-        # Per pipe flex counter configuration. Enable PPIU Mode
-        CTR_EFLEX_CONFIG:
-            CTR_ING_EFLEX_OPERMODE_PIPEUNIQUE: 1
-            CTR_ING_EFLEX_OPERMODE_PIPE_INSTANCE_UNIQUE: 1
-            CTR_EGR_EFLEX_OPERMODE_PIPEUNIQUE: 1
-            CTR_EGR_EFLEX_OPERMODE_PIPE_INSTANCE_UNIQUE: 1
-
-        # IFP mode
-        FP_CONFIG:
-            FP_ING_OPERMODE: GLOBAL_PIPE_AWARE
-
-        #CTR COS_ENABLE
-        CTR_ING_COS_Q_CONFIG:
-            COS_ENABLE: 0
-
-...
 # Initialize the various thresholds to zero
 ---
 # Ingress service pool level initialization
@@ -5059,6 +4980,9 @@ device:
 # PRI_GRP_MAP_ID is the Priority Group profile select, which maps to service pool - SKIP
 
 ######################################
+# Per input port Service Pool Thresholds - SKIP for front panel ports
+# Per input Port PG Thresholds - SKIP for front panel ports
+######################################
 ---
 device:
     0:
@@ -5106,7 +5030,9 @@ device:
                 RESUME_FLOOR_CELLS: 0
                 HEADROOM_LIMIT_AUTO: 0
                 HEADROOM_LIMIT_CELLS: 0
+
 ...
+
 ### Egress Service Pools - SKIP
 ---
 device:
@@ -5207,11 +5133,27 @@ device:
 ...
 ### Queue Thresholds
 ######################################
-# TM_THD_UC_Q - SKIP for front panel ports Qs [0-6]
 ---
 device:
     0:
         TM_THD_UC_Q:
+            ?
+                PORT_ID: [[1,8], [18,25], [36,43], [54,61], [72,79], [90,97], [108,115], [126,133], [144,151], [162,169], [180,187], [198,205], [216,223], [234,241], [252,259], [270,277], [288,295], [306,313], [324,331], [342,349], [360,367], [378,385], [396,403], [414,421], [432,439], [450,457], [468,475], [486,493], [504,511], [522,529], [540,547], [558,565]]
+                TM_UC_Q_ID: 7
+            :
+                MIN_GUARANTEE_CELLS: 0
+                SHARED_LIMITS: 1
+                DYNAMIC_SHARED_LIMITS: 1
+                SHARED_LIMIT_CELLS_STATIC: 0
+                SHARED_LIMIT_DYNAMIC: ALPHA_1
+                DYNAMIC_GROUP: MID_PRI_GROUP
+                RESUME_OFFSET_CELLS: 1
+                COLOR_SPECIFIC_LIMITS: 0
+                COLOR_SPECIFIC_DYNAMIC_LIMITS: 1
+                YELLOW_LIMIT_CELLS_STATIC: 0
+                YELLOW_LIMIT_DYNAMIC: PERCENTAGE_750
+                RED_LIMIT_CELLS_STATIC: 0
+                RED_LIMIT_DYNAMIC: PERCENTAGE_625
             ?
                 PORT_ID: [52, 268, 340, 556]
                 TM_UC_Q_ID: [0,1,2,5,6,7]
@@ -5268,23 +5210,6 @@ device:
                 MIN_GUARANTEE_CELLS: 0
                 SHARED_LIMITS: 1
                 DYNAMIC_SHARED_LIMITS: 0
-                DYNAMIC_GROUP: MID_PRI_GROUP
-                RESUME_OFFSET_CELLS: 1
-                COLOR_SPECIFIC_LIMITS: 0
-                COLOR_SPECIFIC_DYNAMIC_LIMITS: 1
-                YELLOW_LIMIT_CELLS_STATIC: 0
-                YELLOW_LIMIT_DYNAMIC: PERCENTAGE_750
-                RED_LIMIT_CELLS_STATIC: 0
-                RED_LIMIT_DYNAMIC: PERCENTAGE_625
-            ?
-                PORT_ID: [[1,8], [18,25], [36,43], [54,61], [72,79], [90,97], [108,115], [126,133], [144,151], [162,169], [180,187], [198,205], [216,223], [234,241], [252,259], [270,277], [288,295], [306,313], [324,331], [342,349], [360,367], [378,385], [396,403], [414,421], [432,439], [450,457], [468,475], [486,493], [504,511], [522,529], [540,547], [558,565]]
-                TM_UC_Q_ID: 7
-            :
-                MIN_GUARANTEE_CELLS: 0
-                SHARED_LIMITS: 1
-                DYNAMIC_SHARED_LIMITS: 1
-                SHARED_LIMIT_CELLS_STATIC: 0
-                SHARED_LIMIT_DYNAMIC: ALPHA_1
                 DYNAMIC_GROUP: MID_PRI_GROUP
                 RESUME_OFFSET_CELLS: 1
                 COLOR_SPECIFIC_LIMITS: 0
@@ -5501,4 +5426,3 @@ device:
 
 ...
 ### OBM - SKIP
-
