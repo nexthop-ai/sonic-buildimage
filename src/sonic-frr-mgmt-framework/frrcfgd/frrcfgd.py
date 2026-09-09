@@ -3955,6 +3955,603 @@ class BGPConfigDaemon:
     def bfd_mhop_handler(self, table, key, data):
         self.bgp_table_handler_common(table, key, data, [{'remote-address', 'vrf', 'local-address'}])
 
+<<<<<<< HEAD
+=======
+    def bgp_monitors_handler(self, table, key, data):
+        upd_data = {}
+        del_table = False
+        if data is None:
+            upd_data = {}
+            del_table = True
+        else:
+            for upd_key, upd_val in data.items():
+                upd_data[upd_key] = CachedDataWithOp(upd_val, CachedDataWithOp.OP_ADD)
+        # Queue the message for processing in __update_bgp
+        self.bgp_message.put((self.config_db.serialize_key(key), del_table, table, upd_data))
+        # Process the message immediately like other handlers do
+        upd_data_list = []
+        self.__update_bgp(upd_data_list)
+        for table_name, key_name, data_item in upd_data_list:
+            table_key = ExtConfigDBConnector.get_table_key(table_name, key_name)
+            self.__update_cache_data(table_key, data_item)
+
+    # ------------------------------------------------------------------ BMP --
+    # CONFIG_DB BMP_TARGET_AFI_SAFI name -> (FRR afi, FRR safi)
+    BMP_AFI_SAFI_MAP = {
+        'ipv4_unicast': ('ipv4', 'unicast'),
+        'ipv6_unicast': ('ipv6', 'unicast'),
+        'ipv4_multicast': ('ipv4', 'multicast'),
+        'ipv6_multicast': ('ipv6', 'multicast'),
+        'l2vpn_evpn': ('l2vpn', 'evpn'),
+        'ipv4_vpn': ('ipv4', 'vpn'),
+        'ipv6_vpn': ('ipv6', 'vpn'),
+    }
+    # BMP_TARGET_AFI_SAFI boolean attribute -> FRR `bmp monitor` policy keyword
+    BMP_POLICY_ATTRS = (('adj-rib-in-pre', 'pre-policy'),
+                        ('adj-rib-in-post', 'post-policy'),
+                        ('loc-rib', 'loc-rib'))
+    BMP_DEFAULT_TARGET = 'sonic-bmp'
+    BMP_DEFAULT_BUFFER_LIMIT = '4294967214'
+
+    def _bmp_vrfs(self):
+        """(vrf, asn) pairs that have a BGP instance. BMP config is rendered once
+        per `router bgp ...` in the template, so each per-key change is applied to
+        every such instance."""
+        vrfs = [(vrf, asn) for vrf, asn in self.bgp_asn.items() if asn is not None]
+        if not vrfs and self.metadata_asn is not None:
+            vrfs = [(self.DEFAULT_VRF, self.metadata_asn)]
+        return vrfs
+
+    def _bmp_router_bgp(self, vrf, asn):
+        return "router bgp {}".format(asn) if vrf == self.DEFAULT_VRF \
+            else "router bgp {} vrf {}".format(asn, vrf)
+
+    def _bmp_target_configured(self, target):
+        """True while the target still has a BMP_TARGET row. Used to drop stale
+        collector/afi-safi *delete* events that arrive after the target itself was
+        removed: without this, their `bmp targets <t>` (FRR create-or-enter) would
+        resurrect an empty ghost target stanza."""
+        return target in self.config_db.get_table('BMP_TARGET')
+
+    def _bmp_run(self, table, vrf, asn, inner_cmds):
+        """Run a batch of BMP config lines under `router bgp ...` in one vtysh
+        call. No-op when there is nothing to push."""
+        if not inner_cmds:
+            return
+        command = ['vtysh', '-c', 'configure terminal', '-c', self._bmp_router_bgp(vrf, asn)]
+        for line in inner_cmds:
+            command += ['-c', line]
+        self.__run_command(table, command)
+
+    @staticmethod
+    def _bmp_split_key(key):
+        return list(key) if isinstance(key, tuple) else str(key).split('|')
+
+    @staticmethod
+    def _bmp_connect_cmd(ip, port, source_interface=None, min_retry='30000',
+                         max_retry='720000', negate=False):
+        # The `no` form is matched on host+port (plus source-interface when the
+        # collector was configured with one); retry values are not part of the
+        # match, so they are omitted when negating.
+        if negate:
+            cmd = 'no bmp connect {} port {}'.format(ip, port)
+        else:
+            cmd = 'bmp connect {} port {} min-retry {} max-retry {}'.format(
+                ip, port, min_retry, max_retry)
+        if source_interface:
+            cmd += ' source-interface {}'.format(source_interface)
+        return cmd
+
+    def _bmp_default_target_cmds(self):
+        """Config lines for the backward-compat default 'sonic-bmp' target: a
+        localhost collector with ipv4/ipv6 unicast pre-policy monitoring. Mirrors
+        what the startup template renders when no BMP_TARGET rows exist."""
+        return [
+            'bmp targets {}'.format(self.BMP_DEFAULT_TARGET),
+            # retry values mirror the startup template (bgpd.conf.db.j2 /
+            # bgpd.main.conf.j2) so runtime and boot render the same default.
+            'bmp connect 127.0.0.1 port 5000 min-retry 10000 max-retry 15000',
+            'bmp stats interval 1000',
+            'bmp monitor ipv4 unicast pre-policy',
+            'bmp monitor ipv6 unicast pre-policy',
+        ]
+
+    def _bmp_ensure_default_if_empty(self, table, vrfs):
+        """Recreate the default 'sonic-bmp' target when no BMP_TARGET rows remain,
+        keeping runtime behaviour in step with the startup template."""
+        if self.config_db.get_table('BMP_TARGET'):
+            return
+        for vrf, asn in vrfs:
+            self._bmp_run(table, vrf, asn, self._bmp_default_target_cmds())
+
+    def bmp_handler(self, table, key, data):
+        """React to a single BMP CONFIG_DB change and push ONLY the FRR delta for
+        that row, so collector sessions on unrelated targets/collectors are never
+        disturbed.
+
+        The four BMP tables each deliver their own per-key event:
+          - BMP|global                            -> `bmp mirror buffer-limit`
+          - BMP_TARGET|<t>                         -> create/remove target; mirror + stats
+          - BMP_TARGET_COLLECTOR|<t>|<ip>|<port>   -> add/remove one `bmp connect`
+          - BMP_TARGET_AFI_SAFI|<t>|<afi_safi>     -> the `bmp monitor` lines for it
+
+        `data` is the full row (or None on delete). A modified collector is simply
+        re-issued with `bmp connect` (FRR updates it in place); each `bmp monitor`
+        line reflects the row's boolean and is idempotent in FRR. `no ...` is used
+        only for genuine removals, which FRR does require. Any handler that touches
+        a collector/monitor enters `bmp targets <t>` first, which creates-or-gets
+        the target, so events may arrive in any order.
+        """
+        syslog.syslog(syslog.LOG_INFO, '[bgp cfgd](bmp) table={} key={} data={}'.format(table, key, data))
+
+        vrfs = self._bmp_vrfs()
+        if not vrfs:
+            syslog.syslog(syslog.LOG_WARNING, 'BMP configuration update but no BGP ASN configured')
+            return
+
+        if table == 'BMP':
+            # Only BMP|global is relevant to FRR. Other BMP|* keys (e.g. BMP|table)
+            # are bmpcfgd-owned local-collector settings with no FRR relevance, so
+            # frrcfgd ignores them.
+            if key != 'global':
+                return
+            # mirror-buffer-limit comes straight from the delivered row (no DB
+            # round-trip, always this event's value).
+            buffer_limit = (data or {}).get('mirror-buffer-limit', self.BMP_DEFAULT_BUFFER_LIMIT)
+            for vrf, asn in vrfs:
+                self._bmp_run(table, vrf, asn, ['bmp mirror buffer-limit {}'.format(buffer_limit)])
+            # Backward-compat: if BMP is configured but no BMP_TARGET rows exist,
+            # (re)create the default sonic-bmp target so runtime state matches what
+            # the startup template would have rendered.
+            self._bmp_ensure_default_if_empty(table, vrfs)
+            return
+
+        if table == 'BMP_TARGET':
+            target = key if isinstance(key, str) else self._bmp_split_key(key)[0]
+            if data is None:
+                # Remove just this target -> closes only its own collector
+                # sessions; every other target is left untouched.
+                for vrf, asn in vrfs:
+                    self._bmp_run(table, vrf, asn, ['no bmp targets {}'.format(target)])
+                # Drop this target's collector source-interface memory so it can't
+                # linger after the target is gone.
+                self.bmp_collector_srcif = {k: v for k, v in self.bmp_collector_srcif.items()
+                                            if k[0] != target}
+                self._bmp_ensure_default_if_empty(table, vrfs)
+                return
+
+            # Create-or-update the target and re-assert its own attributes (stats,
+            # mirror). Collectors and monitors arrive as their own table events.
+            # These are idempotent in FRR (re-asserting the same value is a no-op
+            # that never touches a session), so the row is applied statelessly.
+            inner = ['bmp targets {}'.format(target)]
+            if 'stats-interval' in data:
+                inner.append('bmp stats interval {}'.format(data['stats-interval']))
+            else:
+                inner.append('no bmp stats')
+            inner.append('bmp mirror' if data.get('mirror') == 'true' else 'no bmp mirror')
+            for vrf, asn in vrfs:
+                self._bmp_run(table, vrf, asn, inner)
+            return
+
+        if table == 'BMP_TARGET_COLLECTOR':
+            parts = self._bmp_split_key(key)
+            if len(parts) < 3:
+                syslog.syslog(syslog.LOG_WARNING, 'BMP_TARGET_COLLECTOR: bad key {}'.format(key))
+                return
+            target, ip, port = parts[0], parts[1], parts[2]
+            state_key = (target, ip, port)
+            if data is None and not self._bmp_target_configured(target):
+                # Target already removed (its own delete closed this connection and
+                # `bmp targets <t>` here would only resurrect an empty ghost stanza).
+                self.bmp_collector_srcif.pop(state_key, None)
+                return
+
+            # The connect/no-connect line depends only on ip/port/data, not on the
+            # VRF, so build it once and apply it to every BGP instance.
+            if data is None:
+                # Repeat the last-applied source-interface so the `no` matches the
+                # connection in FRR (it is gone from CONFIG_DB by now).
+                src = self.bmp_collector_srcif.get(state_key)
+                line = self._bmp_connect_cmd(ip, port, source_interface=src, negate=True)
+            else:
+                line = self._bmp_connect_cmd(
+                    ip, port,
+                    source_interface=data.get('source-interface') or None,
+                    min_retry=data.get('min-retry', '30000'),
+                    max_retry=data.get('max-retry', '720000'))
+            for vrf, asn in vrfs:
+                self._bmp_run(table, vrf, asn, ['bmp targets {}'.format(target), line])
+
+            if data is None:
+                self.bmp_collector_srcif.pop(state_key, None)
+            else:
+                self.bmp_collector_srcif[state_key] = data.get('source-interface') or None
+            return
+
+        if table == 'BMP_TARGET_AFI_SAFI':
+            parts = self._bmp_split_key(key)
+            if len(parts) < 2:
+                syslog.syslog(syslog.LOG_WARNING, 'BMP_TARGET_AFI_SAFI: bad key {}'.format(key))
+                return
+            target, afi_safi = parts[0], parts[1]
+            if afi_safi not in self.BMP_AFI_SAFI_MAP:
+                syslog.syslog(syslog.LOG_WARNING, 'Unknown AFI/SAFI: {}'.format(afi_safi))
+                return
+            if data is None and not self._bmp_target_configured(target):
+                # Target already removed; `no bmp monitor` under a `bmp targets <t>`
+                # here would only resurrect an empty ghost stanza.
+                return
+            afi, safi = self.BMP_AFI_SAFI_MAP[afi_safi]
+            # Re-assert this row's desired monitoring state, one line per policy
+            # (`bmp monitor` when enabled, `no bmp monitor` when not; all off on
+            # delete). `[no] bmp monitor` is idempotent in FRR — re-asserting a
+            # policy already in that state is a no-op that triggers no re-dump — so
+            # only the genuinely-changed policy resyncs, and only on THIS target's
+            # sessions. No previous-state bookkeeping is needed.
+            inner = ['bmp targets {}'.format(target)]
+            for attr, policy in self.BMP_POLICY_ATTRS:
+                enable = data is not None and data.get(attr) == 'true'
+                verb = 'bmp monitor' if enable else 'no bmp monitor'
+                inner.append('{} {} {} {}'.format(verb, afi, safi, policy))
+            for vrf, asn in vrfs:
+                self._bmp_run(table, vrf, asn, inner)
+            return
+
+        syslog.syslog(syslog.LOG_WARNING, '[bgp cfgd](bmp) unhandled table {}'.format(table))
+
+    def protocol_route_map_handler(self, table, key, data):
+        """
+        Translate PROTOCOL_ROUTE_MAP rows to zebra commands.
+
+        CONFIG_DB key: "<vrf>|<addr_family>|<protocol>". Emits:
+            [vrf <vrf>]
+             ip|ipv6 protocol <protocol> route-map <route_map>
+            [exit-vrf]
+        The default VRF renders without the vrf/exit-vrf wrapping.
+
+        Per-key state (self.protocol_route_map_state) lets deletes emit
+        'no ... route-map <NAME>' using the last-applied name, and lets
+        idempotent sets short-circuit.
+        """
+        syslog.syslog(syslog.LOG_INFO,
+                      '[bgp cfgd](protocol_route_map) table={} key={} data={}'.format(table, key, data))
+
+        prm_key = '|'.join(key) if isinstance(key, tuple) else str(key)
+        parts = prm_key.split('|')
+        if len(parts) != 3:
+            syslog.syslog(syslog.LOG_ERR,
+                          'PROTOCOL_ROUTE_MAP: malformed key {} (expected vrf|afi|protocol)'.format(prm_key))
+            return
+
+        # addr_family uses sonic-types:ip-family (values 'IPv4'/'IPv6'); FRR
+        # expects 'ip'/'ipv6' as the CLI keyword. Same mapping used by
+        # bgpd.conf.db.pref_list.j2 and bgpd.conf.db.route_map.j2.
+        entry_vrf, afi, protocol = parts
+        ip_kw = {'IPv4': 'ip', 'IPv6': 'ipv6'}.get(afi)
+        if ip_kw is None:
+            syslog.syslog(syslog.LOG_ERR,
+                          'PROTOCOL_ROUTE_MAP: unsupported addr_family {} in key {}'.format(afi, prm_key))
+            return
+
+        prev_rm = self.protocol_route_map_state.get(prm_key)
+
+        # Decide what command to push, but DON'T mutate state yet — state must
+        # only reflect what FRR has actually accepted. Mutating before the
+        # vtysh succeeds would let a transient failure desync us permanently:
+        # the idempotent `prev_rm == route_map` guard would then silently skip
+        # every retry.
+        is_delete = data is None
+        if is_delete:
+            if prev_rm is None:
+                syslog.syslog(syslog.LOG_DEBUG,
+                              'PROTOCOL_ROUTE_MAP: del for untracked key {}; skipping'.format(prm_key))
+                return
+            inner = 'no {} protocol {} route-map {}'.format(ip_kw, protocol, prev_rm)
+            new_rm = None
+        else:
+            route_map = data.get('route_map') if isinstance(data, dict) else None
+            if not route_map:
+                syslog.syslog(syslog.LOG_ERR,
+                              'PROTOCOL_ROUTE_MAP: missing route_map for key {}'.format(prm_key))
+                return
+            if prev_rm == route_map:
+                syslog.syslog(syslog.LOG_DEBUG,
+                              'PROTOCOL_ROUTE_MAP: {} already bound to {}; skipping vtysh'.format(prm_key, route_map))
+                return
+            # FRR's `ip|ipv6 protocol X route-map Y` is upsert-style: emitting
+            # the new binding replaces any prior route-map for the same
+            # (vrf, afi, proto). No explicit `no ... route-map <prev>` needed.
+            inner = '{} protocol {} route-map {}'.format(ip_kw, protocol, route_map)
+            new_rm = route_map
+
+        # entry_vrf is the union type (literal "default" or a leafref into
+        # VRF_LIST) and route_map is a leafref into ROUTE_MAP_SET, both
+        # validated by YANG against ^[A-Za-z0-9_][A-Za-z0-9_-]*$-ish
+        # identifiers, so inserting them into the vtysh command string carries
+        # no shell-injection risk. If the schema is ever loosened, this
+        # assumption needs revisiting.
+        if entry_vrf == self.DEFAULT_VRF:
+            command = ['vtysh', '-c', 'configure terminal', '-c', inner]
+        else:
+            command = ['vtysh', '-c', 'configure terminal',
+                       '-c', 'vrf {}'.format(entry_vrf), '-c', inner, '-c', 'exit-vrf']
+
+        if not self.__run_command(table, command):
+            syslog.syslog(syslog.LOG_ERR,
+                          'PROTOCOL_ROUTE_MAP: failed running vtysh for key {}'.format(prm_key))
+            return
+
+        # Command succeeded — now it's safe to publish the new state.
+        if is_delete:
+            self.protocol_route_map_state.pop(prm_key, None)
+        else:
+            self.protocol_route_map_state[prm_key] = new_rm
+
+    def nht_handler(self, table, key, data):
+        """
+        Handle NEXTHOP_TRACKING configuration changes for unified mode.
+
+        CONFIG_DB key: "vrf_name|afi"
+
+        Translates to FRR commands:
+            [vrf <vrf_name>]
+             ip|ipv6 nht arp-tracking|nd-tracking
+             ip|ipv6 nht resolve-via-default  (set, or defaulted on for user VRFs)
+            [exit-vrf]
+
+        For default VRF, commands are emitted without vrf/exit-vrf wrapper.
+        """
+        syslog.syslog(syslog.LOG_INFO, '[frrcfgd](nht) value for {} changed to {}'.format(key, data))
+
+        # Parse key: "vrf_name|afi"
+        key_parts = key.split('|')
+        if len(key_parts) != 2:
+            syslog.syslog(syslog.LOG_ERR, '[frrcfgd](nht) invalid key format: {}'.format(key))
+            return
+
+        vrf_name = key_parts[0]
+        afi = key_parts[1]
+
+        # Validate vrf_name: "|ipv4".split('|') yields ['', 'ipv4'] which
+        # passes the length check but would emit malformed vtysh commands.
+        if not vrf_name:
+            syslog.syslog(syslog.LOG_ERR, '[frrcfgd](nht) empty vrf_name in key: {}'.format(key))
+            return
+
+        # Determine neighbor_tracking state
+        # Note: DELETE (data is None) and explicit neighbor_tracking=false are
+        # treated identically - both emit "no ip/ipv6 nht arp/nd-tracking".
+        if data is None:
+            # DELETE: disable tracking
+            neighbor_tracking = False
+        else:
+            nt_value = data.get('neighbor_tracking', 'false')
+            # YANG enforces boolean at write time, but Redis can receive direct
+            # writes. Reject anything outside the allow-list with a warning
+            # rather than silently treating it as false.
+            if nt_value not in ('true', 'false'):
+                syslog.syslog(syslog.LOG_WARNING,
+                              '[frrcfgd](nht) unexpected neighbor_tracking value "{}" for key {}, treating as false'.format(
+                                  nt_value, key))
+                nt_value = 'false'
+            neighbor_tracking = nt_value == 'true'
+
+        # Build AFI-specific tracking command
+        if afi == 'ipv4':
+            nht_cmd = 'ip nht arp-tracking' if neighbor_tracking else 'no ip nht arp-tracking'
+        elif afi == 'ipv6':
+            nht_cmd = 'ipv6 nht nd-tracking' if neighbor_tracking else 'no ipv6 nht nd-tracking'
+        else:
+            syslog.syslog(syslog.LOG_ERR, '[frrcfgd](nht) unknown AFI: {}'.format(afi))
+            return
+
+        # resolve_via_default: DELETE (data is None) restores the YANG default
+        # (enabled) so created-then-deleted matches never-created at runtime.
+        # On SET, an absent field defaults to enabled for user VRFs; the default
+        # VRF's resolve is owned by zebra.interfaces.conf.j2 ('unset' -> no-op).
+        resolve_cmd = None
+        if data is None:
+            rv_value = 'true'
+        else:
+            rv_default = 'true' if vrf_name != self.DEFAULT_VRF else 'unset'
+            rv_value = data.get('resolve_via_default', rv_default)
+            if rv_value not in ('true', 'false'):
+                if rv_value != 'unset':
+                    syslog.syslog(syslog.LOG_WARNING,
+                                  '[frrcfgd](nht) unexpected resolve_via_default value "{}" for key {}, ignoring'.format(
+                                      rv_value, key))
+                rv_value = 'unset'
+        if rv_value == 'true':
+            resolve_cmd = 'ip nht resolve-via-default' if afi == 'ipv4' else 'ipv6 nht resolve-via-default'
+        elif rv_value == 'false':
+            resolve_cmd = 'no ip nht resolve-via-default' if afi == 'ipv4' else 'no ipv6 nht resolve-via-default'
+
+        # Build command list with VRF context
+        if vrf_name == self.DEFAULT_VRF:
+            command = ['vtysh', '-c', 'configure terminal', '-c', nht_cmd]
+            if resolve_cmd is not None:
+                command.extend(['-c', resolve_cmd])
+        else:
+            command = ['vtysh', '-c', 'configure terminal',
+                       '-c', 'vrf {}'.format(vrf_name), '-c', nht_cmd]
+            if resolve_cmd is not None:
+                command.extend(['-c', resolve_cmd])
+            command.extend(['-c', 'exit-vrf'])
+
+        # Execute command
+        if not self.__run_command(table, command):
+            syslog.syslog(syslog.LOG_ERR,
+                          '[frrcfgd](nht) failed running vtysh for key {}'.format(key))
+            return
+
+        syslog.syslog(syslog.LOG_INFO,
+                      '[frrcfgd](nht) successfully configured {} for vrf={} afi={}'.format(
+                          'enabled' if neighbor_tracking else 'disabled', vrf_name, afi))
+        if resolve_cmd is not None:
+            syslog.syslog(syslog.LOG_INFO,
+                          '[frrcfgd](nht) successfully configured resolve_via_default={} for vrf={} afi={}'.format(
+                              'disabled' if resolve_cmd.startswith('no ') else 'enabled',
+                              vrf_name, afi))
+
+    def __ensure_bgpmon_infrastructure(self, vrf, local_asn, table):
+        if 'BGPMON' not in self.bgp_peer_group.setdefault(vrf, {}):
+            # Create router bgp command with proper VRF handling (same pattern as __delete_vrf_asn)
+            if vrf == self.DEFAULT_VRF:
+                router_bgp_cmd = "router bgp {}".format(local_asn)
+            else:
+                router_bgp_cmd = "router bgp {} vrf {}".format(local_asn, vrf)
+
+            command = ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd,
+                       '-c', 'neighbor BGPMON peer-group']
+            if not self.__run_command(table, command):
+                syslog.syslog(syslog.LOG_ERR, 'failed to create BGPMON peer-group for VRF %s' % vrf)
+                return False
+
+            self.bgp_peer_group[vrf]['BGPMON'] = BGPPeerGroup(vrf)
+            ipv4_commands = [
+                ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd, '-c', 'address-family ipv4',
+                 '-c', 'neighbor BGPMON activate', '-c', 'neighbor BGPMON route-map FROM_BGPMON in',
+                 '-c', 'neighbor BGPMON route-map TO_BGPMON out', '-c', 'neighbor BGPMON send-community',
+                 '-c', 'neighbor BGPMON maximum-prefix 1', '-c', 'exit-address-family']
+            ]
+            ipv6_commands = [
+                ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd, '-c', 'address-family ipv6',
+                 '-c', 'neighbor BGPMON activate', '-c', 'neighbor BGPMON route-map FROM_BGPMON in',
+                 '-c', 'neighbor BGPMON route-map TO_BGPMON out', '-c', 'neighbor BGPMON send-community',
+                 '-c', 'neighbor BGPMON maximum-prefix 1', '-c', 'exit-address-family']
+            ]
+            for cmd in ipv4_commands + ipv6_commands:
+                if not self.__run_command(table, cmd):
+                    syslog.syslog(syslog.LOG_ERR, 'failed to configure BGPMON peer-group address families')
+                    return False
+
+        self.__ensure_bgpmon_route_maps(table)
+        return True
+
+    def __ensure_bgpmon_route_maps(self, table):
+        if 'FROM_BGPMON' not in self.route_map:
+            # Create FROM_BGPMON route map (deny all)
+            command = ['vtysh', '-c', 'configure terminal', '-c', 'route-map FROM_BGPMON deny 10']
+            if self.__run_command(table, command):
+                self.route_map.setdefault('FROM_BGPMON', {})['10'] = 'deny'
+                syslog.syslog(syslog.LOG_DEBUG, 'Created FROM_BGPMON route map')
+
+        if 'TO_BGPMON' not in self.route_map:
+            # Create TO_BGPMON route map (permit all)
+            command = ['vtysh', '-c', 'configure terminal', '-c', 'route-map TO_BGPMON permit 10']
+            if self.__run_command(table, command):
+                self.route_map.setdefault('TO_BGPMON', {})['10'] = 'permit'
+                syslog.syslog(syslog.LOG_DEBUG, 'Created TO_BGPMON route map')
+
+    def __process_bgp_monitor(self, vrf, local_asn, key, data, del_table, table):
+        monitor_ip = key
+        if not del_table:
+            return self.__add_bgp_monitor(vrf, local_asn, monitor_ip, data, table)
+        else:
+            return self.__delete_bgp_monitor(vrf, local_asn, monitor_ip, table)
+
+    def __add_bgp_monitor(self, vrf, local_asn, monitor_ip, data, table):
+        if not self.__ensure_bgpmon_infrastructure(vrf, local_asn, table):
+            syslog.syslog(syslog.LOG_INFO, 'failed to ensure BGPMON infrastructure for VRF %s' % vrf)
+            return False
+
+        if vrf == self.DEFAULT_VRF:
+            router_bgp_cmd = "router bgp {}".format(local_asn)
+        else:
+            router_bgp_cmd = "router bgp {} vrf {}".format(local_asn, vrf)
+
+        # Process monitor neighbor configuration using existing neighbor patterns
+        if 'asn' in data and data['asn'].op != CachedDataWithOp.OP_DELETE:
+            monitor_asn = data['asn'].data
+            monitor_description = 'BGPMON'
+            if 'peer_name' in data and data['peer_name'].op != CachedDataWithOp.OP_DELETE:
+                monitor_description = data['peer_name'].data
+            elif 'name' in data and data['name'].op != CachedDataWithOp.OP_DELETE:
+                monitor_description = data['name'].data
+
+            # Get local address for update-source if available
+            monitor_local_addr = None
+            if 'local_addr' in data and data['local_addr'].op != CachedDataWithOp.OP_DELETE:
+                monitor_local_addr = data['local_addr'].data
+
+            commands = [
+                ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd,
+                 '-c', 'neighbor {} remote-as {}'.format(monitor_ip, monitor_asn)],
+                ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd,
+                 '-c', 'neighbor {} peer-group BGPMON'.format(monitor_ip)],
+                ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd,
+                 '-c', 'neighbor {} description {}'.format(monitor_ip, monitor_description)]
+            ]
+            if monitor_local_addr:
+                commands.append(['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd,
+                                 '-c', 'neighbor {} update-source {}'.format(monitor_ip, monitor_local_addr)])
+
+            for cmd in commands:
+                if not self.__run_command(table, cmd):
+                    syslog.syslog(syslog.LOG_ERR, 'failed to configure BGP monitor {}'.format(monitor_ip))
+                    return False
+
+            if 'BGPMON' in self.bgp_peer_group[vrf]:
+                self.bgp_peer_group[vrf]['BGPMON'].ref_nbrs.add(monitor_ip)
+
+            syslog.syslog(syslog.LOG_INFO, 'Successfully configured BGP monitor {} with ASN {}'.\
+                          format(monitor_ip, monitor_asn))
+
+        # admin_status is the only BGP_MONITORS leaf sonic-bgp-monitor.yang leaves
+        # writable after creation, so it is applied outside the create-time 'asn'
+        # branch: a row that only toggles admin_status must still reach FRR.
+        return self.__apply_bgp_monitor_admin_status(router_bgp_cmd, monitor_ip, data, table)
+
+    def __apply_bgp_monitor_admin_status(self, router_bgp_cmd, monitor_ip, data, table):
+        """Translate BGP_MONITORS admin_status into the FRR shutdown state.
+
+        Mirrors bgpcfgd's BGPPeerMgrBase.change_admin_status, which the separated
+        mode relies on for every peer type including monitors. Re-issuing the
+        current state is a no-op in FRR, so this is safe on the create path too.
+        """
+        # bgp_monitors_handler stamps every SET leaf OP_ADD, so a missing key
+        # is the only way this helper sees "no admin_status to apply".
+        if 'admin_status' not in data:
+            return True
+        admin_status = data['admin_status'].data
+        if admin_status == 'up':
+            nbr_cmd = 'no neighbor {} shutdown'.format(monitor_ip)
+        elif admin_status == 'down':
+            nbr_cmd = 'neighbor {} shutdown'.format(monitor_ip)
+        else:
+            syslog.syslog(syslog.LOG_ERR, 'BGP monitor {} has wrong admin_status value {}'.\
+                          format(monitor_ip, admin_status))
+            return False
+        command = ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd, '-c', nbr_cmd]
+        if not self.__run_command(table, command):
+            syslog.syslog(syslog.LOG_ERR, 'failed to set BGP monitor {} admin status to {}'.\
+                          format(monitor_ip, admin_status))
+            return False
+        syslog.syslog(syslog.LOG_INFO, 'BGP monitor {} admin status is set to {}'.\
+                      format(monitor_ip, admin_status))
+        return True
+
+    def __delete_bgp_monitor(self, vrf, local_asn, monitor_ip, table):
+        if vrf == self.DEFAULT_VRF:
+            router_bgp_cmd = "router bgp {}".format(local_asn)
+        else:
+            router_bgp_cmd = "router bgp {} vrf {}".format(local_asn, vrf)
+
+        command = ['vtysh', '-c', 'configure terminal', '-c', router_bgp_cmd,
+                   '-c', 'no neighbor {}'.format(monitor_ip)]
+        if self.__run_command(table, command):
+            # Remove monitor from BGPMON peer group tracking
+            if vrf in self.bgp_peer_group and 'BGPMON' in self.bgp_peer_group[vrf]:
+                self.bgp_peer_group[vrf]['BGPMON'].ref_nbrs.discard(monitor_ip)
+
+            syslog.syslog(syslog.LOG_INFO, 'Successfully removed BGP monitor {}'.format(monitor_ip))
+            return True
+        else:
+            syslog.syslog(syslog.LOG_ERR, 'failed to remove BGP monitor {}'.format(monitor_ip))
+            return False
+
+>>>>>>> b8a4c0eaf (NOS-13538: Translate admin_status change to FRR command in unified mode (#9379))
     def start(self):
         self.subscribe_all()
         self.config_db.listen()
