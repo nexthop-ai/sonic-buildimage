@@ -42,6 +42,9 @@ module sonic-port-qos-map {
         prefix tdm;
     }
 
+    import sonic-tc-dot1p-map {
+        prefix tdot1pm;
+    }
 
     organization
         "SONiC";
@@ -133,6 +136,12 @@ module sonic-port-qos-map {
                 leaf dot1p_to_tc_map {
                     type leafref {
                         path "/dot1ptm:sonic-dot1p-tc-map/dot1ptm:DOT1P_TO_TC_MAP/dot1ptm:DOT1P_TO_TC_MAP_LIST/dot1ptm:name";
+                    }
+                }
+
+                leaf tc_to_dot1p_map {
+                    type leafref {
+                        path "/tdot1pm:sonic-tc-dot1p-map/tdot1pm:TC_TO_DOT1P_MAP/tdot1pm:TC_TO_DOT1P_MAP_LIST/tdot1pm:name";
                     }
                 }
 
