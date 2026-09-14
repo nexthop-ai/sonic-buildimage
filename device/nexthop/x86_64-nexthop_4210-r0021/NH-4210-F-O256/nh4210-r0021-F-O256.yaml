@@ -4655,8 +4655,15 @@ bcm_device:
             sai_tunnel_support: 0x12
             bcm_tunnel_term_compatible_mode: 1
             l3_ecmp_member_first_lkup_mem_size: 32768
+<<<<<<< HEAD:device/nexthop/x86_64-nexthop_4210-r0021/NH-4210-F-O256/nh4210-r0021-F-O256.yaml
             #enable port queue drop stats
             sai_stats_support_mask: 0x884
+=======
+            #bit 0x4 (egress queue drop flexctr) stays clear: that counter only
+            #sees packets that reach the egress pipeline, so it misses MMU
+            #admission-failure drops. Queue drop stats come from the MMU counter.
+            sai_stats_support_mask: 0x800
+>>>>>>> 06d8a9247 (NOS-16006: Clear TH6 sai_stats_support_mask queue-drop flexctr bit (#9485)):device/nexthop/x86_64-nexthop_4210-r0021/NH-4210-F-O256-TC/nh4210-r0021-F-O256-TC.yaml
             #disable vxlan tunnel stats
             sai_stats_disable_mask: 0x200
             #For PPIU Mode, Set resources for counters in global mode counters like ACL, etc
