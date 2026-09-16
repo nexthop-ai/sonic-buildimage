@@ -1,7 +1,11 @@
 obj-m := pddf_custom_fpga_algo.o
 obj-m += pddf_custom_mdio_algo.o
+<<<<<<< HEAD
 obj-m += nh_tda38740.o
 obj-m += nh_isl68137.o
+=======
+obj-m += nh_ibv.o
+>>>>>>> 2d2a8009e (NOS-7880: Delete forked nh_isl68137 driver (#9667))
 obj-m += nh_pmbus_core.o
 obj-m += nh_tmp464.o
 obj-m += nh_adm1266.o
