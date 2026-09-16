@@ -416,3 +416,188 @@ class TestExtractFpgaDevAttrs:
                 pwr_cycle_enable_word=0xDEADBEEF,
             ),
         }
+<<<<<<< HEAD
+=======
+
+
+class TestExtractI2CInfoList:
+    """Test class for 'extract_i2c_info_list' function."""
+
+    def test_extract_i2c_info_list(self, pddf_config_parser_module):
+        """Test extract_i2c_info_list returns only entries matching device_type."""
+        config = {
+            "DCDC0": {
+                "dev_info": {
+                    "device_type": "DCDC",
+                    "device_name": "DCDC0",
+                    "device_parent": "MULTIFPGAPCIE1",
+                },
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x5b",
+                        "dev_addr": "0x70",
+                        "dev_type": "xdpe1a2g5b",
+                    }
+                },
+            },
+            "DCDC1": {
+                "dev_info": {
+                    "device_type": "DCDC",
+                    "device_name": "DCDC1",
+                    "device_parent": "MULTIFPGAPCIE1",
+                },
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x5c",
+                        "dev_addr": "0x60",
+                        "dev_type": "nh_isl68225",
+                    }
+                },
+            },
+            "SOME_OTHER_DEVICE": {
+                "dev_info": {
+                    "device_type": "TEMP_SENSOR",
+                    "device_name": "TEMP0",
+                    "device_parent": "MULTIFPGAPCIE0",
+                },
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x01",
+                        "dev_addr": "0x50",
+                        "dev_type": "tmp464",
+                    }
+                }
+            }
+        }
+
+        # When
+        dcdc_list = pddf_config_parser_module.extract_i2c_info_list(config, "DCDC")
+        temp_list = pddf_config_parser_module.extract_i2c_info_list(config, "TEMP_SENSOR")
+
+        # Then
+        expected_dcdc_devices = [
+            {"name": "DCDC0", "bus": 0x5B, "addr": 0x70, "type": "xdpe1a2g5b"},
+            {"name": "DCDC1", "bus": 0x5C, "addr": 0x60, "type": "nh_isl68225"},
+        ]
+
+        expected_temp_devices = [
+            {"name": "TEMP0", "bus": 0x01, "addr": 0x50, "type": "tmp464"},
+        ]
+
+        assert len(dcdc_list) == 2
+        for expected_device in expected_dcdc_devices:
+            assert expected_device in dcdc_list
+
+        assert len(temp_list) == 1
+        for expected_device in expected_temp_devices:
+            assert expected_device in temp_list
+
+    def test_extract_i2c_info_list_missing_bus_or_addr(self, pddf_config_parser_module):
+        """Test that devices missing parent_bus or dev_addr are filtered out."""
+        config = {
+            "DCDC0": {
+                "dev_info": {"device_type": "DCDC", "device_name": "DCDC0"},
+                "i2c": {"topo_info": {"dev_addr": "0x70", "dev_type": "xdpe1a2g5b"}},
+                # Missing parent_bus
+            },
+            "DCDC1": {
+                "dev_info": {"device_type": "DCDC", "device_name": "DCDC1"},
+                "i2c": {"topo_info": {"parent_bus": "0x5c", "dev_type": "nh_isl68225"}},
+                # Missing dev_addr
+            },
+            "DCDC2": {
+                "dev_info": {"device_type": "DCDC", "device_name": "DCDC2"},
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x5d",
+                        "dev_addr": "0x62",
+                        "dev_type": "nh_isl68225",
+                    }
+                }
+            }
+        }
+
+        # When
+        device_list = pddf_config_parser_module.extract_i2c_info_list(config, "DCDC")
+
+        # Then - only DCDC2 should be included
+        expected = [{"name": "DCDC2", "bus": 0x5D, "addr": 0x62, "type": "nh_isl68225"}]
+
+        assert len(device_list) == 1
+        for expected_device in expected:
+            assert expected_device in device_list
+
+    def test_extract_i2c_info_list_falls_back_to_key_name(self, pddf_config_parser_module):
+        """Test that the outer dict key is used when device_name is absent from dev_info."""
+        config = {
+            "DCDC0": {
+                "dev_info": {"device_type": "DCDC"},  # Missing device_name
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x5b",
+                        "dev_addr": "0x70",
+                        "dev_type": "xdpe1a2g5b",
+                    }
+                }
+            }
+        }
+
+        # When
+        device_list = pddf_config_parser_module.extract_i2c_info_list(config, "DCDC")
+
+        # Then
+        assert len(device_list) == 1
+        assert device_list[0]["name"] == "DCDC0"
+
+    def test_extract_i2c_info_list_non_dict_entries(self, pddf_config_parser_module):
+        """Test that non-dict entries in the config are skipped."""
+        config = {
+            "PLATFORM": "x86_64-nexthop_4010-r0",  # Non-dict value, must not crash
+            "DCDC0": {
+                "dev_info": {"device_type": "DCDC", "device_name": "DCDC0"},
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x5b",
+                        "dev_addr": "0x70",
+                        "dev_type": "xdpe1a2g5b",
+                    }
+                }
+            }
+        }
+
+        # When
+        device_list = pddf_config_parser_module.extract_i2c_info_list(config, "DCDC")
+
+        # Then
+        assert len(device_list) == 1
+        assert device_list[0]["name"] == "DCDC0"
+
+    def test_extract_i2c_info_list_empty_config(self, pddf_config_parser_module):
+        """Test extract_i2c_info_list with empty configuration."""
+        # When
+        device_list = pddf_config_parser_module.extract_i2c_info_list({}, "DCDC")
+
+        # Then
+        assert device_list == []
+
+    def test_extract_i2c_info_list_no_matches(self, pddf_config_parser_module):
+        """Test extract_i2c_info_list when no entries match the requested device_type."""
+        config = {
+            "DCDC0": {
+                "dev_info": {"device_type": "DCDC", "device_name": "DCDC0"},
+                "i2c": {
+                    "topo_info": {
+                        "parent_bus": "0x5b",
+                        "dev_addr": "0x70",
+                        "dev_type": "xdpe1a2g5b",
+                    }
+                }
+            }
+        }
+
+        # When
+        device_list = pddf_config_parser_module.extract_i2c_info_list(config, "FAN")
+
+        # Then
+        assert device_list == []
+>>>>>>> 03fe5d865 (NOS-7880: Delete forked nh_tmp464 driver (#9668))
