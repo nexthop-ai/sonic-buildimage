@@ -120,9 +120,10 @@ fw_setenv linuxargs_old "" || sonic_uboot_env_log "ERROR: Failed to set linuxarg
 
 LINUXARGS_VAL="console=${CONSOLE_PORT},${CONSOLE_SPEED}n8 ${EARLYCON} loopfstype=squashfs loop=$IMAGE_DIR/fs.squashfs varlog_size=${VAR_LOG_SIZE} logs_inram=on"
 fw_setenv linuxargs "$LINUXARGS_VAL" || sonic_uboot_env_log "ERROR: Failed to set linuxargs"
-BOOTARGS_VAL="root=$ROOT_DEV rw rootwait panic=1 $LINUXARGS_VAL"
+BOOTARGS_VAL="root=$ROOT_DEV rw rootwait panic=10 $LINUXARGS_VAL"
 fw_setenv bootargs "$BOOTARGS_VAL" || sonic_uboot_env_log "ERROR: Failed to set bootargs"
 
+<<<<<<< HEAD
 
 # Re-select the eMMC before the FIT read: a WDT SoC reset restarts the SoC without resetting
 # the card, so U-Boot re-inits its controller against a card still in its old high-speed state
@@ -138,20 +139,50 @@ fw_setenv sonic_boot_load "${BOOT_LOAD_REINIT}ext4load ${disk_interface} 0:${dem
 fw_setenv sonic_boot_load_old "${BOOT_LOAD_REINIT}ext4load ${disk_interface} 0:${demo_part} \${loadaddr} \${fit_name_old}" || sonic_uboot_env_log "ERROR: Failed to set sonic_boot_load_old"
 fw_setenv sonic_bootargs "setenv bootargs root=$ROOT_DEV rw rootwait panic=1 \${linuxargs}" || sonic_uboot_env_log "ERROR: Failed to set sonic_bootargs"
 fw_setenv sonic_bootargs_old "setenv bootargs root=$ROOT_DEV rw rootwait panic=1 \${linuxargs_old}" || sonic_uboot_env_log "ERROR: Failed to set sonic_bootargs_old"
+=======
+fw_setenv sonic_boot_load "ext4load ${disk_interface} 0:${demo_part} \${loadaddr} \${fit_name}" || sonic_uboot_env_log "ERROR: Failed to set sonic_boot_load"
+fw_setenv sonic_boot_load_old "ext4load ${disk_interface} 0:${demo_part} \${loadaddr} \${fit_name_old}" || sonic_uboot_env_log "ERROR: Failed to set sonic_boot_load_old"
+fw_setenv sonic_bootargs "setenv bootargs root=$ROOT_DEV rw rootwait panic=10 \${linuxargs}" || sonic_uboot_env_log "ERROR: Failed to set sonic_bootargs"
+fw_setenv sonic_bootargs_old "setenv bootargs root=$ROOT_DEV rw rootwait panic=10 \${linuxargs_old}" || sonic_uboot_env_log "ERROR: Failed to set sonic_bootargs_old"
+>>>>>>> 3b29aba30 (NOS-7673: BMC early boot WDT (#6424))
 fw_setenv sonic_image_1 "run sonic_bootargs; run sonic_boot_load; bootm \${loadaddr}#conf-\${bootconf}" || sonic_uboot_env_log "ERROR: Failed to set sonic_image_1"
 fw_setenv sonic_image_2 "run sonic_bootargs_old; run sonic_boot_load_old; bootm \${loadaddr}#conf-\${bootconf}" || sonic_uboot_env_log "ERROR: Failed to set sonic_image_2"
 
 fw_setenv print_menu "echo ===================================================; echo SONiC Boot Menu; echo ===================================================; echo To boot \$sonic_version_1; echo   type: run sonic_image_1; echo   at the U-Boot prompt after interrupting U-Boot when it says; echo   \\\"Hit any key to stop autoboot:\\\" during boot; echo; echo To boot \$sonic_version_2; echo   type: run sonic_image_2; echo   at the U-Boot prompt after interrupting U-Boot when it says; echo   \\\"Hit any key to stop autoboot:\\\" during boot; echo; echo ===================================================" || sonic_uboot_env_log "ERROR: Failed to set print_menu"
 
 fw_setenv boot_next "run sonic_image_1" || sonic_uboot_env_log "ERROR: Failed to set boot_next"
-fw_setenv bootcmd "run print_menu; test -n \"\$boot_once\" && setenv do_boot_once \"\$boot_once\" && setenv boot_once \"\" && saveenv && run do_boot_once; run boot_next" || sonic_uboot_env_log "ERROR: Failed to set bootcmd"
+
+# Autoboot guard seam: 'bootcmd' gates the boot payload on 'run boot_guard'.
+# The default is a no-op that always succeeds ('test 1 = 1' -- relying only on the
+# 'test' command, which bootcmd already uses, so no extra U-Boot config such as
+# CONFIG_CMD_TRUE is required). A platform package may override boot_guard via the
+# vendor hook below to insert a board-specific check (e.g. a reboot-storm guard
+# command). Keeping the payload here in one place -- and having the vendor override
+# only boot_guard -- avoids duplicating the boot logic in the hook. boot_guard MUST
+# stay defined: an unset var makes 'run boot_guard' fail and the board never boots.
+fw_setenv boot_guard "test 1 = 1" || sonic_uboot_env_log "ERROR: Failed to set boot_guard"
+fw_setenv bootcmd "run print_menu; if run boot_guard; then test -n \"\$boot_once\" && setenv do_boot_once \"\$boot_once\" && setenv boot_once \"\" && saveenv && run do_boot_once; run boot_next; fi" || sonic_uboot_env_log "ERROR: Failed to set bootcmd"
 
 fw_setenv loadaddr "0x432000000" || sonic_uboot_env_log "ERROR: Failed to set loadaddr"
 fw_setenv kernel_addr "0x403000000" || sonic_uboot_env_log "ERROR: Failed to set kernel_addr"
 fw_setenv fdt_addr "0x44C000000" || sonic_uboot_env_log "ERROR: Failed to set fdt_addr"
 fw_setenv initrd_addr "0x440000000" || sonic_uboot_env_log "ERROR: Failed to set initrd_addr"
 
-# fw_setenv failures are logged but non-fatal (exit 0): the caller runs us under `set -e`,
-# so a non-zero exit would skip the first-boot marker and drop the installer to a shell.
+# Optional vendor hook: let a platform package adjust the U-Boot environment
+# (e.g. add a board-specific bootcmd guard) after the vendor-neutral defaults
+# above are programmed. Platforms that do not ship a hook are unaffected. The
+# hook runs with fw_setenv/fw_printenv available and inherits
+# SONIC_UBOOT_ENV_LOG_FILE so it can log in the same style.
+for sonic_uboot_hook in \
+    /usr/bin/sonic-uboot-env-vendor-hook \
+    /usr/local/bin/sonic-uboot-env-vendor-hook \
+    /sbin/sonic-uboot-env-vendor-hook; do
+    if [ -x "$sonic_uboot_hook" ]; then
+        sonic_uboot_env_log "Running vendor U-Boot env hook: $sonic_uboot_hook"
+        "$sonic_uboot_hook" || sonic_uboot_env_log "WARNING: vendor U-Boot env hook $sonic_uboot_hook failed"
+        break
+    fi
+done
+
 sonic_uboot_env_log "U-Boot environment variables programmed successfully."
 exit 0

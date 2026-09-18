@@ -36,6 +36,12 @@ case "$1" in
         # (ordered before sonic.target)
         echo "Enabling cpe_ctrl cold-boot init service..."
         systemctl enable cpe-ctrl-init.service 2>/dev/null || true
+        
+        # Enable watchdog boot-stage markers and storm-guard clear
+        echo "Enabling watchdog services..."
+        systemctl enable --now watchdog-stage-early.service 2>/dev/null || true
+        systemctl enable --now watchdog-stage-late.service 2>/dev/null || true
+        systemctl enable --now storm-guard-clear.service 2>/dev/null || true
         ;;
 esac
 
