@@ -139,6 +139,7 @@ class PddfComponent(ComponentBase, DeviceBase):
             raise RuntimeError("Component missing update command")
 
         if not os.path.exists(image_path):
+            print(f"Error: firmware image not found: {image_path}")
             return False
 
         result = self.pddf_obj.runcmd(update_cmd.format(image_path))
