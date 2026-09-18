@@ -88,6 +88,7 @@ struct xcvr_data {
     uint32_t            rxlos;
     uint32_t            txdisable;
     uint32_t            txfault;
+    uint32_t            power_good;
 };
 
 typedef struct XCVR_SYSFS_ATTR_OPS
@@ -111,6 +112,7 @@ enum xcvr_sysfs_attributes {
     XCVR_RXLOS,
     XCVR_TXDISABLE,
     XCVR_TXFAULT,
+    XCVR_POWER_GOOD,
     XCVR_ATTR_MAX
 };
 

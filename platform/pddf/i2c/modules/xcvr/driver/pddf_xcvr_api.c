@@ -721,6 +721,46 @@ int sonic_i2c_get_mod_txfault(struct i2c_client *client, XCVR_ATTR *info, struct
     return 0;
 }
 
+int sonic_i2c_get_mod_power_good(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data)
+{
+    int status = 0;
+    uint32_t pwr_good = 0;
+
+    if (strcmp(info->devtype, "cpld") == 0)
+    {
+        status = xcvr_i2c_cpld_read(info);
+        if (status < 0)
+            return status;
+        pwr_good = ((status & BIT_INDEX(info->mask)) == info->cmpval) ? 1 : 0;
+    }
+    else if (strcmp(info->devtype, "fpgai2c") == 0)
+    {
+        status = xcvr_i2c_fpga_read(info);
+        if (status < 0)
+            return status;
+        pwr_good = ((status & BIT_INDEX(info->mask)) == info->cmpval) ? 1 : 0;
+    }
+    else if (strcmp(info->devtype, "fpgapci") == 0)
+    {
+        status = xcvr_fpgapci_read(info);
+        if (status < 0)
+            return status;
+        pwr_good = ((status & BIT_INDEX(info->mask)) == info->cmpval) ? 1 : 0;
+    }
+    else if (strcmp(info->devtype, "multifpgapci") == 0)
+    {
+        int output;
+
+        status = xcvr_multifpgapci_read(info, &output);
+        if (status)
+            return status;
+        pwr_good = ((output & BIT_INDEX(info->mask)) == info->cmpval) ? 1 : 0;
+    }
+
+    data->power_good = pwr_good;
+    return 0;
+}
+
 int sonic_i2c_set_mod_reset(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data)
 {
     int status = 0;
@@ -1297,6 +1337,51 @@ ssize_t get_module_txfault(struct device *dev, struct device_attribute *da,
         }
         mutex_unlock(&data->update_lock);
         return sprintf(buf, "%d\n", data->txfault);
+    }
+    return sprintf(buf,"%s","");
+}
+
+ssize_t get_module_power_good(struct device *dev, struct device_attribute *da,
+             char *buf)
+{
+    struct sensor_device_attribute *attr = to_sensor_dev_attr(da);
+    struct i2c_client *client = to_i2c_client(dev);
+    XCVR_PDATA *pdata = (XCVR_PDATA *)(client->dev.platform_data);
+    struct xcvr_data *data = i2c_get_clientdata(client);
+    int idx, status = 0;
+    XCVR_ATTR *attr_data = NULL;
+    XCVR_SYSFS_ATTR_OPS *attr_ops = NULL;
+
+    idx = get_xcvr_module_attr_data(client, dev, da);
+
+    if (idx>=0) attr_data = &pdata->xcvr_attrs[idx];
+
+    if (attr_data!=NULL)
+    {
+        attr_ops = &xcvr_ops[attr->index];
+
+        mutex_lock(&data->update_lock);
+        if (attr_ops->pre_get != NULL)
+        {
+            status = (attr_ops->pre_get)(client, attr_data, data);
+            if (status!=0)
+                dev_warn(&client->dev, "%s: pre_get function fails for %s attribute. ret %d\n", __FUNCTION__, attr_data->aname, status);
+        }
+        if (attr_ops->do_get != NULL)
+        {
+            status = (attr_ops->do_get)(client, attr_data, data);
+            if (status!=0)
+                dev_warn(&client->dev, "%s: do_get function fails for %s attribute. ret %d\n", __FUNCTION__, attr_data->aname, status);
+
+        }
+        if (attr_ops->post_get != NULL)
+        {
+            status = (attr_ops->post_get)(client, attr_data, data);
+            if (status!=0)
+                dev_warn(&client->dev, "%s: post_get function fails for %s attribute. ret %d\n", __FUNCTION__, attr_data->aname, status);
+        }
+        mutex_unlock(&data->update_lock);
+        return sprintf(buf, "%d\n", data->power_good);
     }
     return sprintf(buf,"%s","");
 }

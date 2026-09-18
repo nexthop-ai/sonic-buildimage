@@ -26,6 +26,7 @@ extern int sonic_i2c_get_mod_lpmode(struct i2c_client *client, XCVR_ATTR *info, 
 extern int sonic_i2c_get_mod_rxlos(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
 extern int sonic_i2c_get_mod_txdisable(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
 extern int sonic_i2c_get_mod_txfault(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
+extern int sonic_i2c_get_mod_power_good(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
 extern int sonic_i2c_set_mod_lpmode(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
 extern int sonic_i2c_set_mod_reset(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
 extern int sonic_i2c_set_mod_txdisable(struct i2c_client *client, XCVR_ATTR *info, struct xcvr_data *data);
@@ -40,5 +41,6 @@ extern ssize_t get_module_rxlos(struct device *dev, struct device_attribute *da,
 extern ssize_t get_module_txdisable(struct device *dev, struct device_attribute *da, char *buf);
 extern ssize_t set_module_txdisable(struct device *dev, struct device_attribute *da, const char *buf, size_t count);
 extern ssize_t get_module_txfault(struct device *dev, struct device_attribute *da, char *buf);
+extern ssize_t get_module_power_good(struct device *dev, struct device_attribute *da, char *buf);
 
 #endif

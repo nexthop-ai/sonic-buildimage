@@ -88,6 +88,22 @@ class PddfSfp(SfpOptoeBase):
         else:
             return False
 
+    def get_power_good_status(self):
+        """
+        Retrieves the power-good status of this SFP.
+        Returns:
+            True if power is good, False if not, None if the platform does
+            not expose the xcvr_power_good attribute.
+        """
+        output = self.pddf_obj.get_attr_name_output(self.device, 'xcvr_power_good')
+        if not output:
+            return None
+
+        try:
+            return int(output['status'].rstrip()) == 1
+        except (ValueError, KeyError):
+            return None
+
     def get_reset_status(self):
         """
         Retrieves the reset status of SFP

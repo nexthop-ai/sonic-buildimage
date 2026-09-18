@@ -57,6 +57,7 @@ XCVR_SYSFS_ATTR_OPS xcvr_ops[XCVR_ATTR_MAX] = {
     {XCVR_RXLOS, get_module_rxlos, NULL, sonic_i2c_get_mod_rxlos, NULL, NULL, NULL, NULL, NULL},
     {XCVR_TXDISABLE, get_module_txdisable, NULL, sonic_i2c_get_mod_txdisable, NULL, set_module_txdisable, NULL, sonic_i2c_set_mod_txdisable, NULL},
     {XCVR_TXFAULT, get_module_txfault, NULL, sonic_i2c_get_mod_txfault, NULL, NULL, NULL, NULL, NULL},
+    {XCVR_POWER_GOOD, get_module_power_good, NULL, sonic_i2c_get_mod_power_good, NULL, NULL, NULL, NULL, NULL},
 };
 EXPORT_SYMBOL(xcvr_ops);
 
@@ -70,6 +71,7 @@ static SENSOR_DEVICE_ATTR(xcvr_lpmode,  S_IWUSR|S_IRUGO, get_module_lpmode, set_
 static SENSOR_DEVICE_ATTR(xcvr_rxlos,   S_IWUSR|S_IRUGO, get_module_rxlos, NULL, XCVR_RXLOS);
 static SENSOR_DEVICE_ATTR(xcvr_txdisable,   S_IWUSR|S_IRUGO, get_module_txdisable, set_module_txdisable, XCVR_TXDISABLE);
 static SENSOR_DEVICE_ATTR(xcvr_txfault, S_IWUSR|S_IRUGO, get_module_txfault, NULL, XCVR_TXFAULT);
+static SENSOR_DEVICE_ATTR(xcvr_power_good, S_IRUGO, get_module_power_good, NULL, XCVR_POWER_GOOD);
 
 /* List of all the xcvr attribute structures 
  * to get name, use sensor_dev_attr_<>.dev_attr.attr.name
@@ -83,6 +85,7 @@ static struct sensor_device_attribute *xcvr_attr_list[MAX_XCVR_ATTRS] = {
     &sensor_dev_attr_xcvr_rxlos,
     &sensor_dev_attr_xcvr_txdisable,
     &sensor_dev_attr_xcvr_txfault,
+    &sensor_dev_attr_xcvr_power_good,
 };
 
 static struct attribute *xcvr_attributes[MAX_XCVR_ATTRS] = {NULL};
