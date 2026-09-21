@@ -55,6 +55,23 @@
         },
         "PORT_BUFFER_DROP": {
             "FLEX_COUNTER_STATUS": "enable"
+<<<<<<< HEAD
+=======
+        },
+        "COPP_STATS": {
+            "FLEX_COUNTER_STATUS": "enable"
+        },
+        "BFD_SESSION_STAT": {
+            "FLEX_COUNTER_STATUS": "enable"
+        },
+        "WRED_ECN_QUEUE": {
+            "FLEX_COUNTER_STATUS": "enable",
+            "POLL_INTERVAL": "10000"
+        },
+        "WRED_ECN_PORT": {
+            "FLEX_COUNTER_STATUS": "enable",
+            "POLL_INTERVAL": "10000"
+>>>>>>> 3e8ae2d18 (NOS-15685: enable WRED_ECN_QUEUE/WRED_ECN_PORT flex counters by default (#8783))
         }
 {%- if sonic_asic_platform in ["nvidia-bluefield", "pensando"] %},
         "ENI": {
