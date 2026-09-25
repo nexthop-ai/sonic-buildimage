@@ -22,13 +22,23 @@ def patch_dependencies():
     This fixture is automatically applied to all tests in the unit/ directory.
     It uses function scope, so each test can override the mocked modules if needed.
     """
-    # Mock SONiC dependencies that are not available during wheel build
+    # Mock SONiC dependencies that are not available during wheel build.
+    # The TlvInfo bases must be real classes: eeprom_utils subclasses them
+    # alongside a real mixin, and a Mock co-base is a metaclass conflict.
+    class _TlvInfoDecoder:
+        def __init__(self, *args, **kwargs):
+            pass
+    eeprom_tlvinfo = Mock()
+    eeprom_tlvinfo.TlvInfoDecoder = _TlvInfoDecoder
+    eeprom_tlvinfo.EepromDecodeVisitor = type("EepromDecodeVisitor", (object,), {})
+    sonic_eeprom = Mock()
+    sonic_eeprom.eeprom_tlvinfo = eeprom_tlvinfo
     mock_modules = {
         "sonic_platform_base": Mock(),
-        "sonic_platform_base.sonic_eeprom": Mock(),
-        "sonic_platform_base.sonic_eeprom.eeprom_tlvinfo": Mock(),
-        "sonic_eeprom": Mock(),
-        "sonic_eeprom.eeprom_tlvinfo": Mock(),
+        "sonic_platform_base.sonic_eeprom": sonic_eeprom,
+        "sonic_platform_base.sonic_eeprom.eeprom_tlvinfo": eeprom_tlvinfo,
+        "sonic_eeprom": sonic_eeprom,
+        "sonic_eeprom.eeprom_tlvinfo": eeprom_tlvinfo,
     }
 
     with patch.dict(sys.modules, mock_modules):

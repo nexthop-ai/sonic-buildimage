@@ -125,7 +125,25 @@ def fake_some_base_modules():
     interface_mock.inband_prefix.return_value = "Ethernet-IB"
     interface_mock.recirc_prefix.return_value = "Ethernet-Rec"
 
+    # The Nexthop Eeprom classes subclass these alongside a real mixin, so they
+    # must be real (constructible) classes rather than Mock attributes.
+    class _TlvInfoDecoder:
+        def __init__(self, *args, **kwargs):
+            pass
+    eeprom_tlvinfo = Mock()
+    eeprom_tlvinfo.TlvInfoDecoder = _TlvInfoDecoder
+    eeprom_tlvinfo.EepromDecodeVisitor = type("EepromDecodeVisitor", (object,), {})
+    sonic_eeprom = Mock()
+    sonic_eeprom.eeprom_tlvinfo = eeprom_tlvinfo
+    pddf_eeprom = Mock()
+    pddf_eeprom.PddfEeprom = type("PddfEeprom", (_TlvInfoDecoder,), {})
+
     return {
+        "sonic_platform_base.sonic_eeprom": sonic_eeprom,
+        "sonic_platform_base.sonic_eeprom.eeprom_tlvinfo": eeprom_tlvinfo,
+        "sonic_eeprom": sonic_eeprom,
+        "sonic_eeprom.eeprom_tlvinfo": eeprom_tlvinfo,
+        "sonic_platform_pddf_base.pddf_eeprom": pddf_eeprom,
         "sonic_platform_base.sonic_thermal_control.thermal_json_object": thermal_json_object,
         "sonic_platform_base.sonic_thermal_control.thermal_info_base": thermal_info_base,
         "sonic_platform_base.sonic_thermal_control.thermal_action_base": thermal_action_base,

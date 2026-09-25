@@ -1,6 +1,7 @@
 # Copyright 2025 Nexthop Systems Inc. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import io
 import os
 import struct
 
@@ -119,7 +120,22 @@ class NexthopEepromDecodeVisitor(eeprom_tlvinfo.EepromDecodeVisitor):
          print("%-25s 0x%02X %3d %s" % (name, code, length, value))
 
 
-class Eeprom(eeprom_tlvinfo.TlvInfoDecoder):
+class NexthopEepromMixin:
+    """Shared by the Nexthop Eeprom classes (TlvInfoDecoder- and PddfEeprom-based):
+    cache-aware, exact-size device reads. List it before the vendor base so its
+    super() calls reach that base."""
+
+    def open_eeprom(self):
+        # io.open() wraps the device in a BufferedReader that rounds every
+        # read up to 4 KiB, which is way too costly for live-device reads.
+        # Read the exact size instead.
+        f = super().open_eeprom()
+        if isinstance(f, io.BufferedReader) and self.cache_update_needed:
+            return io.BufferedReader(f.detach(), buffer_size=1)
+        return f
+
+
+class Eeprom(NexthopEepromMixin, eeprom_tlvinfo.TlvInfoDecoder):
     def decoder(self, s, t):
         # Vendor Extension TLV schema:
         # Byte | Name
