@@ -120,7 +120,7 @@
         "sonic-mac-move-guard:sonic-mac-move-guard": {
             "sonic-mac-move-guard:MAC_MOVE_GUARD": {
                 "sonic-mac-move-guard:GLOBAL": {
-                    "action_interval": 0
+                    "action_interval": 119
                 }
             }
         }

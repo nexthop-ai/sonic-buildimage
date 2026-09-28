@@ -94,13 +94,17 @@ module sonic-mac-move-guard {
 
                 leaf action_interval {
                     type uint32 {
-                        range "1..86400";
+                        range "120..86400";
                     }
                     units "seconds";
                     default 600;
                     description
                         "Duration the mitigation action stays in effect
-                         before the orchestrator reverts it.";
+                         before the orchestrator reverts it. The
+                         implementation for reverting the action may be
+                         based on a periodic timer (30 seconds, say), so
+                         the action is released between action_interval
+                         and action_interval + 30s.";
                 }
 
                 leaf action {

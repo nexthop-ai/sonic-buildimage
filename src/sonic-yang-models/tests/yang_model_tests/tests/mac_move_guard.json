@@ -70,7 +70,7 @@
         "eStrKey": "Range"
     },
     "MAC_MOVE_GUARD_ACTION_INTERVAL_LOW": {
-        "desc": "MAC_MOVE_GUARD with action_interval=0 is rejected (min is 1).",
+        "desc": "MAC_MOVE_GUARD with action_interval=119 is rejected (min is 120).",
         "eStrKey": "Range"
     },
     "MAC_MOVE_GUARD_ACTION_INTERVAL_HIGH": {
