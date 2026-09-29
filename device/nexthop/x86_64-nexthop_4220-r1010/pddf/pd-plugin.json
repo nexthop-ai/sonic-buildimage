@@ -72,7 +72,17 @@
         "switch_card_1": {
             "type": "adm1266",
             "dpm": "DPM2",
-            "dpm_signal_to_fault_cause": [ ],
+            "dpm_signal_to_fault_cause": [
+                {
+                    "pdio_mask": "0x0080",
+                    "gpio_mask": "0x0000",
+                    "pdio_value": "0x0080",
+                    "gpio_value": "0x0000",
+                    "hw_cause": "CPU_CMD_PCYC",
+                    "hw_desc": "CPU card commanded power cycle",
+                    "reboot_cause": "REBOOT_CAUSE_POWER_LOSS"
+                }
+            ],
             "pin_to_name": {
                 "VH1": "12V",
                 "VH2": "5V0",
@@ -88,8 +98,8 @@
                 "VP8": "0V8",
                 "VP9": "0V9_PVDD_0",
                 "VP10": "0V9_PVDD_1",
-                "VP11": "0V8_PB0",
-                "VP12": "0V8_PB1",
+                "VP11": "0V72_PB0",
+                "VP12": "0V72_PB1",
                 "VP13": "1V8"
             }
         },
@@ -152,15 +162,6 @@
                     "reboot_cause": "REBOOT_CAUSE_POWER_LOSS"
                 },
                 {
-                    "pdio_mask": "0x0100",
-                    "gpio_mask": "0x0000",
-                    "pdio_value": "0x0100",
-                    "gpio_value": "0x0000",
-                    "hw_cause": "CPU_CMD_PCYC",
-                    "hw_desc": "CPU card commanded power cycle",
-                    "reboot_cause": "REBOOT_CAUSE_POWER_LOSS"
-                },
-                {
                     "pdio_mask": "0x0000",
                     "gpio_mask": "0x0080",
                     "pdio_value": "0x0000",
@@ -168,12 +169,23 @@
                     "hw_cause": "NO_FAN_PRSNT",
                     "hw_desc": "All 4 system fans removed",
                     "reboot_cause": "REBOOT_CAUSE_INSUFFICIENT_FAN_SPEED"
+                },
+                {
+                    "pdio_mask": "0x0000",
+                    "gpio_mask": "0x0000",
+                    "pdio_value": "0x0000",
+                    "gpio_value": "0x0000",
+                    "vh_uv_mask": "0x1",
+                    "vh_uv_value": "0x1",
+                    "hw_cause": "MAIN_12V_LOSS",
+                    "hw_desc": "Main 12V rail lost input power",
+                    "reboot_cause": "REBOOT_CAUSE_POWER_LOSS"
                 }
             ],
             "pin_to_name": {
                 "VH1": "12V",
                 "VH2": "3V3",
-                "VH3": "1V45",
+                "VH3": "1V5_PB",
                 "VH4": "0V9_EAST",
                 "VP1": "0V75_EAST",
                 "VP2": "0V8_PT7",
@@ -184,8 +196,8 @@
                 "VP7": "0V8_PT5",
                 "VP8": "0V9_PVDD_2",
                 "VP9": "0V9_PVDD_3",
-                "VP10": "0V8_PB2",
-                "VP11": "0V8_PB3",
+                "VP10": "0V72_PB2",
+                "VP11": "0V72_PB3",
                 "VP12": "1V2_PCIE",
                 "VP13": "1V5_RVDD"
             }
@@ -268,10 +280,21 @@
                 }
             }
         },
+        "default_max_speed": 75,
         "duty_cycle_to_pwm": "lambda dc: ((dc/100) * 255)",
         "pwm_to_duty_cycle": "lambda pwm: ((pwm/255) * 100)"
     },
     "REBOOT_CAUSE": {
         "reboot_cause_file": "/host/reboot-cause/reboot-cause.txt"
+    },
+    "BLACKBOX": {
+        "dcdc": {
+            "log_path": "/host/blackbox/dcdc",
+            "discard_duplicate_logs": true
+        },
+        "psu": {
+            "log_path": "/host/blackbox/psu",
+            "discard_duplicate_logs": false
+        }
     }
 }
