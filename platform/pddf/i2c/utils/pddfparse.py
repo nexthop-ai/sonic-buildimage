@@ -491,17 +491,28 @@ class PddfParse():
         return create_ret.append(ret)
 
     def create_temp_sensor_device(self, dev, ops):
+<<<<<<< HEAD
         return self.create_non_pddf_i2c_device(dev, ops)
+=======
+        return [self.create_non_pddf_i2c_device(dev)]
+>>>>>>> 0968161ed (NOS-17242: Return the device-creation rc as a list from the non-PDDF i2c creators (#9626))
 
     def create_asic_temp_sensor_device(self, dev, ops):
         # NO-OP
         return [0]
 
     def create_dpm_device(self, dev, ops):
+<<<<<<< HEAD
         return self.create_non_pddf_i2c_device(dev, ops)
 
     def create_dcdc_device(self, dev, ops):
         return self.create_non_pddf_i2c_device(dev, ops)
+=======
+        return [self.create_non_pddf_i2c_device(dev)]
+
+    def create_dcdc_device(self, dev, ops):
+        return [self.create_non_pddf_i2c_device(dev)]
+>>>>>>> 0968161ed (NOS-17242: Return the device-creation rc as a list from the non-PDDF i2c creators (#9626))
 
     def create_cpld_device(self, dev, ops):
         create_ret = []
