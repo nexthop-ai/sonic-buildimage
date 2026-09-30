@@ -19,6 +19,10 @@ module sonic-port{
 
 	description "PORT yang Module for SONiC OS";
 
+	revision 2026-09-23 {
+		description "Remove the mode leaf.";
+	}
+
 	revision 2019-07-01 {
 		description "First Revision";
 	}
@@ -81,11 +85,6 @@ module sonic-port{
 					type string {
 						length 1..128;
 					}
-				}
-
-				leaf mode {
-					description "SwitchPort Modes possible values are routed|access|trunk. Default value  for mode is routed"; 
-					type stypes:switchport_mode; 
 				}
 
 				leaf description {

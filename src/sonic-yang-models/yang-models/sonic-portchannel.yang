@@ -15,7 +15,7 @@ module sonic-portchannel {
 
     import sonic-port {
         prefix port;
-        revision-date 2019-07-01;
+        revision-date 2026-09-23;
     }
 
     import sonic-vrf {
@@ -24,6 +24,37 @@ module sonic-portchannel {
 
     description "Link Aggregation Group (LAG/PortChannel) configuration using LACP";
 
+<<<<<<< HEAD
+=======
+    revision 2026-09-23 {
+        description "Remove the mode leaf.";
+    }
+
+    revision 2026-07-27 {
+        description "Apply the micro-BFD 100/1000 ms timer restriction only when hardware BFD offload is active (DEVICE_METADATA switch_type voq and SYSTEM_DEFAULTS hw_bfd_offload enabled, software_bfd not enabled).";
+    }
+
+    revision 2026-07-23 {
+        description "Restrict micro_bfd_rx_interval and micro_bfd_tx_interval to 100 or 1000 ms; hardware BFD offload only supports these timer values (default remains 1000).";
+    }
+
+    revision 2026-07-21 {
+        description "Constrain a member port's MTU to match the PortChannel MTU, unless either is unset.";
+    }
+
+    revision 2026-07-13 {
+        description "Add PortChannel-level micro-BFD (RFC 7130): micro_bfd toggle, per-address-family peer IP, and timer leaves.";
+    }
+    
+    revision 2026-07-08 {
+        description "lacp_mode: rename value 'couple' to 'coupled', and drop the per-PortChannel default so an absent value inherits the switch-wide DEVICE_METADATA default_lacp_mode.";
+    }
+
+    revision 2025-06-28 {
+        description "Add lacp_mode (independent|coupled) attribute to PortChannel.";
+    }
+
+>>>>>>> 99816fcd7 (NOS-16717: retire the switchport mode field from the port models (#9934))
     revision 2025-06-24 {
         description "Add LACP System MAC address";
     }
@@ -68,12 +99,6 @@ module sonic-portchannel {
                     type uint16 {
                         range 1..1024;
                     }
-                }
-
-               leaf mode {
-                   description "PortChannel SwitchPort Mode possible values are routed|access|trunk. Default value for mode is routed.";
-                   type stypes:switchport_mode;
-
                 }
 
                 leaf description {

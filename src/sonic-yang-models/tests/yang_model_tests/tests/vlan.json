@@ -138,7 +138,15 @@
     },
     "VLAN_ADD_PORT_THAT_IS_ROUTER_INTERFACE": {
         "desc": "Add to Vlan port that is router interface",
-        "eStr": "Port is a router interface"
+        "eStr": ["Port is both a VLAN member and a router interface"]
+    },
+    "VLAN_ADD_PORTCHANNEL_THAT_IS_ROUTER_INTERFACE": {
+        "desc": "Add to Vlan port channel that is router interface",
+        "eStr": ["Port channel is both a VLAN member and a router interface"]
+    },
+    "VLAN_ADD_PORTCHANNEL_WITH_ONLY_ADDRESS_ROWS": {
+        "desc": "Add to Vlan port channel that is routed only through address rows",
+        "eStr": ["Port channel is both a VLAN member and a router interface"]
     },
     "VLAN_INTERFACE_WITH_VNET_AND_IP_PREFIXES": {
         "desc": "Configure a VLAN interface with VNET and both IPv4 and IPv6 prefixes."

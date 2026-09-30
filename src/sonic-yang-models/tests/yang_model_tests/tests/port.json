@@ -23,10 +23,9 @@
     "PORT_VALID_MTU_TEST_2": {
         "desc": "PORT_VALID_MTU_TEST_2 no failure."
     },
-    "PORT_INVLAID_MODE_TEST": {
-        "desc": "PORT_INVLAID_MODE_TEST invalid mode failure.",
-        "eStrKey" : "Pattern",
-        "eStr": ["routed|access|trunk"]
+    "PORT_MODE_IS_UNKNOWN": {
+        "desc": "PORT row carrying mode, which the model does not declare.",
+        "eStrKey" : "UnknownElement"
     },
     "PORT_VALID_AUTONEG_TEST_1": {
         "desc": "PORT_VALID_AUTONEG_TEST_1 no failure."

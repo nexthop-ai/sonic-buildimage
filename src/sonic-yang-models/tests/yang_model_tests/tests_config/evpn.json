@@ -42,15 +42,13 @@
                         "name": "PortChannel0001",
                         "admin_status": "up",
                         "min_links": "1",
-                        "mtu": "9100",
-                        "mode": "routed"
+                        "mtu": "9100"
                     },
                     {
                         "name": "PortChannel0002",
                         "admin_status": "up",
                         "min_links": "2",
-                        "mtu": "9100",
-                        "mode": "trunk"
+                        "mtu": "9100"
                     }
                 ]
             }
@@ -354,8 +352,7 @@
                         "name": "PortChannel0001",
                         "admin_status": "up",
                         "min_links": "1",
-                        "mtu": "9100",
-                        "mode": "routed"
+                        "mtu": "9100"
                     }
                 ]
             }

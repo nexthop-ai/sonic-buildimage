@@ -10,8 +10,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode": "trunk"
+                        "speed": 25000
                     },
                     {
                         "admin_status": "up",
@@ -20,8 +19,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet10",
-                        "speed": 25000,
-                        "mode":"routed"
+                        "speed": 25000
                     }
                 ]
             }
@@ -34,16 +32,14 @@
                         "min_links": "1",
                         "mtu": "9100",
                         "lacp_key": "auto",
-                        "name": "PortChannel2",
-                        "mode":"trunk"
+                        "name": "PortChannel2"
                     },
                     {
                         "admin_status": "up",
                         "min_links": "1",
                         "mtu": "9100",
                         "lacp_key": "auto",
-                        "name": "PortChannel10",
-                        "mode":"trunk"
+                        "name": "PortChannel10"
 
                     }
                 ]
@@ -131,8 +127,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     },
                     {
                         "admin_status": "up",
@@ -141,8 +136,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet4",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -155,8 +149,7 @@
                         "min_links": "1",
                         "mtu": "9100",
                         "lacp_key": "auto",
-                        "name": "PortChannel2",
-                        "mode":"trunk"
+                        "name": "PortChannel2"
                     }
                 ]
             }
@@ -310,8 +303,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet12",
-                        "speed": 25000,
-                        "mode":"routed"
+                        "speed": 25000
                     }
                 ]
             }

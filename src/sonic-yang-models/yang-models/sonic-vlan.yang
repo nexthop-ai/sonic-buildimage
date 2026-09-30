@@ -19,7 +19,7 @@ module sonic-vlan {
 
 	import sonic-port {
 		prefix port;
-		revision-date 2019-07-01;
+		revision-date 2026-09-23;
 	}
 
 	import sonic-portchannel {
@@ -47,6 +47,17 @@ module sonic-vlan {
 
 	description "VLAN yang Module for SONiC OS";
 
+<<<<<<< HEAD
+=======
+	revision 2026-09-23 {
+		description "Reject a VLAN member that is a PortChannel router interface.";
+	}
+
+	revision 2025-11-10 {
+		description "Add autostate field to VLAN configuration";
+	}
+
+>>>>>>> 99816fcd7 (NOS-16717: retire the switchport mode field from the port models (#9934))
 	revision 2025-04-22 {
 		description "Add SAG support";
 	}
@@ -293,7 +304,7 @@ module sonic-vlan {
 
 		container VLAN_MEMBER {
 
-			description "VLAN port membership and tagging configuration";
+			description "VLAN port membership and tagging configuration. A port's switchport mode follows from its memberships; a router interface must have its interface entry removed before it can join a VLAN.";
 
 			list VLAN_MEMBER_LIST {
 
@@ -324,7 +335,14 @@ module sonic-vlan {
 						error-message "Port is a member of a port channel.";
 					}
 					must "not(/intf:sonic-interface/intf:INTERFACE/intf:INTERFACE_LIST[intf:name=current()])" {
-						error-message "Port is a router interface.";
+						error-message "Port is both a VLAN member and a router interface; remove its INTERFACE entries or its VLAN memberships.";
+						error-app-tag vlan-member-is-routed-port;
+					}
+					/* Address rows alone make a router interface; nothing requires the base row. */
+					must "not(/lag:sonic-portchannel/lag:PORTCHANNEL_INTERFACE/lag:PORTCHANNEL_INTERFACE_LIST[lag:name=current()]
+						or /lag:sonic-portchannel/lag:PORTCHANNEL_INTERFACE/lag:PORTCHANNEL_INTERFACE_IPPREFIX_LIST[lag:name=current()])" {
+						error-message "Port channel is both a VLAN member and a router interface; remove its PORTCHANNEL_INTERFACE entries or its VLAN memberships.";
+						error-app-tag vlan-member-is-routed-portchannel;
 					}
 					must "count(../../vlan:VLAN_MEMBER_LIST[vlan:port=current() and vlan:tagging_mode='untagged']) <= 1" {
 						error-message "Port can be untagged in at most one VLAN.";

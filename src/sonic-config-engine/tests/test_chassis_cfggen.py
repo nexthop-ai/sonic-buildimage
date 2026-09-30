@@ -1156,6 +1156,19 @@ class TestPacketChassisSup(TestChassis):
             )
         )
 
+    def test_vlan_member(self):
+        argument = [
+            '-m', self.sample_graph,
+            '-p', self.sample_port_config,
+            '-n', 'asic0',
+            '-v', "VLAN_MEMBER"
+        ]
+        output = self.run_script(argument, ignore_warning=True)
+        vlan_members = utils.to_dict(output.strip())
+        # Only PortChannel5004-5010 are in asic0's PORTCHANNEL.
+        for pc in range(5004, 5011):
+            self.assertEqual(vlan_members['Vlan2|PortChannel{}'.format(pc)], {'tagging_mode': 'untagged'})
+
     def tearDown(self):
         os.environ['CFGGEN_UNIT_TESTING'] = ''
         os.environ['CFGGEN_UNIT_TESTING_TOPOLOGY'] = ''

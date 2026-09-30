@@ -27,8 +27,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     },
                     {
                         "admin_status": "up",
@@ -37,8 +36,7 @@
                         "lanes": "71",
                         "mtu": 9000,
                         "name": "Ethernet9",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -73,8 +71,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -107,8 +104,7 @@
                         "description": "Ethernet8",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -144,8 +140,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -181,8 +176,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -210,8 +204,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -239,8 +232,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -268,8 +260,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -318,8 +309,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode": "trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -368,8 +358,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode": "trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -397,8 +386,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -426,8 +414,7 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -455,11 +442,192 @@
                         "lanes": "65",
                         "mtu": 9000,
                         "name": "Ethernet8",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
         }
+<<<<<<< HEAD
+=======
+    },
+    "INTERFACE_VALID_DHCP_SERVERS": {
+        "sonic-interface:sonic-interface": {
+            "sonic-interface:INTERFACE": {
+                "INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet8",
+                        "dhcp_servers": [
+                            "192.168.1.100",
+                            "192.168.1.101"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth8",
+                        "description": "Ethernet8",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "name": "Ethernet8",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "INTERFACE_VALID_DHCPV6_SERVERS": {
+        "sonic-interface:sonic-interface": {
+            "sonic-interface:INTERFACE": {
+                "INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet8",
+                        "dhcpv6_servers": [
+                            "2001:db8::1",
+                            "2001:db8::2"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth8",
+                        "description": "Ethernet8",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "name": "Ethernet8",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "INTERFACE_VALID_BOTH_DHCP_SERVERS": {
+        "sonic-interface:sonic-interface": {
+            "sonic-interface:INTERFACE": {
+                "INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet8",
+                        "dhcp_servers": [
+                            "192.168.1.100",
+                            "192.168.1.101"
+                        ],
+                        "dhcpv6_servers": [
+                            "2001:db8::1",
+                            "2001:db8::2"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth8",
+                        "description": "Ethernet8",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "name": "Ethernet8",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "INTERFACE_INVALID_DHCP_SERVER_FORMAT": {
+        "sonic-interface:sonic-interface": {
+            "sonic-interface:INTERFACE": {
+                "INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet8",
+                        "dhcp_servers": [
+                            "192.168.1.256"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth8",
+                        "description": "Ethernet8",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "name": "Ethernet8",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "INTERFACE_INVALID_DHCPV6_SERVER_FORMAT": {
+        "sonic-interface:sonic-interface": {
+            "sonic-interface:INTERFACE": {
+                "INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet8",
+                        "dhcpv6_servers": [
+                            "2001:db8::gggg"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth8",
+                        "description": "Ethernet8",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "name": "Ethernet8",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "INTERFACE_EMPTY_DHCP_SERVERS_LIST": {
+        "sonic-interface:sonic-interface": {
+            "sonic-interface:INTERFACE": {
+                "INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet8",
+                        "dhcp_servers": []
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth8",
+                        "description": "Ethernet8",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "name": "Ethernet8",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+>>>>>>> 99816fcd7 (NOS-16717: retire the switchport mode field from the port models (#9934))
     }
 }

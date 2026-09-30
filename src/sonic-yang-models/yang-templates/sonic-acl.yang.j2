@@ -20,7 +20,7 @@ module sonic-acl {
 
 	import sonic-types {
 		prefix stypes;
-		revision-date 2019-07-01;
+		revision-date 2026-09-23;
 	}
 
 	import sonic-extension {
@@ -30,7 +30,7 @@ module sonic-acl {
 
 	import sonic-port {
 		prefix port;
-		revision-date 2019-07-01;
+		revision-date 2026-09-23;
 	}
 
 	import sonic-portchannel {
@@ -42,6 +42,10 @@ module sonic-acl {
 	}
 
 	description "ACL YANG Module for SONiC OS";
+
+	revision 2026-09-23 {
+		description "Import the sonic-port and sonic-types revisions without switchport mode.";
+	}
 
 	revision 2019-07-01 {
 		description "First Revision";

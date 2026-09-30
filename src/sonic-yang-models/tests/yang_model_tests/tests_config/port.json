@@ -13,8 +13,7 @@
                         "pfc_asym": "off",
                         "name": "Ethernet8",
                         "tpid": "0x8100",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -34,8 +33,7 @@
                         "pfc_asym": "on",
                         "name": "Ethernet8",
                         "tpid": "0x8100",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -50,8 +48,7 @@
                         "alias": "eth8",
                         "lanes": "65",
                         "speed": 25000,
-                        "mtu": 68,
-                        "mode":"trunk"
+                        "mtu": 68
                     }
                 ]
             }
@@ -66,14 +63,14 @@
                         "alias": "eth8",
                         "lanes": "65",
                         "speed": 25000,
-                        "mtu": 9216,
-                        "mode":"trunk"
+                        "mtu": 9216
                     }
                 ]
             }
         }
     },
-    "PORT_INVLAID_MODE_TEST": {
+
+    "PORT_MODE_IS_UNKNOWN": {
         "sonic-port:sonic-port": {
             "sonic-port:PORT": {
                 "PORT_LIST": [
@@ -82,7 +79,7 @@
                         "alias": "eth8",
                         "lanes": "65",
                         "speed": 25000,
-                        "mode" : "off"
+                        "mode": "access"
                     }
                 ]
             }
@@ -99,7 +96,6 @@
                         "lanes": "60, 61",
                         "speed": 100000,
                         "subport": 1,
-                        "mode":"trunk",
                         "dhcp_rate_limit": "301"
                     },
                     {
@@ -108,7 +104,6 @@
                         "lanes": "62, 63",
                         "speed": 100000,
                         "subport": 2,
-                        "mode":"trunk",
                         "dhcp_rate_limit": "500"
                     },
                     {
@@ -117,7 +112,6 @@
                         "lanes": "64, 65",
                         "speed": 100000,
                         "subport": 3,
-                        "mode":"trunk",
                         "dhcp_rate_limit": "100000"
                     },
                     {
@@ -126,7 +120,6 @@
                         "lanes": "66, 67",
                         "speed": 100000,
                         "subport": 4,
-                        "mode":"trunk",
                         "dhcp_rate_limit": "400000"
                     }
                 ]
@@ -144,8 +137,7 @@
                         "lanes": "65",
                         "speed": 25000,
                         "tpid": "0x8100",
-                        "autoneg": "on",
-                        "mode":"trunk"
+                        "autoneg": "on"
                     }
                 ]
             }
@@ -162,8 +154,7 @@
                         "lanes": "65",
                         "speed": 25000,
                         "tpid": "0x8100",
-                        "autoneg": "off",
-                        "mode":"trunk"
+                        "autoneg": "off"
                     }
                 ]
             }
@@ -180,8 +171,7 @@
                         "lanes": "65",
                         "speed": 25000,
                         "tpid": "0x8100",
-                        "autoneg": "invalid",
-                        "mode":"trunk"
+                        "autoneg": "invalid"
                     }
                 ]
             }
@@ -547,8 +537,7 @@
                         "lanes": "65",
                         "speed": 25000,
                         "tpid": "0x8100",
-                        "link_training": "on",
-                        "mode":"trunk"
+                        "link_training": "on"
                     }
                 ]
             }
@@ -565,8 +554,7 @@
                         "lanes": "65",
                         "speed": 25000,
                         "tpid": "0x8100",
-                        "link_training": "off",
-                        "mode":"trunk"
+                        "link_training": "off"
                     }
                 ]
             }
@@ -655,8 +643,7 @@
                          "alias": "etp1a",
                          "lanes": "60, 61",
                          "speed": 100000,
-                         "subport": 9,
-                         "mode":"trunk"
+                         "subport": 9
                      }
                  ]
              }
@@ -672,32 +659,28 @@
                         "alias": "etp1a",
                         "lanes": "60, 61",
                         "speed": 100000,
-                        "subport": 1,
-                        "mode":"trunk"
+                        "subport": 1
                     },
                     {
                        "name": "Ethernet2",
                         "alias": "etp1b",
                         "lanes": "62, 63",
                         "speed": 100000,
-                        "subport": 2,
-                        "mode":"trunk"
+                        "subport": 2
                     },
                     {
                         "name": "Ethernet4",
                         "alias": "etp1c",
                         "lanes": "64, 65",
                         "speed": 100000,
-                        "subport": 3,
-                        "mode":"trunk"
+                        "subport": 3
                     },
                     {
                         "name": "Ethernet6",
                         "alias": "etp1d",
                         "lanes": "66, 67",
                         "speed": 100000,
-                        "subport": 4,
-                        "mode":"trunk"
+                        "subport": 4
                     }
                 ]
             }

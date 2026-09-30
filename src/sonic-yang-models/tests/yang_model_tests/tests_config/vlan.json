@@ -241,8 +241,7 @@
                 "PORTCHANNEL_LIST": [
                     {
                         "admin_status": "up",
-                        "name": "PortChannel5",
-                        "mode":"trunk"
+                        "name": "PortChannel5"
                     }
                 ]
             }
@@ -391,8 +390,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -610,8 +608,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -667,8 +664,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -825,8 +821,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -914,8 +909,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -959,8 +953,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -1004,8 +997,7 @@
                         "mtu": 9000,
                         "lanes": "1",
                         "name": "Ethernet0",
-                        "speed": 25000,
-                        "mode":"trunk"
+                        "speed": 25000
                     }
                 ]
             }
@@ -1170,8 +1162,7 @@
                         "lacp_key": "auto",
                         "name": "PortChannel0001",
                         "fast_rate": "false",
-                        "fallback" : "false",
-                        "mode" :  "routed"
+                        "fallback" : "false"
                     }
                 ]
             },
@@ -1273,6 +1264,81 @@
                 "VLAN_MEMBER_LIST": [
                     {
                         "port": "Ethernet1",
+                        "tagging_mode": "untagged",
+                        "name": "Vlan10"
+                    }
+                ]
+            }
+        }
+    },
+    "VLAN_ADD_PORTCHANNEL_THAT_IS_ROUTER_INTERFACE": {
+        "sonic-portchannel:sonic-portchannel": {
+            "sonic-portchannel:PORTCHANNEL": {
+                "PORTCHANNEL_LIST": [
+                    {
+                        "admin_status": "up",
+                        "name": "PortChannel1"
+                    }
+                ]
+            },
+            "sonic-portchannel:PORTCHANNEL_INTERFACE": {
+                "PORTCHANNEL_INTERFACE_LIST": [
+                    {
+                        "name": "PortChannel1"
+                    }
+                ]
+            }
+        },
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan10"
+                    }
+                ]
+            },
+            "sonic-vlan:VLAN_MEMBER": {
+                "VLAN_MEMBER_LIST": [
+                    {
+                        "port": "PortChannel1",
+                        "tagging_mode": "untagged",
+                        "name": "Vlan10"
+                    }
+                ]
+            }
+        }
+    },
+    "VLAN_ADD_PORTCHANNEL_WITH_ONLY_ADDRESS_ROWS": {
+        "sonic-portchannel:sonic-portchannel": {
+            "sonic-portchannel:PORTCHANNEL": {
+                "PORTCHANNEL_LIST": [
+                    {
+                        "admin_status": "up",
+                        "name": "PortChannel1"
+                    }
+                ]
+            },
+            "sonic-portchannel:PORTCHANNEL_INTERFACE": {
+                "PORTCHANNEL_INTERFACE_IPPREFIX_LIST": [
+                    {
+                        "name": "PortChannel1",
+                        "ip_prefix": "192.0.2.0/31"
+                    }
+                ]
+            }
+        },
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan10"
+                    }
+                ]
+            },
+            "sonic-vlan:VLAN_MEMBER": {
+                "VLAN_MEMBER_LIST": [
+                    {
+                        "port": "PortChannel1",
                         "tagging_mode": "untagged",
                         "name": "Vlan10"
                     }

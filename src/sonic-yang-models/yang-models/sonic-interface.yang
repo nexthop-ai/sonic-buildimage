@@ -15,7 +15,7 @@ module sonic-interface {
 
 	import sonic-port {
 		prefix port;
-		revision-date 2019-07-01;
+		revision-date 2026-09-23;
 	}
 
 	import sonic-vrf {
@@ -28,6 +28,17 @@ module sonic-interface {
 
 	description "Physical Ethernet interface L3 configuration including IP addressing, VRF binding, and NAT zones";
 
+<<<<<<< HEAD
+=======
+	revision 2026-09-23 {
+		description "Import the sonic-port revision without the mode leaf.";
+	}
+
+	revision 2026-08-27 {
+		description "Add DHCP relay server leaf-lists for routed interfaces";
+	}
+
+>>>>>>> 99816fcd7 (NOS-16717: retire the switchport mode field from the port models (#9934))
 	revision 2025-03-06 {
 		description "Add leaf vnet_name";
 	}
