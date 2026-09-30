@@ -2661,11 +2661,53 @@ class BGPConfigDaemon:
             return False
         if vrf in self.bgp_asn:
             del(self.bgp_asn[vrf])
+        self.__cleanup_vrf_cache(vrf)
+        # table_data_cache is not the only per-VRF state 'no router bgp'
+        # invalidates. These three gate command emission the same way: a stale
+        # bgp_peer_group entry suppresses the 'neighbor <pg> peer-group'
+        # creation on re-create, after which FRR rejects every follow-on
+        # attribute command for it, and hdl_confed_peers diffs against
+        # bgp_confed_peers exactly as the leaf-lists diff against the cache.
+        # __delete_vrf_neighbor already clears the first two on the
+        # single-neighbor path; the VRF-wide path was the odd one out.
+        self.bgp_peer_group.pop(vrf, None)
+        self.bgp_intf_nbr.pop(vrf, None)
+        self.bgp_confed_peers.pop(vrf, None)
+        # af_aggr_list is the one the cache purge above actively exposes: with
+        # the cached row gone, a re-created aggregate emits again, hdl_af_aggregate
+        # still finds the prefix here and prepends 'no aggregate-address', FRR
+        # rejects that for an aggregate it does not have, and BGPKeyMapList.run_command
+        # breaks on the first failure so the real command never runs.
+        self.af_aggr_list.pop(vrf, None)
         for dkey, dval in data.items():
             # force delete all VRF instance attributes in cache
             dval.status = CachedDataWithOp.STAT_SUCC
             dval.op = CachedDataWithOp.OP_DELETE
         return True
+
+    def __cleanup_vrf_cache(self, vrf):
+        # 'no router bgp' drops every VRF-scoped table from FRR in one command.
+        # The caller clears BGP_GLOBALS' own attributes, but the child tables
+        # keep their cached rows, which then claim values FRR no longer holds.
+        # A later re-create diffs against that cache and emits nothing, silently
+        # losing leaf-list fields such as import-rts/export-rts.
+        #
+        # BGP_GLOBALS is excluded because the caller already marks its own
+        # attributes OP_DELETE, and global_key_map declares no leaf-list field,
+        # so a row left in the cache there cannot suppress a re-create the way a
+        # child row can.
+        tables = self.vrf_tables - {'BGP_GLOBALS'}
+        dropped = 0
+        for key in list(self.table_data_cache):
+            table, sep, rest = key.partition('&&')
+            if sep and table in tables and rest.split('|', 1)[0] == vrf:
+                syslog.syslog(syslog.LOG_DEBUG,
+                              'drop cached {} after removing BGP for VRF {}'.format(key, vrf))
+                del self.table_data_cache[key]
+                dropped += 1
+        if dropped:
+            syslog.syslog(syslog.LOG_INFO,
+                          'dropped {} cached row(s) after removing BGP for VRF {}'.format(dropped, vrf))
 
     def __cleanup_nbr_cache(self, vrf, nbr):
         nbr_key = ExtConfigDBConnector.get_table_key('BGP_NEIGHBOR',
