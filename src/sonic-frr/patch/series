@@ -66,3 +66,5 @@
 0105-bgpd-Show-all-advertised-paths-including-non-best-paths-only-if-addpath-is-enabled.patch
 0106-bgpd-Fix-suppress-fib-pending-config-race-condition.patch
 0107-zebra-defer-rib-sweep-until-metaqueue-drained.patch
+0108-zebra-keep-NEXTHOP_FLAG_LINKDOWN-in-sync-with-carrier-state.patch
+0109-tests-add-zebra_linkdown_nhg-topotest.patch

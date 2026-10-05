@@ -1,0 +1,87 @@
+From b6502d38d1a52c4afbe27a08f780747bc49ea681 Mon Sep 17 00:00:00 2001
+From: Manoharan Sundaramoorthy <manoharan@nexthop.ai>
+Date: Sat, 3 Oct 2026 14:04:59 +0530
+Subject: [PATCH] zebra: keep NEXTHOP_FLAG_LINKDOWN in sync with carrier
+ state
+
+The kernel marks a route RTNH_F_LINKDOWN when its interface is admin-up but has no carrier. When carrier changes it sends only RTM_NEWLINK and does not re-send the route, so zebra kept a stale linkdown flag after carrier returned, and never set it when carrier was lost.
+
+Set or clear NEXTHOP_FLAG_LINKDOWN in nexthop_active_check() for kernel and system routes from the interface state, and treat a change of the flag as a nexthop change so the route is reprocessed.
+
+Include the flag in the nexthop group comparisons. nexthop_same() ignores flags, so without this a route is moved back to an existing nexthop group that differs only in LINKDOWN.
+
+Signed-off-by: Manoharan Sundaramoorthy <manoharan@nexthop.ai>
+---
+ zebra/zebra_nhg.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/zebra/zebra_nhg.c b/zebra/zebra_nhg.c
+index cba335640c7c..f2c08f845c80 100644
+--- a/zebra/zebra_nhg.c
++++ b/zebra/zebra_nhg.c
+@@ -554,6 +554,10 @@ static bool nhg_compare_nexthops(const struct nexthop *nh1,
+ 	    != CHECK_FLAG(nh2->flags, NEXTHOP_FLAG_ACTIVE))
+ 		return false;
+ 
++	if (CHECK_FLAG(nh1->flags, NEXTHOP_FLAG_LINKDOWN)
++	    != CHECK_FLAG(nh2->flags, NEXTHOP_FLAG_LINKDOWN))
++		return false;
++
+ 	if (!nexthop_same(nh1, nh2))
+ 		return false;
+ 
+@@ -2816,7 +2820,11 @@ static unsigned nexthop_active_check(struct route_node *rn,
+ 
+ 		if (ifp && ifp->vrf->vrf_id == vrf_id && if_is_up(ifp) && if_is_operative(ifp)) {
+ 			SET_FLAG(nexthop->flags, NEXTHOP_FLAG_ACTIVE);
++			UNSET_FLAG(nexthop->flags, NEXTHOP_FLAG_LINKDOWN);
+ 			goto skip_check;
++		} else if (ifp && ifp->vrf->vrf_id == vrf_id && if_is_up(ifp)) {
++			UNSET_FLAG(nexthop->flags, NEXTHOP_FLAG_ACTIVE);
++			SET_FLAG(nexthop->flags, NEXTHOP_FLAG_LINKDOWN);
+ 		}
+ 	}
+ 
+@@ -3011,6 +3019,7 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
+ {
+ 	union g_addr prev_src;
+ 	unsigned int prev_active, new_active;
++	unsigned int prev_linkdown;
+ 	ifindex_t prev_index;
+ 	uint32_t counter = 0;
+ 	struct nexthop *nexthop;
+@@ -3034,6 +3043,7 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
+ 		prev_src = nexthop->rmap_src;
+ 		prev_active = CHECK_FLAG(nexthop->flags, NEXTHOP_FLAG_ACTIVE);
+ 		prev_index = nexthop->ifindex;
++		prev_linkdown = CHECK_FLAG(nexthop->flags, NEXTHOP_FLAG_LINKDOWN);
+ 
+ 		/* Include the containing nhe for primary nexthops: if there's
+ 		 * recursive resolution, we capture the backup info also.
+@@ -3064,6 +3074,8 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
+ 		/* Check for changes to the nexthop - set ROUTE_ENTRY_CHANGED */
+ 		if (prev_active != new_active ||
+ 		    prev_index != nexthop->ifindex ||
++		    prev_linkdown != CHECK_FLAG(nexthop->flags,
++						NEXTHOP_FLAG_LINKDOWN) ||
+ 		    ((nexthop->type >= NEXTHOP_TYPE_IFINDEX &&
+ 		      nexthop->type < NEXTHOP_TYPE_IPV6) &&
+ 		     prev_src.ipv4.s_addr != nexthop->rmap_src.ipv4.s_addr) ||
+@@ -3177,6 +3189,16 @@ static bool zebra_nhg_nexthop_compare(const struct nexthop *nhop,
+ 				   CHECK_FLAG(nhop->flags, NEXTHOP_FLAG_ACTIVE), old_nhop,
+ 				   old_nhop->flags, CHECK_FLAG(old_nhop->flags, NEXTHOP_FLAG_ACTIVE),
+ 				   nexthop_same_no_ifindex(nhop, old_nhop));
++		/* nexthop_same() ignores flags; without this a route reverts
++		 * to an old NHE that differs only in LINKDOWN.
++		 */
++		if (nexthop_same_no_ifindex(nhop, old_nhop) &&
++		    CHECK_FLAG(nhop->flags, NEXTHOP_FLAG_LINKDOWN) !=
++			    CHECK_FLAG(old_nhop->flags, NEXTHOP_FLAG_LINKDOWN)) {
++			same = false;
++			break;
++		}
++
+ 		if (!CHECK_FLAG(old_nhop->flags, NEXTHOP_FLAG_ACTIVE)) {
+ 			if (IS_ZEBRA_DEBUG_NHG_DETAIL)
+ 				zlog_debug("%s: %pRN Old is not active going to the next one",
+
