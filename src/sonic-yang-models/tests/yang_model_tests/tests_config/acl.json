@@ -2284,7 +2284,361 @@
             }
         }
     },
+<<<<<<< HEAD
     "ACL_RULE_WITH_ARBITRARY_IPV4_SRC_MASK": {
+=======
+    "ACL_RULE_TCP_FLAGS_BUILTIN_TABLE_TYPES": {
+        "sonic-acl:sonic-acl": {
+            "sonic-acl:ACL_RULE": {
+                "ACL_RULE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "PACKET_ACTION": "FORWARD"
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3V6",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "NEXT_HEADER": 6,
+                        "PACKET_ACTION": "FORWARD"
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3V4V6",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "PACKET_ACTION": "FORWARD"
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_MIRROR",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "MIRROR_INGRESS_ACTION": "everflow"
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_MIRRORV6",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "NEXT_HEADER": 6,
+                        "MIRROR_INGRESS_ACTION": "everflow"
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_ARS",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "DISABLE_ARS_FORWARDING": "true"
+                    }
+                ]
+            },
+            "sonic-acl:ACL_TABLE": {
+                "ACL_TABLE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3",
+                        "policy_desc": "TCP_FLAGS_L3",
+                        "stage": "INGRESS",
+                        "type": "L3",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3V6",
+                        "policy_desc": "TCP_FLAGS_L3V6",
+                        "stage": "INGRESS",
+                        "type": "L3V6",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3V4V6",
+                        "policy_desc": "TCP_FLAGS_L3V4V6",
+                        "stage": "INGRESS",
+                        "type": "L3V4V6",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_MIRROR",
+                        "policy_desc": "TCP_FLAGS_MIRROR",
+                        "stage": "INGRESS",
+                        "type": "MIRROR",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_MIRRORV6",
+                        "policy_desc": "TCP_FLAGS_MIRRORV6",
+                        "stage": "INGRESS",
+                        "type": "MIRRORV6",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_ARS",
+                        "policy_desc": "TCP_FLAGS_ARS",
+                        "stage": "INGRESS",
+                        "type": "ARS",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth1",
+                        "description": "Ethernet1",
+                        "mtu": 9000,
+                        "lanes": "0,1,2,3",
+                        "name": "Ethernet1",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-mirror-session:sonic-mirror-session": {
+            "sonic-mirror-session:MIRROR_SESSION": {
+                "MIRROR_SESSION_LIST": [
+                    {
+                        "name": "everflow",
+                        "type": "ERSPAN",
+                        "src_ip": "10.1.1.1",
+                        "dst_ip": "11.1.1.1",
+                        "gre_type": "0x88be",
+                        "dscp": "8"
+                    }
+                ]
+            }
+        }
+    },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_L2_TABLE_TYPE": {
+        "sonic-acl:sonic-acl": {
+            "sonic-acl:ACL_RULE": {
+                "ACL_RULE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L2",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "PACKET_ACTION": "FORWARD"
+                    }
+                ]
+            },
+            "sonic-acl:ACL_TABLE": {
+                "ACL_TABLE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L2",
+                        "policy_desc": "TCP_FLAGS_L2",
+                        "stage": "INGRESS",
+                        "type": "L2",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth1",
+                        "description": "Ethernet1",
+                        "mtu": 9000,
+                        "lanes": "0,1,2,3",
+                        "name": "Ethernet1",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_MIRROR_DSCP_TABLE_TYPE": {
+        "sonic-acl:sonic-acl": {
+            "sonic-acl:ACL_RULE": {
+                "ACL_RULE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_MIRROR_DSCP",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "MIRROR_INGRESS_ACTION": "everflow"
+                    }
+                ]
+            },
+            "sonic-acl:ACL_TABLE": {
+                "ACL_TABLE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_MIRROR_DSCP",
+                        "policy_desc": "TCP_FLAGS_MIRROR_DSCP",
+                        "stage": "INGRESS",
+                        "type": "MIRROR_DSCP",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth1",
+                        "description": "Ethernet1",
+                        "mtu": 9000,
+                        "lanes": "0,1,2,3",
+                        "name": "Ethernet1",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-mirror-session:sonic-mirror-session": {
+            "sonic-mirror-session:MIRROR_SESSION": {
+                "MIRROR_SESSION_LIST": [
+                    {
+                        "name": "everflow",
+                        "type": "ERSPAN",
+                        "src_ip": "10.1.1.1",
+                        "dst_ip": "11.1.1.1",
+                        "gre_type": "0x88be",
+                        "dscp": "8"
+                    }
+                ]
+            }
+        }
+    },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_CTRLPLANE_TABLE_TYPE": {
+        "sonic-acl:sonic-acl": {
+            "sonic-acl:ACL_RULE": {
+                "ACL_RULE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_CTRLPLANE",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "PACKET_ACTION": "ACCEPT"
+                    }
+                ]
+            },
+            "sonic-acl:ACL_TABLE": {
+                "ACL_TABLE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_CTRLPLANE",
+                        "policy_desc": "TCP_FLAGS_CTRLPLANE",
+                        "stage": "INGRESS",
+                        "type": "CTRLPLANE",
+                        "services": [
+                            "SSH"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth1",
+                        "description": "Ethernet1",
+                        "mtu": 9000,
+                        "lanes": "0,1,2,3",
+                        "name": "Ethernet1",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "ACL_RULE_TCP_FLAGS_L2_TABLE_NEXT_TO_L3_TABLE": {
+        "sonic-acl:sonic-acl": {
+            "sonic-acl:ACL_RULE": {
+                "ACL_RULE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "PACKET_ACTION": "FORWARD"
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L2",
+                        "RULE_NAME": "ESTABLISHED",
+                        "PRIORITY": 100,
+                        "TCP_FLAGS": "0x10/0x10",
+                        "IP_PROTOCOL": 6,
+                        "PACKET_ACTION": "FORWARD"
+                    }
+                ]
+            },
+            "sonic-acl:ACL_TABLE": {
+                "ACL_TABLE_LIST": [
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L3",
+                        "policy_desc": "TCP_FLAGS_L3",
+                        "stage": "INGRESS",
+                        "type": "L3",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    },
+                    {
+                        "ACL_TABLE_NAME": "TCP_FLAGS_L2",
+                        "policy_desc": "TCP_FLAGS_L2",
+                        "stage": "INGRESS",
+                        "type": "L2",
+                        "ports": [
+                            "Ethernet1"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth1",
+                        "description": "Ethernet1",
+                        "mtu": 9000,
+                        "lanes": "0,1,2,3",
+                        "name": "Ethernet1",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "ACL_TABLE_WITH_VLAN_PORTS": {
+>>>>>>> 9a465ba27 (NOS-11483: [sonic-yang-models] Accept TCP_FLAGS on built-in ACL table types (#10229))
         "sonic-acl:sonic-acl": {
             "sonic-acl:ACL_RULE": {
                 "ACL_RULE_LIST": [

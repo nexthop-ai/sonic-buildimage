@@ -172,6 +172,29 @@
     "ACL_RULE_TCP_FLAGS_SUPPORTED_TABLE": {
         "desc": "Configure ACL_RULE with TCP_FLAGS in a table type that supports it."
     },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_TABLE_TYPES": {
+        "desc": "Configure ACL_RULE with TCP_FLAGS on every built-in table type that supports it, with no ACL_TABLE_TYPE rows."
+    },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_L2_TABLE_TYPE": {
+        "desc": "Configure ACL_RULE with TCP_FLAGS on the built-in L2 table type, which does not support it.",
+        "eStrKey": "Must",
+        "eStr": ["TCP_FLAGS"]
+    },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_MIRROR_DSCP_TABLE_TYPE": {
+        "desc": "Configure ACL_RULE with TCP_FLAGS on the built-in MIRROR_DSCP table type, which does not support it.",
+        "eStrKey": "Must",
+        "eStr": ["TCP_FLAGS"]
+    },
+    "ACL_RULE_TCP_FLAGS_BUILTIN_CTRLPLANE_TABLE_TYPE": {
+        "desc": "Configure ACL_RULE with TCP_FLAGS on the built-in CTRLPLANE table type, which caclmgrd does not handle for every value and service.",
+        "eStrKey": "Must",
+        "eStr": ["TCP_FLAGS"]
+    },
+    "ACL_RULE_TCP_FLAGS_L2_TABLE_NEXT_TO_L3_TABLE": {
+        "desc": "Configure ACL_RULE with TCP_FLAGS on an L2 table while an L3 table also exists; the must checks the rule's own table.",
+        "eStrKey": "Must",
+        "eStr": ["TCP_FLAGS"]
+    },
     "ACL_RULE_WRONG_BTH_OPCODE": {
         "desc": "Configure invalid BTH_OPCODE in decimal format.",
         "eStrKey" : "Pattern"

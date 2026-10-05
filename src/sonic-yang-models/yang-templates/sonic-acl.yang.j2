@@ -282,8 +282,19 @@ module sonic-acl {
 						pattern '0[xX][0-9a-fA-F]{1,2}(/0[xX][0-9a-fA-F]{1,2})?';
 					}
 				}
-				/* Validating 'TCP_FLAGS' is supported by the ACL table type */
+				/* Validating 'TCP_FLAGS' is supported by the ACL table type.
+				   A built-in type has no ACL_TABLE_TYPE row to look up, so the
+				   built-ins whose table matches TCP_FLAGS are accepted by name.
+				   This list mirrors orchagent's initDefaultTableTypes() and must
+				   classify every member of stypes:acl_table_type (sonic-types);
+				   yang_model_pytests/test_acl_tcp_flags.py fails on an unclassified one.
+				   CTRLPLANE is left out: caclmgrd requires the value/mask form
+				   and ignores TCP_FLAGS for services that are not tcp. */
 				must "not(TCP_FLAGS) or " +
+					"/acl:sonic-acl/acl:ACL_TABLE/acl:ACL_TABLE_LIST" +
+					"[acl:ACL_TABLE_NAME = current()/ACL_TABLE_NAME]" +
+					"[acl:type = 'L3' or acl:type = 'L3V6' or acl:type = 'L3V4V6' or " +
+					"acl:type = 'MIRROR' or acl:type = 'MIRRORV6' or acl:type = 'ARS'] or " +
 					"count(/acl:sonic-acl/acl:ACL_TABLE_TYPE/acl:ACL_TABLE_TYPE_LIST" +
 					"[acl:ACL_TABLE_TYPE_NAME = " +
  					"/acl:sonic-acl/acl:ACL_TABLE/acl:ACL_TABLE_LIST" +
@@ -412,6 +423,90 @@ module sonic-acl {
 		}
 		/* end of container ACL_RULE */
 
+<<<<<<< HEAD
+=======
+		container ACL_RULE_UDF {
+
+			description "User-defined (UDF) matches on an ACL rule. One entry per
+				UDF group a rule matches on, keyed by the rule it belongs to and
+				the group name, so the rule's own field set stays closed.";
+
+			list ACL_RULE_UDF_LIST {
+
+				key "ACL_TABLE_NAME ACL_RULE_NAME UDF_NAME";
+
+				leaf ACL_TABLE_NAME {
+					description "ACL table owning the rule this match belongs to";
+					type leafref {
+						path "/acl:sonic-acl/acl:ACL_TABLE/acl:ACL_TABLE_LIST/acl:ACL_TABLE_NAME";
+					}
+				}
+
+				leaf ACL_RULE_NAME {
+					description "Rule this match belongs to, within ACL_TABLE_NAME";
+					type leafref {
+						path "../../../ACL_RULE/ACL_RULE_LIST[ACL_TABLE_NAME=current()/../ACL_TABLE_NAME]/RULE_NAME";
+					}
+				}
+
+				leaf UDF_NAME {
+					description "UDF group whose extracted bytes are matched on";
+					type leafref {
+						path "/udf:sonic-udf/udf:UDF/udf:UDF_LIST/udf:UDF_NAME";
+					}
+				}
+
+				/* Validating the UDF group is supported by the ACL table type.
+				   orchagent refuses a group absent from the referencing table
+				   type's MATCHES at rule-programming time; declaring it here
+				   means the config is refused before it reaches CONFIG_DB.
+
+				   Unlike the TCP_FLAGS must above, which fires only when
+				   TCP_FLAGS is set, this one fires on every row. Both meet a
+				   second case: ACL_TABLE's type is a union, so it can hold a
+				   built-in type such as L3 rather than a name in
+				   ACL_TABLE_TYPE_LIST, in which case the lookup finds no table
+				   type and the count is zero. The TCP_FLAGS must accepts the
+				   built-in types that support it by name; this one does not,
+				   and should not. Refusing the row
+				   is right either way -- a UDF match is only meaningful on a
+				   custom table type that declares the group -- so the message
+				   names both causes rather than only the first. */
+				must "count(/acl:sonic-acl/acl:ACL_TABLE_TYPE/acl:ACL_TABLE_TYPE_LIST" +
+					"[acl:ACL_TABLE_TYPE_NAME = " +
+					"/acl:sonic-acl/acl:ACL_TABLE/acl:ACL_TABLE_LIST" +
+					"[acl:ACL_TABLE_NAME = current()/ACL_TABLE_NAME]/acl:type]" +
+					"/acl:MATCHES[. = current()/UDF_NAME]) > 0" {
+					error-message "the table's type does not declare this UDF group, or is not a custom table type";
+				}
+
+				leaf VALUE {
+					description "Value and mask matched against the bytes the UDF
+						group extracts, as hex";
+					/* A match with nothing to match on is not a match: an entry
+					   carrying only its keys would name a UDF group and then
+					   give orchagent no value to program. */
+					mandatory true;
+					/* The width here is deliberately independent of the group's
+					   own length: orchagent pads or truncates the value to the
+					   group's declared length, so the two do not have to agree.
+
+					   The mask is optional, as it is on the MATCH_* leaves above.
+					   orchagent defaults an absent mask to all-ones for the group's
+					   length, and doc/swss-schema.md documents that form, so
+					   requiring it here made the model stricter than both --
+					   anyone following the schema document wrote a value the model
+					   then refused. */
+					type string {
+						pattern "0[xX][0-9a-fA-F]{1,16}(/0[xX][0-9a-fA-F]{1,16})?";
+					}
+				}
+			}
+			/* end of ACL_RULE_UDF_LIST */
+		}
+		/* end of container ACL_RULE_UDF */
+
+>>>>>>> 9a465ba27 (NOS-11483: [sonic-yang-models] Accept TCP_FLAGS on built-in ACL table types (#10229))
 		container ACL_TABLE_TYPE {
 			description "Defines user-defined ACL table types with custom matches, actions, and bind points";
 
