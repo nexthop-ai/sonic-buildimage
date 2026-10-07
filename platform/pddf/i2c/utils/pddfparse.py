@@ -2459,7 +2459,7 @@ class PddfParse():
                 attr = self.data[key]['dev_info']
                 if attr['device_type'] == type:
                     list.append(self.data[key])
-                    logger.debug("%s: LED device %s", ops["cmd"], key)
+                    logger.debug("device-list: %s device %s", device_type, key)
 
 
     def create_pddf_devices(self):
