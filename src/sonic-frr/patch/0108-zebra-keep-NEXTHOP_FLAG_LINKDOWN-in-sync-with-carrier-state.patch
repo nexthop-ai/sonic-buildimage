@@ -1,8 +1,7 @@
-From b6502d38d1a52c4afbe27a08f780747bc49ea681 Mon Sep 17 00:00:00 2001
+From aa76cad08ad7c224a32dcfaa712443b59642aa8f Mon Sep 17 00:00:00 2001
 From: Manoharan Sundaramoorthy <manoharan@nexthop.ai>
 Date: Sat, 3 Oct 2026 14:04:59 +0530
-Subject: [PATCH] zebra: keep NEXTHOP_FLAG_LINKDOWN in sync with carrier
- state
+Subject: [PATCH] zebra: keep NEXTHOP_FLAG_LINKDOWN in sync with carrier state
 
 The kernel marks a route RTNH_F_LINKDOWN when its interface is admin-up but has no carrier. When carrier changes it sends only RTM_NEWLINK and does not re-send the route, so zebra kept a stale linkdown flag after carrier returned, and never set it when carrier was lost.
 
@@ -10,16 +9,209 @@ Set or clear NEXTHOP_FLAG_LINKDOWN in nexthop_active_check() for kernel and syst
 
 Include the flag in the nexthop group comparisons. nexthop_same() ignores flags, so without this a route is moved back to an existing nexthop group that differs only in LINKDOWN.
 
+Add the zebra_linkdown_nhg topotest covering carrier loss and recovery.
+
 Signed-off-by: Manoharan Sundaramoorthy <manoharan@nexthop.ai>
 ---
- zebra/zebra_nhg.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ .../topotests/zebra_linkdown_nhg/__init__.py  |   0
+ .../topotests/zebra_linkdown_nhg/r1/frr.conf  |   6 +
+ .../test_zebra_linkdown_nhg.py                | 164 ++++++++++++++++++
+ zebra/zebra_nhg.c                             |  22 +++
+ 4 files changed, 192 insertions(+)
+ create mode 100644 tests/topotests/zebra_linkdown_nhg/__init__.py
+ create mode 100644 tests/topotests/zebra_linkdown_nhg/r1/frr.conf
+ create mode 100644 tests/topotests/zebra_linkdown_nhg/test_zebra_linkdown_nhg.py
 
+diff --git a/tests/topotests/zebra_linkdown_nhg/__init__.py b/tests/topotests/zebra_linkdown_nhg/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/topotests/zebra_linkdown_nhg/r1/frr.conf b/tests/topotests/zebra_linkdown_nhg/r1/frr.conf
+new file mode 100644
+index 0000000..8ac416d
+--- /dev/null
++++ b/tests/topotests/zebra_linkdown_nhg/r1/frr.conf
+@@ -0,0 +1,6 @@
++hostname r1
++!
++debug zebra kernel
++debug zebra rib
++debug zebra nexthop
++!
+diff --git a/tests/topotests/zebra_linkdown_nhg/test_zebra_linkdown_nhg.py b/tests/topotests/zebra_linkdown_nhg/test_zebra_linkdown_nhg.py
+new file mode 100644
+index 0000000..3ad18cc
+--- /dev/null
++++ b/tests/topotests/zebra_linkdown_nhg/test_zebra_linkdown_nhg.py
+@@ -0,0 +1,164 @@
++#!/usr/bin/env python
++# SPDX-License-Identifier: ISC
++
++#
++# test_zebra_linkdown_nhg.py
++#
++# Copyright (c) 2026 by Manoharan Sundaramoorthy
++#
++
++"""
++Verify that zebra keeps NEXTHOP_FLAG_LINKDOWN in sync with the carrier state
++of a kernel route's interface.
++
++When a link has no carrier but is admin-up, the kernel keeps routes through
++it and flags them RTNH_F_LINKDOWN. When carrier changes the kernel sends only
++RTM_NEWLINK; it does not re-send the routes. Zebra must therefore update the
++flag itself when the interface state changes.
++
++Two bonds drive carrier changes by enslaving or releasing a veth:
++
++  bond0: route added without carrier, then carrier is gained.
++         Expect linkDown, then not linkDown.
++  bond1: route added with carrier, then carrier is lost and regained.
++         Expect not linkDown, linkDown, then not linkDown again.
++         The route must stay in the RIB while the carrier is down.
++"""
++
++import os
++import sys
++import pytest
++
++CWD = os.path.dirname(os.path.realpath(__file__))
++sys.path.append(os.path.join(CWD, "../"))
++
++from lib import topotest
++from lib.topogen import Topogen, get_topogen
++from lib.common_config import step
++
++pytestmark = pytest.mark.random_order(disabled=True)
++
++BOND0, SLAVE0, PEER0 = "bond0", "veth0", "veth1"
++PREFIX0 = "fdbd:dc00:46:14::/127"
++
++BOND1, SLAVE1, PEER1 = "bond1", "veth2", "veth3"
++PREFIX1 = "fdbd:dc00:46:15::/127"
++
++
++def build_topo(tgen):
++    tgen.add_router("r1")
++
++
++def setup_module(mod):
++    tgen = Topogen(build_topo, mod.__name__)
++    tgen.start_topology()
++
++    r1 = tgen.gears["r1"]
++    r1.load_frr_config(os.path.join(CWD, "r1/frr.conf"))
++
++    tgen.start_router()
++
++    r1.run("ip link add {} type bond".format(BOND0))
++    r1.run("ip link set {} up".format(BOND0))
++    r1.run("ip link add {} type veth peer name {}".format(SLAVE0, PEER0))
++    r1.run("ip link set {} up".format(PEER0))
++    r1.run("ip link set {} up".format(SLAVE0))
++    r1.run("ip -6 route add {} dev {}".format(PREFIX0, BOND0))
++
++    r1.run("ip link add {} type bond".format(BOND1))
++    r1.run("ip link set {} up".format(BOND1))
++    r1.run("ip link add {} type veth peer name {}".format(SLAVE1, PEER1))
++    r1.run("ip link set {} up".format(PEER1))
++    r1.run("ip link set {} down".format(SLAVE1))
++    r1.run("ip link set {} master {}".format(SLAVE1, BOND1))
++    r1.run("ip link set {} up".format(SLAVE1))
++    r1.run("ip -6 route add {} dev {}".format(PREFIX1, BOND1))
++
++
++def teardown_module(_mod):
++    get_topogen().stop_topology()
++
++
++def check_linkdown(prefix, bond, linkdown):
++    r1 = get_topogen().gears["r1"]
++    expected = {
++        prefix: [
++            {
++                "protocol": "kernel",
++                "nexthops": [
++                    {"interfaceName": bond, "linkDown": True if linkdown else None}
++                ],
++            }
++        ]
++    }
++    test_func = lambda: topotest.router_json_cmp(
++        r1, "show ipv6 route {} json".format(prefix), expected
++    )
++    _, result = topotest.run_and_expect(test_func, None, count=30, wait=1)
++    assert result is None, "{} on {} should have linkDown={}:\n{}".format(
++        prefix, bond, linkdown, result
++    )
++
++
++def test_bond0_route_added_without_carrier():
++    tgen = get_topogen()
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    check_linkdown(PREFIX0, BOND0, True)
++
++
++def test_bond0_carrier_gained():
++    tgen = get_topogen()
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    r1 = tgen.gears["r1"]
++
++    step("Enslave {} into {}".format(SLAVE0, BOND0))
++    r1.run("ip link set {} down".format(SLAVE0))
++    r1.run("ip link set {} master {}".format(SLAVE0, BOND0))
++    r1.run("ip link set {} up".format(SLAVE0))
++
++    check_linkdown(PREFIX0, BOND0, False)
++
++
++def test_bond1_route_added_with_carrier():
++    tgen = get_topogen()
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    check_linkdown(PREFIX1, BOND1, False)
++
++
++def test_bond1_carrier_lost():
++    tgen = get_topogen()
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    r1 = tgen.gears["r1"]
++
++    step("Release {} from {}".format(SLAVE1, BOND1))
++    r1.run("ip link set {} nomaster".format(SLAVE1))
++
++    check_linkdown(PREFIX1, BOND1, True)
++
++
++def test_bond1_carrier_regained():
++    tgen = get_topogen()
++    if tgen.routers_have_failure():
++        pytest.skip(tgen.errors)
++
++    r1 = tgen.gears["r1"]
++
++    step("Enslave {} into {} again".format(SLAVE1, BOND1))
++    r1.run("ip link set {} down".format(SLAVE1))
++    r1.run("ip link set {} master {}".format(SLAVE1, BOND1))
++    r1.run("ip link set {} up".format(SLAVE1))
++
++    check_linkdown(PREFIX1, BOND1, False)
++
++
++if __name__ == "__main__":
++    args = ["-s"] + sys.argv[1:]
++    sys.exit(pytest.main(args))
 diff --git a/zebra/zebra_nhg.c b/zebra/zebra_nhg.c
-index cba335640c7c..f2c08f845c80 100644
+index ad1c898..6f917e7 100644
 --- a/zebra/zebra_nhg.c
 +++ b/zebra/zebra_nhg.c
-@@ -554,6 +554,10 @@ static bool nhg_compare_nexthops(const struct nexthop *nh1,
+@@ -533,6 +533,10 @@ static bool nhg_compare_nexthops(const struct nexthop *nh1,
  	    != CHECK_FLAG(nh2->flags, NEXTHOP_FLAG_ACTIVE))
  		return false;
  
@@ -30,7 +222,7 @@ index cba335640c7c..f2c08f845c80 100644
  	if (!nexthop_same(nh1, nh2))
  		return false;
  
-@@ -2816,7 +2820,11 @@ static unsigned nexthop_active_check(struct route_node *rn,
+@@ -2691,7 +2695,11 @@ static unsigned nexthop_active_check(struct route_node *rn,
  
  		if (ifp && ifp->vrf->vrf_id == vrf_id && if_is_up(ifp) && if_is_operative(ifp)) {
  			SET_FLAG(nexthop->flags, NEXTHOP_FLAG_ACTIVE);
@@ -42,7 +234,7 @@ index cba335640c7c..f2c08f845c80 100644
  		}
  	}
  
-@@ -3011,6 +3019,7 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
+@@ -2886,6 +2894,7 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
  {
  	union g_addr prev_src;
  	unsigned int prev_active, new_active;
@@ -50,7 +242,7 @@ index cba335640c7c..f2c08f845c80 100644
  	ifindex_t prev_index;
  	uint32_t counter = 0;
  	struct nexthop *nexthop;
-@@ -3034,6 +3043,7 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
+@@ -2909,6 +2918,7 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
  		prev_src = nexthop->rmap_src;
  		prev_active = CHECK_FLAG(nexthop->flags, NEXTHOP_FLAG_ACTIVE);
  		prev_index = nexthop->ifindex;
@@ -58,7 +250,7 @@ index cba335640c7c..f2c08f845c80 100644
  
  		/* Include the containing nhe for primary nexthops: if there's
  		 * recursive resolution, we capture the backup info also.
-@@ -3064,6 +3074,8 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
+@@ -2939,6 +2949,8 @@ static uint32_t nexthop_list_active_update(struct route_node *rn,
  		/* Check for changes to the nexthop - set ROUTE_ENTRY_CHANGED */
  		if (prev_active != new_active ||
  		    prev_index != nexthop->ifindex ||
@@ -67,7 +259,7 @@ index cba335640c7c..f2c08f845c80 100644
  		    ((nexthop->type >= NEXTHOP_TYPE_IFINDEX &&
  		      nexthop->type < NEXTHOP_TYPE_IPV6) &&
  		     prev_src.ipv4.s_addr != nexthop->rmap_src.ipv4.s_addr) ||
-@@ -3177,6 +3189,16 @@ static bool zebra_nhg_nexthop_compare(const struct nexthop *nhop,
+@@ -3052,6 +3064,16 @@ static bool zebra_nhg_nexthop_compare(const struct nexthop *nhop,
  				   CHECK_FLAG(nhop->flags, NEXTHOP_FLAG_ACTIVE), old_nhop,
  				   old_nhop->flags, CHECK_FLAG(old_nhop->flags, NEXTHOP_FLAG_ACTIVE),
  				   nexthop_same_no_ifindex(nhop, old_nhop));
@@ -84,4 +276,6 @@ index cba335640c7c..f2c08f845c80 100644
  		if (!CHECK_FLAG(old_nhop->flags, NEXTHOP_FLAG_ACTIVE)) {
  			if (IS_ZEBRA_DEBUG_NHG_DETAIL)
  				zlog_debug("%s: %pRN Old is not active going to the next one",
+-- 
+2.55.0
 
