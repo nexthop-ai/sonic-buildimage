@@ -54,6 +54,22 @@ class ServiceChecker(HealthChecker):
     # Monit 5.34.3+ (Debian 13) uses 'OK' for all service types
     EXPECTED_STATUS = 'OK'
 
+    # Host services that run outside a container and have no monit stanza.
+    HOST_SERVICES = ('chrony',)
+
+    # Queried together so that an unloadable unit, a stopped one and a unit
+    # looping on restarts are all distinguishable.
+    CHECK_HOST_SERVICE_CMD = ('systemctl show {} --property=LoadState'
+                              ' --property=ActiveState --property=SubState')
+
+    # A restart passes through 'activating' and a reload through 'reloading';
+    # neither is a fault.
+    HOST_SERVICE_OK_STATES = ('active', 'activating', 'reloading')
+
+    # A unit waiting between restart attempts is 'activating' too, so only the
+    # substate separates a restart from a daemon that keeps failing to start.
+    HOST_SERVICE_RESTART_WAIT_SUBSTATES = ('auto-restart', 'auto-restart-queued')
+
     # Whitelist of containers which are managed by KubeSonic to bypass health checking entirely.
     # These containers will be excluded from both expected and running container sets.
     CONTAINER_K8S_WHITELIST = {'telemetry', 'acms', 'restapi'}
@@ -438,6 +454,38 @@ class ServiceChecker(HealthChecker):
         for bad_container in self.bad_containers:
             self.set_object_not_ok('Service', bad_container, 'Syntax of critical_processes file is incorrect')
 
+    def check_host_services(self, config):
+        """Check host services that are not containers and have no monit stanza.
+
+        Args:
+            config (config.Config): Health checker configuration.
+        """
+        for service in ServiceChecker.HOST_SERVICES:
+            if config and config.ignore_services and service in config.ignore_services:
+                continue
+
+            output = utils.run_command(ServiceChecker.CHECK_HOST_SERVICE_CMD.format(service))
+            states = dict(
+                line.split('=', 1) for line in (output or '').splitlines() if '=' in line
+            )
+            load_state = states.get('LoadState')
+            active_state = states.get('ActiveState')
+
+            if not load_state or not active_state:
+                self.set_object_not_ok('Service', service,
+                                       'Failed to read systemd state of {}'.format(service))
+            elif load_state != 'loaded':
+                self.set_object_not_ok('Service', service,
+                                       '{} is not loaded by systemd'.format(service))
+            elif states.get('SubState') in ServiceChecker.HOST_SERVICE_RESTART_WAIT_SUBSTATES:
+                self.set_object_not_ok('Service', service,
+                                       '{} is restarting after a failure'.format(service))
+            elif active_state not in ServiceChecker.HOST_SERVICE_OK_STATES:
+                self.set_object_not_ok('Service', service,
+                                       '{} is {}'.format(service, active_state))
+            else:
+                self.set_object_ok('Service', service)
+
     def check(self, config):
         """Check critical system service status.
 
@@ -447,6 +495,7 @@ class ServiceChecker(HealthChecker):
         self.reset()
         self.check_by_monit(config)
         self.check_services(config)
+        self.check_host_services(config)
 
     def _parse_supervisorctl_status(self, process_status):
         """Expected input:

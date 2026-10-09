@@ -279,6 +279,7 @@ def test_user_defined_checker(mock_run):
 @patch('docker.DockerClient')
 @patch('health_checker.utils.run_command')
 @patch('swsscommon.swsscommon.ConfigDBConnector')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_single_asic(mock_config_db, mock_run, mock_docker_client):
     mock_db_data = MagicMock()
     mock_get_table = MagicMock()
@@ -363,6 +364,7 @@ def test_service_checker_single_asic(mock_config_db, mock_run, mock_docker_clien
 @patch('docker.DockerClient')
 @patch('health_checker.utils.run_command')
 @patch('swsscommon.swsscommon.ConfigDBConnector')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_group_expansion(mock_config_db, mock_run, mock_docker_client):
     """Verify that group: entries in critical_processes are expanded to individual processes."""
     setup()
@@ -455,6 +457,7 @@ def test_service_checker_group_expansion_retries_on_empty(mock_run, mock_docker_
 @patch('docker.DockerClient')
 @patch('health_checker.utils.run_command')
 @patch('swsscommon.swsscommon.ConfigDBConnector')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_telemetry(mock_config_db, mock_run, mock_docker_client):
     setup()
     mock_db_data = MagicMock()
@@ -506,6 +509,7 @@ def test_service_checker_telemetry(mock_config_db, mock_run, mock_docker_client)
 @patch('sonic_py_common.multi_asic.get_current_namespace', MagicMock(return_value=''))
 @patch('docker.DockerClient')
 @patch('swsscommon.swsscommon.ConfigDBConnector')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_multi_asic(mock_config_db, mock_docker_client):
     mock_db_data = MagicMock()
     mock_db_data.get_table = MagicMock()
@@ -563,7 +567,8 @@ def test_service_checker_multi_asic(mock_config_db, mock_docker_client):
 @patch('health_checker.service_checker.ServiceChecker.check_by_monit', MagicMock())
 @patch('docker.DockerClient')
 @patch('swsscommon.swsscommon.ConfigDBConnector.get_table')
-def test_service_checker_no_critical_process(mock_get_table, mock_docker_client):
+@patch('health_checker.service_checker.ServiceChecker.check_host_services')
+def test_service_checker_no_critical_process(mock_host_services, mock_get_table, mock_docker_client):
     mock_get_table.return_value = {
         'snmp': {
             'state': 'enabled',
@@ -583,9 +588,13 @@ def test_service_checker_no_critical_process(mock_get_table, mock_docker_client)
     checker.check(config)
     assert 'system' in checker._info
     assert checker._info['system'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    # check() must reach the host services even though check_services() returned
+    # early on "no critical process found".
+    mock_host_services.assert_called_once_with(config)
 
 @patch('health_checker.service_checker.ServiceChecker.check_services', MagicMock())
 @patch('health_checker.utils.run_command')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_check_by_monit(mock_run):
     return_value = '''Monit 5.34.3 uptime: 23h 11m
  Service Name                     Status                      Type
@@ -629,6 +638,7 @@ def test_service_checker_check_by_monit(mock_run):
 @patch('docker.DockerClient')
 @patch('health_checker.utils.run_command')
 @patch('swsscommon.swsscommon.ConfigDBConnector')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_k8s_containers(mock_config_db, mock_run, mock_docker_client):
     """Test that service checker skips Kubernetes-managed containers (namespace=sonic)"""
     setup()
@@ -704,6 +714,7 @@ def test_service_checker_k8s_containers(mock_config_db, mock_run, mock_docker_cl
 @patch('docker.DockerClient')
 @patch('health_checker.utils.run_command')
 @patch('swsscommon.swsscommon.ConfigDBConnector')
+@patch('health_checker.service_checker.ServiceChecker.check_host_services', MagicMock())
 def test_service_checker_mixed_containers(mock_config_db, mock_run, mock_docker_client):
     """Test that service checker handles both regular Docker and Kubernetes containers"""
     setup()
@@ -1905,3 +1916,94 @@ def test_get_all_service_list_multi_asic(mock_config_db, mock_run, mock_docker_c
     # Global-scope services should remain
     assert 'radv.service' in result
     assert 'database.service' in result
+
+
+def build_systemd_show_output(load_state, active_state, sub_state):
+    return 'LoadState={}\nActiveState={}\nSubState={}\n'.format(
+        load_state, active_state, sub_state)
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_running(mock_run):
+    mock_run.return_value = build_systemd_show_output('loaded', 'active', 'running')
+
+    checker = ServiceChecker()
+    checker.check_host_services(Config())
+
+    # The substate branch is only reachable if the command asks for SubState.
+    mock_run.assert_called_once_with(
+        'systemctl show chrony --property=LoadState'
+        ' --property=ActiveState --property=SubState')
+
+    assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_OK
+    assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_TYPE] == 'Service'
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_transient_states_are_ok(mock_run):
+    for active_state, sub_state in (('activating', 'start-pre'), ('reloading', 'reload')):
+        mock_run.return_value = build_systemd_show_output('loaded', active_state, sub_state)
+
+        checker = ServiceChecker()
+        checker.check_host_services(Config())
+
+        assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_OK
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_restart_loop_is_not_ok(mock_run):
+    for sub_state in ('auto-restart', 'auto-restart-queued'):
+        mock_run.return_value = build_systemd_show_output('loaded', 'activating', sub_state)
+
+        checker = ServiceChecker()
+        checker.check_host_services(Config())
+
+        assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+        assert 'restarting after a failure' in checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_stopped(mock_run):
+    mock_run.return_value = build_systemd_show_output('loaded', 'inactive', 'dead')
+
+    checker = ServiceChecker()
+    checker.check_host_services(Config())
+
+    assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'inactive' in checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_unit_not_loaded(mock_run):
+    mock_run.return_value = build_systemd_show_output('not-found', 'inactive', 'dead')
+
+    checker = ServiceChecker()
+    checker.check_host_services(Config())
+
+    assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+    assert 'not loaded' in checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_systemctl_unavailable(mock_run):
+    for output in ('', None):
+        mock_run.return_value = output
+
+        checker = ServiceChecker()
+        checker.check_host_services(Config())
+
+        assert checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_STATUS] == HealthChecker.STATUS_NOT_OK
+        assert 'Failed to read systemd state' in checker._info['chrony'][HealthChecker.INFO_FIELD_OBJECT_MSG]
+
+
+@patch('health_checker.utils.run_command')
+def test_check_host_services_honours_services_to_ignore(mock_run):
+    mock_run.return_value = build_systemd_show_output('loaded', 'inactive', 'dead')
+
+    config = Config()
+    config.ignore_services = ['chrony']
+    checker = ServiceChecker()
+    checker.check_host_services(config)
+
+    assert len(checker._info) == 0
+    assert mock_run.call_count == 0
