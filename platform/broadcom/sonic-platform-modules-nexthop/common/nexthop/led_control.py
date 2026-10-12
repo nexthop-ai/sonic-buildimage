@@ -26,10 +26,6 @@ APP_PORT_PREFIX = "PORT_TABLE:"
 STATE_XCVR_PREFIX = "TRANSCEIVER_INFO|"
 
 
-def get_chassis():
-    return sonic_platform.platform.Platform().get_chassis()
-
-
 class LedControl(LedControlBase):
     """Platform specific LED control class"""
 
@@ -38,6 +34,8 @@ class LedControl(LedControlBase):
         self.db.connect(self.db.APPL_DB)
         self.db.connect(self.db.CONFIG_DB)
         self.db.connect(self.db.STATE_DB)
+
+        self.chassis = sonic_platform.platform.Platform().get_chassis()
 
         self.logical_to_physical_map = {}
         self.physical_to_logical_map = defaultdict(list)
@@ -125,7 +123,7 @@ class LedControl(LedControlBase):
 
     def _set_led_color(self, port, color):
         led_device_name = f"PORT_LED_{port}"
-        if not get_chassis().set_system_led(led_device_name, color):
+        if not self.chassis.set_system_led(led_device_name, color):
             sonic_logger.log_error(f"Error setting {led_device_name} to {color}")
         return
 
@@ -135,12 +133,14 @@ class LedControl(LedControlBase):
     def _get_interfaces_for_port(self, port_num):
         return self.physical_to_logical_map.get(port_num, [])
 
-    def port_link_state_change(self, port):
+    def port_link_state_change(self, port, state=None):
         """
         Called when port link state changes:
         admin_status, oper_status, or xcvr presence
 
         :param port: A string, SONiC port name (e.g., "Ethernet0")
+        :param state: The link state stock ledd passes; ignored, the whole
+                      breakout group's status is re-read from the DB below.
         """
         port_num = self._get_port_num(port)
         if port_num is None:

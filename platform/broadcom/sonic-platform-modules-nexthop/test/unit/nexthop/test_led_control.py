@@ -236,7 +236,7 @@ class TestLedControl:
 
         # Patch the module-level functions in the led_control module
         with patch.object(led_control_module, "get_port_config") as mock_get_port_config, \
-             patch.object(led_control_module, "get_chassis", return_value=MagicMock()) as mock_get_chassis, \
+             patch("sonic_platform.platform.Platform") as mock_platform_cls, \
              patch.object(LedControl, "_get_xcvr_presence") as mock_get_xcvr_presence, \
              patch.object(LedControl, "_get_port_status") as mock_get_port_status, \
              patch.object(LedControl, "_get_port_num") as mock_get_port_num, \
@@ -259,10 +259,13 @@ class TestLedControl:
             led_control.port_link_state_change(port_name)
 
             # Assert we're setting the expected LED color
-            mock_chassis = mock_get_chassis.return_value
+            mock_chassis = mock_platform_cls.return_value.get_chassis.return_value
             mock_chassis.set_system_led.assert_called_with(
                 expected_led_device_name, expected_color
             )
+
+            led_control.port_link_state_change(port_name, "up")
+            mock_platform_cls.assert_called_once_with()
 
 
     @pytest.mark.parametrize(
