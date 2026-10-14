@@ -281,16 +281,42 @@ class RebootCauseManager:
             else:
                 logger.log_warning(f"Unknown DPM type '{dpm_type}' for '{dpm_name}' DPM.")
 
+<<<<<<< HEAD
     def _read_powerups_from_all_dpms(self) -> dict[DpmBase, list[DpmPowerUpEntry]]:
         """Returns a dictionary of DPM to a list of powerups."""
         dpm_to_powerups: dict[DpmBase, list[DpmPowerUpEntry]] = {}
+=======
+        self.blackbox_logger = _RebootBlackBoxLogger(
+            history_dir="/host/reboot-cause/nexthop",
+            initial_max=5,
+            recent_max=5,
+            history_max=20,
+        )
+
+    def _read_powerups_from_all_dpms(self) -> dict[Dpm, list[PowerUpEntry]]:
+        """Returns a dictionary of DPM to a list of powerups.
+
+        A DPM whose blackbox cannot be read is left out, so one failed read
+        does not cost the reboot cause from the others.
+        """
+        dpm_to_powerups: dict[Dpm, list[PowerUpEntry]] = {}
+>>>>>>> 7f9b61d45 (NOS-19615: [platform] Retry ADM1266 blackbox reads and skip a DPM that cannot be read (#11365))
         for dpm in self._dpm_devices:
-            dpm_to_powerups[dpm] = dpm.get_powerup_entries()
+            try:
+                dpm_to_powerups[dpm] = dpm.get_powerup_entries()
+            except OSError as e:
+                logger.log_warning(f"Ignoring DPM {dpm.get_name()}: failed to read its blackbox: {e}")
         return dpm_to_powerups
 
+<<<<<<< HEAD
     def _clear_records_on_all_dpms(self):
         for dpm in self._dpm_devices:
             dpm.clear_records()
+=======
+    def _clear_records_on_dpms(self, dpms: Iterable[Dpm]) -> None:
+        for dpm in dpms:
+            dpm.clear_blackbox()
+>>>>>>> 7f9b61d45 (NOS-19615: [platform] Retry ADM1266 blackbox reads and skip a DPM that cannot be read (#11365))
 
     def _read_sw_reboot_cause(self) -> RebootCause | None:
         if not self._sw_reboot_cause_filepath or not os.path.exists(self._sw_reboot_cause_filepath):
@@ -339,5 +365,33 @@ class RebootCauseManager:
         # Save all records to history.
         DpmLogger().save(ret_causes, dpm_to_powerups)
 
+<<<<<<< HEAD
         self._clear_records_on_all_dpms()
         return squash_sw_and_hw_causes(ret_causes)
+=======
+        self._clear_records_on_dpms(dpm_to_powerups)
+
+        squashed = squash_sw_and_hw_causes(ret_causes)
+        self._log_problematic_causes(squashed, dpm_to_powerups)
+        return squashed
+
+    def load(self) -> DataBase | None:
+        """Loads the most recent reboot-cause entry as a DataBase object."""
+        data = self.blackbox_logger.load()
+        return data_from_dict(data) if data is not None else None
+
+    def load_all(self) -> tuple[list[DataBase | SkippedEntries], int, int]:
+        """Loads all reboot-cause entries, reconstructing dicts into DataBase objects.
+
+        Returns (items, total, skipped), where items interleaves DataBase entries
+        with SkippedEntries markers in chronological order.
+        """
+        items, total, skipped = self.blackbox_logger.load_all()
+        reconstructed: list[DataBase | SkippedEntries] = []
+        for item in items:
+            if isinstance(item, SkippedEntries):
+                reconstructed.append(item)
+            elif (data := data_from_dict(item)) is not None:
+                reconstructed.append(data)
+        return reconstructed, total, skipped
+>>>>>>> 7f9b61d45 (NOS-19615: [platform] Retry ADM1266 blackbox reads and skip a DPM that cannot be read (#11365))

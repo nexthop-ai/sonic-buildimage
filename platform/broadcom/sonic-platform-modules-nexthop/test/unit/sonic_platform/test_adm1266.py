@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
 import datetime
+<<<<<<< HEAD
 import pytest
+=======
+import errno
+>>>>>>> 7f9b61d45 (NOS-19615: [platform] Retry ADM1266 blackbox reads and skip a DPM that cannot be read (#11365))
 import textwrap
+from unittest.mock import patch
 
 from fixtures import test_helpers_adm1266
 from fixtures.test_helpers_adm1266 import create_raw_adm1266_blackbox_record
@@ -542,6 +547,39 @@ class TestAdm1266:
             read_records = adm1266.read_raw_records()
             # Then
             assert read_records == [RECORDS[1]]
+
+    def test_get_blackbox_raw_retries_a_failed_read(self, adm1266_module):
+        # Given - the first read fails the way an early-boot PEC mismatch does.
+        platform_spec = {"dpm": "DPM1"}
+        pddf_device_data = {"DPM1": {"i2c": {"topo_info": {"parent_bus": "0x7", "dev_addr": "0x41"}}}}
+        adm1266 = _make_adm1266(adm1266_module, "test-dpm", platform_spec, pddf_device_data)
+        error = OSError(errno.EBADMSG, "Bad message")
+        # When
+        with (
+            patch.object(adm1266, "_read_nvmem", side_effect=[error, b"records"]) as read,
+            patch.object(adm1266_module.time, "sleep") as sleep,
+        ):
+            raw = adm1266.get_blackbox_raw()
+        # Then
+        assert raw == b"records"
+        assert read.call_count == 2
+        sleep.assert_called_once_with(adm1266_module.BLACKBOX_READ_RETRY_DELAY_S)
+
+    def test_get_blackbox_raw_raises_after_last_attempt(self, adm1266_module):
+        # Given
+        platform_spec = {"dpm": "DPM1"}
+        pddf_device_data = {"DPM1": {"i2c": {"topo_info": {"parent_bus": "0x7", "dev_addr": "0x41"}}}}
+        adm1266 = _make_adm1266(adm1266_module, "test-dpm", platform_spec, pddf_device_data)
+        error = OSError(errno.EBADMSG, "Bad message")
+        # When / Then
+        with (
+            patch.object(adm1266, "_read_nvmem", side_effect=error) as read,
+            patch.object(adm1266_module.time, "sleep") as sleep,
+            pytest.raises(OSError),
+        ):
+            adm1266.get_blackbox_raw()
+        assert read.call_count == adm1266_module.BLACKBOX_READ_ATTEMPTS
+        assert sleep.call_count == adm1266_module.BLACKBOX_READ_ATTEMPTS - 1
 
     def test_read_records(self, adm1266_module):
         # Given

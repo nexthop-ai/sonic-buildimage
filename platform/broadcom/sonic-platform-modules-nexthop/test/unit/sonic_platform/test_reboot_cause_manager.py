@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 
 import datetime
+<<<<<<< HEAD
+=======
+import errno
+from unittest.mock import create_autospec, patch
+
+>>>>>>> 7f9b61d45 (NOS-19615: [platform] Retry ADM1266 blackbox reads and skip a DPM that cannot be read (#11365))
 import pytest
 import sys
 
@@ -398,6 +404,92 @@ class TestRebootCauseManager:
 
             # Then
             assert reboot_causes == []
+
+    def _two_adm1266_manager(self, reboot_cause_manager_module, paths):
+        pddf_plugin_data = {
+            "DPM": {
+                "test-dpm1": {"type": "adm1266", "dpm": "DPM1", "dpm_signal_to_fault_cause": []},
+                "test-dpm2": {"type": "adm1266", "dpm": "DPM2", "dpm_signal_to_fault_cause": []},
+            }
+        }
+        pddf_data = mock_pddf_data(
+            {
+                "DPM1": {"i2c": {"topo_info": {"parent_bus": "0x0", "dev_addr": "0x40", "dev_type": "adm1266"}}},
+                "DPM2": {"i2c": {"topo_info": {"parent_bus": "0x0", "dev_addr": "0x41", "dev_type": "adm1266"}}},
+                "PLATFORM": {"num_dpms": 2},
+            },
+        )
+        reboot_cause_manager = reboot_cause_manager_module.RebootCauseManager(pddf_data, pddf_plugin_data)
+        dpms = {dpm.get_name(): dpm for dpm in reboot_cause_manager._dpm_devices}
+        for name, (nvmem, counter, clear) in paths.items():
+            dpms[name]._nvmem_path = nvmem
+            dpms[name]._powerup_counter_path = counter
+            dpms[name]._clear_blackbox_path = clear
+        return reboot_cause_manager, dpms
+
+    def test_summarize_reboot_causes_ignores_dpm_that_fails_to_read(self, reboot_cause_manager_module):
+        # Given - DPM1's blackbox read fails the way an early-boot PEC mismatch does.
+        DPM_2_RECORDS = [create_raw_adm1266_blackbox_record(uid=1, powerup_counter=10)]
+        with (
+            temp_file(content="") as clear_path_1,
+            temp_file(content="") as clear_path_2,
+            temp_file(content=b"") as nvmem_path_1,
+            temp_file(content=b"".join(DPM_2_RECORDS)) as nvmem_path_2,
+            temp_file(content="1") as counter_path_1,
+            temp_file(content="10") as counter_path_2,
+        ):
+            reboot_cause_manager, dpms = self._two_adm1266_manager(
+                reboot_cause_manager_module,
+                {
+                    "test-dpm1": (nvmem_path_1, counter_path_1, clear_path_1),
+                    "test-dpm2": (nvmem_path_2, counter_path_2, clear_path_2),
+                },
+            )
+
+            # When
+            with patch.object(
+                dpms["test-dpm1"], "get_blackbox_raw", side_effect=OSError(errno.EBADMSG, "Bad message")
+            ):
+                reboot_causes = reboot_cause_manager.summarize_reboot_causes()
+
+            # Then - the failed DPM is left out and keeps its records; the other is read and cleared.
+            assert reboot_causes == []
+            with open(clear_path_1) as f:
+                assert f.read() == ""
+            with open(clear_path_2) as f:
+                assert f.read() == "1"
+
+    def test_summarize_reboot_causes_all_dpms_fail_to_read(self, reboot_cause_manager_module):
+        # Given
+        with (
+            temp_file(content="") as clear_path_1,
+            temp_file(content="") as clear_path_2,
+            temp_file(content=b"") as nvmem_path_1,
+            temp_file(content=b"") as nvmem_path_2,
+            temp_file(content="1") as counter_path_1,
+            temp_file(content="1") as counter_path_2,
+        ):
+            reboot_cause_manager, dpms = self._two_adm1266_manager(
+                reboot_cause_manager_module,
+                {
+                    "test-dpm1": (nvmem_path_1, counter_path_1, clear_path_1),
+                    "test-dpm2": (nvmem_path_2, counter_path_2, clear_path_2),
+                },
+            )
+            error = OSError(errno.EIO, "Input/output error")
+
+            # When
+            with (
+                patch.object(dpms["test-dpm1"], "get_blackbox_raw", side_effect=error),
+                patch.object(dpms["test-dpm2"], "get_blackbox_raw", side_effect=error),
+            ):
+                reboot_causes = reboot_cause_manager.summarize_reboot_causes()
+
+            # Then - no reboot cause, and nothing cleared.
+            assert reboot_causes == []
+            for clear_path in (clear_path_1, clear_path_2):
+                with open(clear_path) as f:
+                    assert f.read() == ""
 
     def test_summarize_reboot_causes_sw_and_hw(self, reboot_cause_manager_module):
         # Given
