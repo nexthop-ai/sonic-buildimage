@@ -485,7 +485,190 @@ static int fpga_axi_iic_poll(struct fpgalogic_i2c *i2c,
 		xiic_process(i2c);
 	}
 
+<<<<<<< HEAD
 	return (i2c->state == STATE_DONE) ? num : -EIO;
+=======
+	return (i2c->state == STATE_DONE) ? num : err;
+}
+
+static bool xiic_needs_std_mode(struct i2c_msg *msgs, int num)
+{
+	int i;
+
+	for (i = 0; i < num; i++)
+		if ((msgs[i].flags & I2C_M_RD) && msgs[i].len > XIIC_DYN_MAX_READ_LEN)
+			return true;
+	return false;
+}
+
+#define XIIC_STD_SETTLE_US 100
+
+static int xiic_std_fail(struct fpgalogic_i2c *i2c, int err)
+{
+	u32 isr;
+
+	mutex_lock(&i2c->lock);
+	isr = xiic_getreg32(i2c, XIIC_IISR_OFFSET);
+	if (isr & XIIC_INTR_ARB_LOST_MASK)
+		atomic64_inc(&i2c->arb_lost);
+	if (err == -ENXIO)
+		atomic64_inc(&i2c->nak);
+	else
+		atomic64_inc(&i2c->timeout);
+	xiic_setreg32(i2c, XIIC_RESETR_OFFSET, XIIC_RESET_MASK);
+	(void)xiic_reinit(i2c);
+	i2c->state = STATE_ERROR;
+	mutex_unlock(&i2c->lock);
+	nh_i2c_err_ratelimited(i2c, "%s: bus %d, slave_addr: %d, standard-mode transfer failed (%d), ISR 0x%x\n",
+			       __func__, i2c->adap->nr, i2c->msg->addr, err, isr);
+	return err;
+}
+
+static int xiic_std_nak_or(struct fpgalogic_i2c *i2c, int err)
+{
+	u32 isr;
+
+	mutex_lock(&i2c->lock);
+	isr = xiic_getreg32(i2c, XIIC_IISR_OFFSET);
+	mutex_unlock(&i2c->lock);
+	return (isr & XIIC_INTR_TX_ERROR_MASK) ? -ENXIO : err;
+}
+
+static int xiic_std_write(struct fpgalogic_i2c *i2c, struct i2c_msg *msg, bool last)
+{
+	int pos, err;
+	u32 cr;
+
+	mutex_lock(&i2c->lock);
+	xiic_irq_clr(i2c, XIIC_INTR_TX_ERROR_MASK);
+	cr = xiic_getreg32(i2c, XIIC_CR_REG_OFFSET);
+	if (cr & XIIC_CR_MSMS_MASK)
+		xiic_setreg32(i2c, XIIC_CR_REG_OFFSET,
+			      (cr | XIIC_CR_REPEATED_START_MASK | XIIC_CR_DIR_IS_TX_MASK) & ~XIIC_CR_NO_ACK_MASK);
+	xiic_setreg32(i2c, XIIC_DTR_REG_OFFSET, i2c_8bit_addr_from_msg(msg));
+	if (!(cr & XIIC_CR_MSMS_MASK))
+		xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, cr | XIIC_CR_MSMS_MASK | XIIC_CR_DIR_IS_TX_MASK);
+	mutex_unlock(&i2c->lock);
+
+	for (pos = 0; pos < msg->len; pos++) {
+		if (last && pos == msg->len - 1) {
+			err = poll_wait(i2c, XIIC_SR_REG_OFFSET, XIIC_SR_TX_FIFO_EMPTY_MASK,
+					XIIC_SR_TX_FIFO_EMPTY_MASK, msecs_to_jiffies(50));
+			if (err)
+				return xiic_std_nak_or(i2c, err);
+			mutex_lock(&i2c->lock);
+			cr = xiic_getreg32(i2c, XIIC_CR_REG_OFFSET);
+			xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, cr & ~XIIC_CR_MSMS_MASK);
+			mutex_unlock(&i2c->lock);
+		} else {
+			err = poll_wait(i2c, XIIC_SR_REG_OFFSET, XIIC_SR_TX_FIFO_FULL_MASK, 0,
+					msecs_to_jiffies(50));
+			if (err)
+				return xiic_std_nak_or(i2c, err);
+		}
+		mutex_lock(&i2c->lock);
+		xiic_setreg32(i2c, XIIC_DTR_REG_OFFSET, msg->buf[pos]);
+		mutex_unlock(&i2c->lock);
+	}
+
+	err = poll_wait(i2c, XIIC_SR_REG_OFFSET, XIIC_SR_TX_FIFO_EMPTY_MASK,
+			XIIC_SR_TX_FIFO_EMPTY_MASK, msecs_to_jiffies(50));
+	if (!err && !last)
+		usleep_range(XIIC_STD_SETTLE_US, 2 * XIIC_STD_SETTLE_US);
+	return xiic_std_nak_or(i2c, err);
+}
+
+static int xiic_std_read(struct fpgalogic_i2c *i2c, struct i2c_msg *msg, bool last)
+{
+	int pos, err;
+	u32 cr;
+
+	mutex_lock(&i2c->lock);
+	xiic_irq_clr(i2c, XIIC_INTR_TX_ERROR_MASK | XIIC_INTR_RX_FULL_MASK);
+	xiic_setreg32(i2c, XIIC_RFD_REG_OFFSET, 0);
+	cr = xiic_getreg32(i2c, XIIC_CR_REG_OFFSET);
+	if (msg->len == 1)
+		cr |= XIIC_CR_NO_ACK_MASK;
+	else
+		cr &= ~XIIC_CR_NO_ACK_MASK;
+	if (cr & XIIC_CR_MSMS_MASK)
+		xiic_setreg32(i2c, XIIC_CR_REG_OFFSET,
+			      (cr | XIIC_CR_REPEATED_START_MASK) & ~XIIC_CR_DIR_IS_TX_MASK);
+	else
+		xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, cr);
+	xiic_setreg32(i2c, XIIC_DTR_REG_OFFSET, i2c_8bit_addr_from_msg(msg));
+	if (!(cr & XIIC_CR_MSMS_MASK))
+		xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, (cr | XIIC_CR_MSMS_MASK) & ~XIIC_CR_DIR_IS_TX_MASK);
+	mutex_unlock(&i2c->lock);
+
+	for (pos = 0; pos < msg->len; pos++) {
+		int rem = msg->len - pos - 1;
+
+		err = poll_wait(i2c, XIIC_SR_REG_OFFSET, XIIC_SR_RX_FIFO_EMPTY_MASK, 0,
+				msecs_to_jiffies(50));
+		if (err)
+			return pos ? err : xiic_std_nak_or(i2c, err);
+
+		mutex_lock(&i2c->lock);
+		cr = xiic_getreg32(i2c, XIIC_CR_REG_OFFSET);
+		if (rem == 1) {
+			xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, cr | XIIC_CR_NO_ACK_MASK);
+		} else if (rem == 0) {
+			if (last)
+				cr &= ~XIIC_CR_MSMS_MASK;
+			xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, cr & ~XIIC_CR_NO_ACK_MASK);
+		}
+		msg->buf[pos] = xiic_getreg32(i2c, XIIC_DRR_REG_OFFSET);
+		mutex_unlock(&i2c->lock);
+	}
+	return 0;
+}
+
+static int fpga_axi_iic_poll_std(struct fpgalogic_i2c *i2c, struct i2c_msg *msgs, int num)
+{
+	int i, err;
+
+	mutex_lock(&i2c->lock);
+	xiic_setreg32(i2c, XIIC_RESETR_OFFSET, XIIC_RESET_MASK);
+	xiic_setreg32(i2c, XIIC_RFD_REG_OFFSET, 0);
+	xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, XIIC_CR_TX_FIFO_RESET_MASK);
+	xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, XIIC_CR_ENABLE_DEVICE_MASK);
+	i2c->msg = msgs;
+	i2c->pos = 0;
+	i2c->nmsgs = num;
+	i2c->state = STATE_START;
+	err = xiic_clear_rx_fifo(i2c);
+	mutex_unlock(&i2c->lock);
+	if (err)
+		return err;
+
+	for (i = 0; i < num; i++) {
+		bool last = i == num - 1;
+
+		mutex_lock(&i2c->lock);
+		i2c->msg = &msgs[i];
+		i2c->nmsgs = num - i;
+		i2c->state = (msgs[i].flags & I2C_M_RD) ? STATE_READ : STATE_WRITE;
+		mutex_unlock(&i2c->lock);
+
+		if (msgs[i].flags & I2C_M_RD)
+			err = xiic_std_read(i2c, &msgs[i], last);
+		else
+			err = xiic_std_write(i2c, &msgs[i], last);
+		if (err)
+			return xiic_std_fail(i2c, err);
+	}
+
+	err = poll_wait(i2c, XIIC_SR_REG_OFFSET, XIIC_SR_BUS_BUSY_MASK, 0, msecs_to_jiffies(50));
+	if (err)
+		return xiic_std_fail(i2c, err);
+
+	mutex_lock(&i2c->lock);
+	i2c->nmsgs = 0;
+	i2c->state = STATE_DONE;
+	mutex_unlock(&i2c->lock);
+	return num;
+>>>>>>> 6cd8caf3c (NOS-19615: [platform] Let the last write byte finish before a polled repeated-start read (#11381))
 }
 
 static int fpga_axi_iic_access(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
