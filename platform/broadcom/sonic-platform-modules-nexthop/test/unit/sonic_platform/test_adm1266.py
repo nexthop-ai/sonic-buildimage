@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 #!/usr/bin/env python
+=======
+import datetime
+import textwrap
+>>>>>>> 703d8788d (NOS-19615: [platform] Drop the ADM1266 blackbox read retry (#11394))
 
 import datetime
 import pytest
@@ -541,7 +546,11 @@ class TestAdm1266:
             # When
             read_records = adm1266.read_raw_records()
             # Then
+<<<<<<< HEAD
             assert read_records == [RECORDS[1]]
+=======
+            assert read_records == b"".join(RECORDS)
+>>>>>>> 703d8788d (NOS-19615: [platform] Drop the ADM1266 blackbox read retry (#11394))
 
     def test_read_records(self, adm1266_module):
         # Given

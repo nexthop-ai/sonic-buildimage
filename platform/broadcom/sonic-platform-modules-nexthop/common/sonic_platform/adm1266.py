@@ -8,7 +8,12 @@ and parsing the ADM1266 blackbox data.
 """
 
 import datetime
+<<<<<<< HEAD
 
+=======
+import glob
+import os
+>>>>>>> 703d8788d (NOS-19615: [platform] Drop the ADM1266 blackbox read retry (#11394))
 from dataclasses import dataclass
 from enum import Enum
 from itertools import groupby
@@ -26,6 +31,7 @@ from sonic_py_common import syslogger
 
 UNIX_EPOCH = datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
 
+<<<<<<< HEAD
 # This MUST match ADM1266_NH_CUSTOM_EPOCH_OFFSET in nh_adm1266.c kernel driver.
 # ADM1266 only uses 4 bytes to store the seconds, which rollover every ~136 years.
 # If using the normal UNIX epoch (1970), the timestamp will rollover in 2106.
@@ -33,6 +39,8 @@ UNIX_EPOCH = datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
 CUSTOM_EPOCH = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
 EPOCH_OFFSET_SECONDS = int((CUSTOM_EPOCH - UNIX_EPOCH).total_seconds())  # 1704067200
 
+=======
+>>>>>>> 703d8788d (NOS-19615: [platform] Drop the ADM1266 blackbox read retry (#11394))
 SYSLOG_IDENTIFIER = "sonic_platform.adm1266"
 logger = syslogger.SysLogger(SYSLOG_IDENTIFIER)
 
@@ -606,8 +614,117 @@ class Adm1266(DpmBase, type=DpmType.ADM1266, max_powerup_counter=65535):
         with open(self._powerup_counter_path, "r") as file:
             return int(file.read())
 
+<<<<<<< HEAD
     def get_powerup_entries(self) -> list[DpmPowerUpEntry]:
         records = self.read_records(Adm1266BlackBoxRecord)
+=======
+    def _get_power_fault_cause_from_signal(
+        self,
+        record: Adm1266BlackBoxRecord,
+        dpm_signal_to_fault_cause: list[dict[str, Any]],
+    ) -> RebootCause | None:
+        """Returns the power fault cause for the record from the signal-pattern mappings.
+
+        An entry may also constrain the rail undervoltage flags via the optional
+        vh_uv_mask/vh_uv_value keys, for events the PDIO/GPIO signals cannot
+        distinguish. Omitting them matches any rail state.
+        """
+        for entry in dpm_signal_to_fault_cause:
+            pdio_mask = int(entry["pdio_mask"], 0)
+            pdio_value = int(entry["pdio_value"], 0)
+            gpio_mask = int(entry["gpio_mask"], 0)
+            gpio_value = int(entry["gpio_value"], 0)
+            vh_uv_mask = int(entry.get("vh_uv_mask", "0x0"), 0)
+            vh_uv_value = int(entry.get("vh_uv_value", "0x0"), 0)
+            if (record.pdio_in.val & pdio_mask) == pdio_value and \
+               (record.gpio_in.val & gpio_mask) == gpio_value and \
+               (record.vh_under_voltage.val & vh_uv_mask) == vh_uv_value:
+                return RebootCause(
+                    type=RebootCause.Type.HARDWARE,
+                    source=record.name,
+                    timestamp=record.timestamp,
+                    cause=entry["hw_cause"],
+                    description=entry["hw_desc"],
+                    chassis_reboot_cause_category=entry["reboot_cause"],
+                )
+        return None
+
+    def _process_record(self, record: Adm1266BlackBoxRecord) -> None:
+        """Enriches the record using this DPM's platform spec and computes its power fault cause.
+
+        Sets, on the record:
+        - Nickname of each VH/VP/GPI/GPO/PDI/PDO pin
+        - Power fault cause (if the PDI & GPI signal matches a known pattern)
+        """
+        platform_spec = self._platform_spec
+
+        # Set nicknames for each pin.
+        if "pin_to_name" in platform_spec:
+            pin_to_name = platform_spec["pin_to_name"]
+            record.vh_over_voltage.set_pin_nickname(pin_to_name)
+            record.vh_under_voltage.set_pin_nickname(pin_to_name)
+            record.vp_over_voltage.set_pin_nickname(pin_to_name)
+            record.vp_under_voltage.set_pin_nickname(pin_to_name)
+            record.gpio_in.set_pin_nickname(pin_to_name)
+            record.gpio_out.set_pin_nickname(pin_to_name)
+            record.pdio_in.set_pin_nickname(pin_to_name)
+            record.pdio_out.set_pin_nickname(pin_to_name)
+
+        # Analyze the signal pattern to determine the power fault cause.
+        record._power_fault_cause = self._get_power_fault_cause_from_signal(
+            record, platform_spec.get("dpm_signal_to_fault_cause", {})
+        )
+
+    def get_blackbox_raw(self) -> bytes:
+        """Read the blackbox data from the DPM memory.
+
+        Returns:
+            List of bytes, or empty if unsupported.
+        """
+
+        raw_bytes = b""
+        with open(self._nvmem_path, "rb") as f:
+            raw_bytes = f.read()
+
+        return raw_bytes
+
+    def clear_blackbox(self):
+        """Clears the blackbox data via the adm1266 driver's debugfs knob.
+
+        The nvmem device is read-only; the driver exposes the clear
+        operation as a separate write-only debugfs file.
+        """
+        with open(self._clear_blackbox_path, "w") as file:
+            file.write("1")
+
+    def decode_blackbox_records(self, raw: bytes) -> list[BlackBoxRecordBase]:
+        """Decode blackbox data into records
+
+        By default, no blackbox access is provided at the base Dpm level; subclasses for chips
+        that support blackbox parsing override this to return their own BlackBoxRecordBase subclass.
+
+        Returns:
+            List of records, specific to the DPM device
+        """
+
+        return cast(list[BlackBoxRecordBase], self._decode_records(raw))
+
+    def _decode_records(self, raw: bytes) -> list[Adm1266BlackBoxRecord]:
+        """`decode_blackbox_records` without the base class's erased element type."""
+        SIZE = Adm1266BlackBoxRecord.RECORD_SIZE_IN_BYTES
+        records = []
+        for start in range(0, len(raw), SIZE):
+            raw_record = raw[start : start + SIZE]
+            parsed_record = Adm1266BlackBoxRecord.from_bytes(raw_record, self.get_name())
+            if parsed_record.is_valid():
+                self._process_record(parsed_record)
+                records.append(parsed_record)
+
+        return records
+
+    def get_powerup_entries(self) -> list[PowerUpEntry]:
+        records = self._decode_records(self.get_blackbox_raw())
+>>>>>>> 703d8788d (NOS-19615: [platform] Drop the ADM1266 blackbox read retry (#11394))
         records.sort(key=lambda record: record.uid)
         grouped_by_powerup = groupby(records, lambda record: record.powerup_counter)
 
