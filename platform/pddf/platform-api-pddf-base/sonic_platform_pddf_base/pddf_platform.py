@@ -6,6 +6,8 @@
 #############################################################################
 
 
+from typing import cast
+
 try:
     import json
     from . import pddfapi
@@ -34,3 +36,12 @@ class PddfPlatform(PlatformBase):
 
         PlatformBase.__init__(self)
         self._chassis = Chassis(self.pddf_data, self.pddf_plugin_data)
+
+    def get_chassis(self) -> Chassis:
+        """
+        Retrieves the chassis for this platform
+
+        Returns:
+            The PDDF platform's Chassis object
+        """
+        return cast(Chassis, self._chassis)

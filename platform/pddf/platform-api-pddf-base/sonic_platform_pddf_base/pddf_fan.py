@@ -18,12 +18,17 @@ try:
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sonic_platform_pddf_base.pddfapi import PddfApi
+
 
 class PddfFan(FanBase):
     """PDDF generic Fan class"""
 
-    pddf_obj = {}
-    plugin_data = {}
+    pddf_obj: "PddfApi"
+    plugin_data: dict
 
     def __init__(self, tray_idx, fan_idx=0, pddf_data=None, pddf_plugin_data=None, is_psu_fan=False, psu_index=0):
         # idx is 0-based

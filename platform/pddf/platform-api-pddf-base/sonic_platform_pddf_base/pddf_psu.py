@@ -32,12 +32,17 @@ try:
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sonic_platform_pddf_base.pddfapi import PddfApi
+
 
 class PddfPsu(PsuBase):
     """PDDF generic PSU class"""
 
-    pddf_obj = {}
-    plugin_data = {}
+    pddf_obj: "PddfApi"
+    plugin_data: dict
 
     def __init__(self, index, pddf_data=None, pddf_plugin_data=None):
         PsuBase.__init__(self)
@@ -272,7 +277,7 @@ class PddfPsu(PsuBase):
         result, color = self.pddf_obj.get_system_led_color(psu_led_device)
         return (color)
 
-    def get_temperature(self, thermal_index=1):
+    def get_temperature(self, thermal_index=1) -> "float | None":
         """
         Retrieves current temperature reading from PSU
 

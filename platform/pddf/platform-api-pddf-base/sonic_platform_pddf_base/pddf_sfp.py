@@ -13,13 +13,19 @@ except ImportError as e:
 QSFP_PWR_CTRL_ADDR = 93
 
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sonic_platform_pddf_base.pddfapi import PddfApi
+
+
 class PddfSfp(SfpOptoeBase):
     """
     PDDF generic Sfp class
     """
 
-    pddf_obj = {}
-    plugin_data = {}
+    pddf_obj: "PddfApi"
+    plugin_data: dict
     _port_start = 0
     _port_end = 0
 

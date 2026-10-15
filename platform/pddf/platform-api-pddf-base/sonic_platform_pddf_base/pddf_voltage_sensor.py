@@ -5,10 +5,16 @@ try:
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sonic_platform_pddf_base.pddfapi import PddfApi
+
+
 class PddfVoltageSensor(VoltageSensorBase):
     """PDDF generic Voltage Sensor class"""
-    pddf_obj = {}
-    plugin_data = {}
+    pddf_obj: "PddfApi"
+    plugin_data: dict
 
     def __init__(self, index, pddf_data=None, pddf_plugin_data=None):
         if not pddf_data or not pddf_plugin_data:

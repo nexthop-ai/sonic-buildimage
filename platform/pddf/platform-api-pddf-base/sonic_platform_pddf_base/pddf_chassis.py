@@ -5,6 +5,8 @@
 #
 #############################################################################
 
+from typing import cast
+
 try:
     import sys
     from sonic_platform_base.chassis_base import ChassisBase
@@ -40,28 +42,55 @@ try:
 except ImportError as e:
     component_present = False
 
+<<<<<<< HEAD
+=======
+dcdc_present = True
+try:
+    from sonic_platform.dcdc import Dcdc
+except ImportError as e:
+    dcdc_present = False
+
+dpm_present = True
+try:
+    from sonic_platform.dpm import Dpm
+except ImportError as e:
+    dpm_present = False
+
+cpo_present = True
+try:
+    from sonic_platform.cpo import Cpo
+except ImportError as e:
+    cpo_present = False
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sonic_platform_pddf_base.pddfapi import PddfApi
+
+
+>>>>>>> 938f65fc1 (NOS-20012: [pddf] Declare the types of the PDDF base class attributes and getters (#11444))
 class PddfChassis(ChassisBase):
     """
     PDDF Generic Chassis class
     """
-    pddf_obj = {}
-    plugin_data = {}
+    pddf_obj: "PddfApi"
+    plugin_data: dict
 
     def __init__(self, pddf_data=None, pddf_plugin_data=None):
 
         ChassisBase.__init__(self)
 
-        self.pddf_obj = pddf_data if pddf_data else None
-        self.plugin_data = pddf_plugin_data if pddf_plugin_data else None
-        if not self.pddf_obj or not self.plugin_data:
+        if not pddf_data or not pddf_plugin_data:
             try:
                 from . import pddfapi
                 import json
-                self.pddf_obj = pddfapi.PddfApi()
+                pddf_data = pddfapi.PddfApi()
                 with open('/usr/share/sonic/platform/pddf/pd-plugin.json') as pd:
-                    self.plugin_data = json.load(pd)
+                    pddf_plugin_data = json.load(pd)
             except Exception as e:
                 raise Exception("Error: Unable to load PDDF JSON data - %s" % str(e))
+        self.pddf_obj = pddf_data
+        self.plugin_data = pddf_plugin_data
 
         self.platform_inventory = self.pddf_obj.get_platform()
 
@@ -119,6 +148,30 @@ class PddfChassis(ChassisBase):
                 component = Component(i, self.pddf_obj, self.plugin_data)
                 self._component_list.append(component)
 
+<<<<<<< HEAD
+=======
+        if dcdc_present:
+            # DC/DC
+            for i in range(self.platform_inventory.get('num_dcdcs', 0)):
+                dcdc = Dcdc(i, self.pddf_obj, self.plugin_data)
+                self._dcdc_list.append(dcdc)
+
+        if dpm_present:
+            # DPM (Digital Power Manager)
+            for i in range(self.platform_inventory.get('num_dpms', 0)):
+                dpm = Dpm(i, self.pddf_obj, self.plugin_data)
+                self._dpm_list.append(dpm)
+
+    def get_eeprom(self) -> "Eeprom | None":
+        """
+        Retrieves eeprom device on this chassis
+
+        Returns:
+            The chassis Eeprom object, or None if it failed to initialize
+        """
+        return cast("Eeprom | None", self._eeprom)
+
+>>>>>>> 938f65fc1 (NOS-20012: [pddf] Declare the types of the PDDF base class attributes and getters (#11444))
     def get_name(self):
         """
         Retrieves the name of the chassis

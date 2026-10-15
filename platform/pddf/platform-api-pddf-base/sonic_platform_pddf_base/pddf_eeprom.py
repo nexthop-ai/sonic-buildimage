@@ -13,10 +13,16 @@ except ImportError as e:
 CACHE_ROOT = '/var/cache/sonic/decode-syseeprom'
 CACHE_FILE = 'syseeprom_cache'
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sonic_platform_pddf_base.pddfapi import PddfApi
+
+
 class PddfEeprom(eeprom_tlvinfo.TlvInfoDecoder):
     _TLV_INFO_MAX_LEN = 256
-    pddf_obj = {}
-    plugin_data = {}
+    pddf_obj: "PddfApi"
+    plugin_data: dict
 
     def __init__(self, pddf_data=None, pddf_plugin_data=None):
         if not pddf_data or not pddf_plugin_data:
