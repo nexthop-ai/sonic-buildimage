@@ -97,6 +97,12 @@ platform/**/*.mod.o
 platform/**/*.o
 platform/**/*.d
 !platform/**/etc/systemd/system/*.d
+<<<<<<< HEAD
+=======
+!platform/**/systemd/*.service.d
+!platform/**/etc/systemd/system.conf.d
+!platform/**/etc/modules-load.d
+>>>>>>> 25aeb0b9a (NOS-18541: Stop ifup@bmc0 failing on the first boot after imaging (#11514))
 platform/**/*.cmd
 platform/**/*.order
 platform/broadcom/sonic-platform-modules-dell/s5232f/sonic_platform/ipmihelper.py
