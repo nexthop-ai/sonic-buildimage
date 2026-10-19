@@ -248,6 +248,23 @@ def test_optional_containers(mock_check_docker_image):
     assert expected == {'configured'}
 
 
+@patch('sonic_py_common.device_info.is_disaggregated_chassis', MagicMock(return_value=False))
+@patch('sonic_py_common.device_info.is_supervisor', MagicMock(return_value=False))
+@patch('sonic_py_common.multi_asic.is_multi_asic', MagicMock(return_value=False))
+@patch('sonic_py_common.multi_asic.get_asic_presence_list', MagicMock(return_value=[]))
+@patch('health_checker.service_checker.ServiceChecker.load_critical_process_cache', MagicMock())
+def test_feature_entry_without_state():
+    feature_table = {
+        'swss': {'state': 'enabled'},
+        'trimming': {'delayed': 'False', 'has_global_scope': 'True', 'has_per_asic_scope': 'False'},
+    }
+
+    expected, feature_dict = ServiceChecker().get_expected_running_containers(feature_table, Config())
+
+    assert expected == {'swss'}
+    assert feature_dict == {'swss': 'swss'}
+
+
 @patch('health_checker.utils.run_command')
 def test_user_defined_checker(mock_run):
     mock_run.return_value = ''

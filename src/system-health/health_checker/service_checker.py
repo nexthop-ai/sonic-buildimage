@@ -149,6 +149,9 @@ class ServiceChecker(HealthChecker):
 
         for container_name in container_list:
             feature_entry = feature_table[container_name]
+            if "state" not in feature_entry:
+                logger.log_debug("Ignoring {} container check: FEATURE entry has no state".format(container_name))
+                continue
             if feature_entry["state"] not in ["disabled", "always_disabled"]:
                 if multi_asic.is_multi_asic():
                     if feature_entry.get("has_global_scope", "True") == "True":
