@@ -32,14 +32,20 @@ def _read_device_version():
     Read failure is deliberately distinct from a value -- the caller treats None
     as 'do not margin'."""
     try:
-        from sonic_platform.platform import Platform
+        from nexthop.nexthop_device_info import get_device_version
 
+<<<<<<< HEAD
         raw = Platform().get_chassis().get_eeprom().eeprom_tlv_dict.get("0x26")
         if raw is None:
             return None
         return int(str(raw).strip())
     except Exception as e:
         _log("could not read IDPROM device version: %s" % e)
+=======
+        return get_device_version()
+    except (ImportError, OSError, RuntimeError, ValueError, TypeError) as e:
+        _log(f"could not read IDPROM device version: {e}")
+>>>>>>> a21f06d15 (NOS-19190: [nexthop] SONiC support for reading Device Version (#10311))
         return None
 
 

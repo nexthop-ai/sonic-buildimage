@@ -13,6 +13,11 @@ import syslog
 from nexthop import feature_flags_lib, pcie_lib
 from sonic_py_common import device_info
 
+<<<<<<< HEAD
+=======
+from nexthop import feature_flags_lib, gen_lib, nexthop_device_info, pcie_lib
+
+>>>>>>> a21f06d15 (NOS-19190: [nexthop] SONiC support for reading Device Version (#10311))
 PLATFORM_FOLDER = "/usr/share/sonic/platform"
 PDDF_FOLDER = "/usr/share/sonic/platform/pddf"
 
@@ -38,8 +43,9 @@ def check_file_exists_if_not_default(filepath: str, default_filepath: str, param
         raise click.BadParameter(f"{filepath} does not exist.", param_hint=param_name)
 
 def generate_file_from_jinja2_template(
-    template_filepath: str, variables: dict[str, str], output_filepath: str
+    template_filepath: str, variables: dict[str, Any], output_filepath: str
 ):
+<<<<<<< HEAD
     loader = jinja2.FileSystemLoader(os.path.dirname(template_filepath))
     # nosemgrep: python.flask.security.xss.audit.direct-use-of-jinja2.direct-use-of-jinja2
     j2_env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
@@ -48,6 +54,21 @@ def generate_file_from_jinja2_template(
     output = template.render(variables)
     with open(output_filepath, "w") as f:
         f.write(output)
+=======
+    try:
+        device_version = nexthop_device_info.get_device_version()
+    except Exception as e:  # noqa: BLE001
+        device_version = nexthop_device_info.UNPROGRAMMED_DEVICE_VERSION
+        syslog.syslog(
+            syslog.LOG_WARNING,
+            f"Couldn't determine device_version ({type(e).__name__}: {e}), using default value: {device_version} "
+            f"for generation of {output_filepath}",
+        )
+    variables = {**variables, "device_version": device_version}
+    gen_lib.write_atomically(
+        gen_lib.render(template_filepath, variables), output_filepath
+    )
+>>>>>>> a21f06d15 (NOS-19190: [nexthop] SONiC support for reading Device Version (#10311))
     syslog.syslog(syslog.LOG_INFO, f"Successfully generated {output_filepath}")
 
 def get_model_name(platform_json_filepath):
