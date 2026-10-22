@@ -289,6 +289,90 @@ class HardwareChecker(HealthChecker):
     def reset(self):
         self._info = {}
 
+<<<<<<< HEAD
+=======
+    def _get_psu_power_states(self):
+        """
+        Read PSU_INFO once and classify each PSU's power state so the fan checker
+        can tell whether a stopped PSU fan is expected (its PSU has no power).
+        :return: dict mapping PSU index (int) -> 'absent' | 'unpowered' | 'faulted' | 'ok'.
+                 Non-PSU rows (e.g. PDB) are skipped.
+        """
+        states = {}
+        keys = self._db.keys(self._db.STATE_DB, HardwareChecker.PSU_TABLE_NAME + '*')
+        if not keys:
+            return states
+        for key in keys:
+            key_list = key.split('|')
+            if len(key_list) != 2:
+                continue
+            index = self._psu_index_from_name(key_list[1])
+            if index is None:
+                continue
+            states[index] = self._classify_psu_power(self._db.get_all(self._db.STATE_DB, key))
+        return states
+
+    @staticmethod
+    def _classify_psu_power(data_dict):
+        """Classify a PSU_INFO row from the evidence present in STATE_DB:
+            'absent'    - not present (presence false)
+            'ok'        - present and delivering good output (power-good and output voltage)
+            'unpowered' - present, no good output, AND positive evidence of no input
+                          (input_status 'false', or, when input_status is unavailable,
+                          input_voltage at/below PSU_NO_INPUT_VOLTAGE)
+            'faulted'   - present, no good output, but input is present OR input is
+                          unknown. We never infer "unpowered" from a deasserted
+                          power-good alone, so a real fault is not masked.
+        """
+        if data_dict.get('presence', 'false').lower() != 'true':
+            return 'absent'
+
+        output_bad = data_dict.get('status', 'false').lower() != 'true'
+        if not output_bad:
+            voltage = data_dict.get('voltage', None)
+            if voltage is not None:
+                try:
+                    output_bad = float(voltage) <= PSU_OUTPUT_DEAD_VOLTAGE
+                except ValueError:
+                    pass
+        if not output_bad:
+            return 'ok'
+
+        # input_status is the PSU's own UVLO verdict; input_voltage is the fallback.
+        input_status = data_dict.get('input_status', '').lower()
+        if input_status in ('true', 'false'):
+            return 'faulted' if input_status == 'true' else 'unpowered'
+
+        input_voltage = data_dict.get('input_voltage', None)
+        if input_voltage is not None:
+            try:
+                if float(input_voltage) <= PSU_NO_INPUT_VOLTAGE:
+                    return 'unpowered'
+            except ValueError:
+                pass
+        return 'faulted'
+
+    @staticmethod
+    def _psu_index_from_name(name):
+        """'PSU 4' / 'PSU4' -> 4. Returns None for non-PSU names (e.g. 'PDB 1')."""
+        match = re.match(r'^PSU\s*(\d+)$', name)
+        return int(match.group(1)) if match else None
+
+    @staticmethod
+    def _psu_fan_parent_index(fan_name):
+        """'PSU4_FAN1' / 'PSU 4_FAN1' -> 4. Returns None for non-PSU fans."""
+        match = re.match(r'^PSU\s*(\d+)_FAN', fan_name)
+        return int(match.group(1)) if match else None
+
+    @classmethod
+    def _psu_fan_parent_powerless(cls, fan_name, psu_power_states):
+        """True if fan_name is a PSU fan whose parent PSU is absent or unpowered, so a
+        missing/stopped fan is expected and its alarm should be suppressed (the PSU's
+        own reason line conveys the cause). A faulted/healthy parent is not suppressed."""
+        psu_index = cls._psu_fan_parent_index(fan_name)
+        return psu_index is not None and psu_power_states.get(psu_index) in ('absent', 'unpowered')
+
+>>>>>>> eebe85c01 (NOS-10269: report PSU input presence from PMBus STATUS_INPUT and use it in system-health (#10561))
     @classmethod
     def _ignore_check(cls, ignore_set, category, object_name, check_point):
         if not ignore_set:
