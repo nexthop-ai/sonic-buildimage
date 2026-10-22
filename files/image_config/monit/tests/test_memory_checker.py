@@ -87,6 +87,13 @@ class TestMemoryChecker(unittest.TestCase):
         """Container running with same ID - should not exit."""
         memory_checker.exit_if_container_stopped('gnmi', container_id='same_id_123')
 
+    @patch('memory_checker._try_get_container_id', return_value=memory_checker._CONTAINER_RESTARTED)
+    def test_exit_if_container_restarted_same_id(self, mock_get_id):
+        """Container stopped and started again with the same ID - should exit gracefully."""
+        with self.assertRaises(SystemExit) as cm:
+            memory_checker.exit_if_container_stopped('gnmi', container_id='same_id_123')
+        self.assertEqual(cm.exception.code, 0)
+
     @patch('memory_checker._try_get_container_id', return_value=memory_checker._CONTAINER_NOT_RUNNING)
     def test_exit_if_container_removed(self, mock_get_id):
         """Container gone by ID lookup - should exit gracefully."""
@@ -108,6 +115,28 @@ class TestMemoryChecker(unittest.TestCase):
         mock_docker.DockerClient.return_value.containers.get.return_value = mock_container
         result = memory_checker._try_get_container_id('gnmi')
         self.assertEqual(result, 'abc123')
+
+    @patch('memory_checker.docker')
+    def test_try_get_container_id_started_before_check(self, mock_docker):
+        """Container running since before the check began - should return its ID."""
+        mock_container = MagicMock()
+        mock_container.id = 'abc123'
+        mock_container.status = 'running'
+        mock_container.attrs = {'State': {'StartedAt': '2020-01-01T00:00:00.000000000Z'}}
+        mock_docker.DockerClient.return_value.containers.get.return_value = mock_container
+        result = memory_checker._try_get_container_id('gnmi')
+        self.assertEqual(result, 'abc123')
+
+    @patch('memory_checker.docker')
+    def test_try_get_container_id_started_after_check(self, mock_docker):
+        """Container restarted (same ID) after the check began - should return _CONTAINER_RESTARTED."""
+        mock_container = MagicMock()
+        mock_container.id = 'abc123'
+        mock_container.status = 'running'
+        mock_container.attrs = {'State': {'StartedAt': '2999-01-01T00:00:00.000000000Z'}}
+        mock_docker.DockerClient.return_value.containers.get.return_value = mock_container
+        result = memory_checker._try_get_container_id('gnmi')
+        self.assertIs(result, memory_checker._CONTAINER_RESTARTED)
 
     @patch('memory_checker.docker')
     def test_try_get_container_id_stopped(self, mock_docker):

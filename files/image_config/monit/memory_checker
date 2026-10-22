@@ -26,6 +26,7 @@ import sys
 import syslog
 import re
 import time
+from datetime import datetime
 
 import docker
 
@@ -91,11 +92,36 @@ class _ContainerNotRunning:
 _CONTAINER_NOT_RUNNING = _ContainerNotRunning()
 
 
+class _ContainerRestarted:
+    """Sentinel returned by _try_get_container_id when the container is running but was
+    started again after this check began."""
+    pass
+
+
+_CONTAINER_RESTARTED = _ContainerRestarted()
+
+CHECK_START_TIME = time.time()
+
+
+def _started_after_check_began(container):
+    """Return True if the container's current run began after this check started.
+
+    'docker stop' followed by 'docker start' keeps the container ID, so a restart
+    during config reload is only visible as a newer State.StartedAt.
+    """
+    try:
+        started_at = datetime.fromisoformat(container.attrs["State"]["StartedAt"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    return started_at.timestamp() >= CHECK_START_TIME
+
+
 def _try_get_container_id(container_name):
     """Get the ID of the running container.
 
     Returns the ID string if the container is running, _CONTAINER_NOT_RUNNING if
-    the container is not found or not running, or None on transient Docker
+    the container is not found or not running, _CONTAINER_RESTARTED if it is
+    running but was started after this check began, or None on transient Docker
     API errors.
     """
     try:
@@ -104,6 +130,8 @@ def _try_get_container_id(container_name):
             container = docker_client.containers.get(container_name)
             if container.status != 'running':
                 return _CONTAINER_NOT_RUNNING
+            if _started_after_check_began(container):
+                return _CONTAINER_RESTARTED
             return container.id
         finally:
             docker_client.close()
@@ -117,10 +145,11 @@ def exit_if_container_stopped(container_name, container_id=None):
     """Exit gracefully if the container stopped or restarted.
 
     Call before logging ERR to avoid false alarms when a container
-    disappears or restarts with a new ID during config reload.
+    disappears or restarts during config reload, with or without a new ID.
     """
     current_id = _try_get_container_id(container_name)
-    if isinstance(current_id, _ContainerNotRunning) or (container_id and current_id and current_id != container_id):
+    if isinstance(current_id, (_ContainerNotRunning, _ContainerRestarted)) or \
+            (container_id and current_id and current_id != container_id):
         reason = "stopped" if isinstance(current_id, _ContainerNotRunning) else "restarted"
         syslog.syslog(syslog.LOG_INFO,
                       "[memory_checker] Container '{}' {} during memory check. Exiting gracefully."
