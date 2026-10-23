@@ -20,8 +20,7 @@
                     "meter_type": "bytes",
                     "pbs": 2048,
                     "pir": 2560000,
-                    "type": "STRICT",
-                    "priority": 0
+                    "type": "STRICT"
                 },
                 {
                     "name":"Test@2",
@@ -58,6 +57,20 @@
                 {
                     "name":"Test@0",
                     "weight": 120
+                }
+                ]
+            }
+        }
+    },
+
+    "SCHEDULER_UNKNOWN_PRIORITY": {
+        "sonic-scheduler:sonic-scheduler":{
+            "sonic-scheduler:SCHEDULER": {
+                "SCHEDULER_LIST": [
+                {
+                    "name":"scheduler.0",
+                    "type": "STRICT",
+                    "priority": 0
                 }
                 ]
             }
@@ -166,8 +179,7 @@
                     "meter_type": "bytes",
                     "pbs": 2048,
                     "pir": 2560000,
-                    "type": "STRICT",
-                    "priority": 0
+                    "type": "STRICT"
                 },
                 {
                     "name":"scheduler.2",

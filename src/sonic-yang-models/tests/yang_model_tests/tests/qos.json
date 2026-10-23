@@ -14,6 +14,12 @@
         "eStrKey" : "Range"
     },
 
+    "SCHEDULER_UNKNOWN_PRIORITY": {
+        "desc": "Configure the unsupported priority field in SCHEDULER table.",
+        "eStrKey": "UnknownElement",
+        "eStr": ["priority"]
+    },
+
     "SCHEDULER_INVALID_METER_TYPE": {
         "desc": "Configure unsuported meter type in SCHEDULER table.",
         "eStrKey": "InvalidValue",
