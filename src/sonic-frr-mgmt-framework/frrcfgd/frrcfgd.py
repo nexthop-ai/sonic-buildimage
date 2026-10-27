@@ -1845,6 +1845,9 @@ class BGPConfigDaemon:
                            '+route_flap_dampen_reuse_threshold',
                            '+route_flap_dampen_suppress_threshold',
                            '+route_flap_dampen_max_suppress'],          '{no:no-prefix}bgp dampening {} {} {} {}', ['true', 'false']),
+                         # Before the other EVPN leaves: bgpd refuses advertise-svi-ip, advertise-default-gw
+                         # and dup-addr-detection until advertise-all-vni is set, so one row apply needs it
+                         # first. A leaf refused in an earlier update is not cached and is re-sent with the row.
                          ('advertise-all-vni',                      '{no:no-prefix}advertise-all-vni', ['true','false']),
                          ('advertise-svi-ip',                       '{no:no-prefix}advertise-svi-ip', ['true','false']),
                          ('advertise-default-gw',                   '{no:no-prefix}advertise-default-gw', ['true','false']),
@@ -2981,6 +2984,20 @@ class BGPConfigDaemon:
                     syslog.syslog(syslog.LOG_ERR, 'failed running BGP global AF config command')
                     continue
                 self.tmp_cache_key = ''
+                aav = data.get('advertise-all-vni', None)
+                if (key.lower() == 'l2vpn_evpn' and isinstance(aav, CachedDataWithOp) and aav.data == 'true' and
+                        aav.op in (CachedDataWithOp.OP_ADD, CachedDataWithOp.OP_UPDATE) and
+                        aav.status == CachedDataWithOp.STAT_SUCC and not self._replaying):
+                    # bgpd refuses a per-VNI rd or route-target until advertise-all-vni is set ("This
+                    # command is only supported under EVPN VRF"), and a refused row is not retried, so a
+                    # VNI row that arrived first renders as a bare 'vni N' block. Re-apply the VRF's
+                    # per-VNI rows now that EVPN is enabled: VNI rows before their route-target rows.
+                    # aav.status, not run_command()'s result, which is true if any field of the row
+                    # succeeded. Not during start()'s replay, which reaches BGP_GLOBALS_AF before the
+                    # per-VNI tables in table_handler_list, so they are applied once, in order.
+                    syslog.syslog(syslog.LOG_INFO, 'advertise-all-vni set for VRF {}: re-apply its per-VNI EVPN rows'.format(vrf))
+                    self.__apply_dep_vrf_table(vrf, 'BGP_GLOBALS_EVPN_VNI')
+                    self.__apply_dep_vrf_table(vrf, 'BGP_GLOBALS_EVPN_VNI_RT')
             elif table == 'BGP_GLOBALS_LISTEN_PREFIX':
                 syslog.syslog(syslog.LOG_INFO, 'Set BGP listen prefix {}'.format(key))
                 cmd_prefix = ['configure terminal',
