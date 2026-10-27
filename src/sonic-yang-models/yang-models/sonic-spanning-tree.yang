@@ -19,12 +19,43 @@ module sonic-spanning-tree {
 	description
 		"YANG model for Spanning Tree Protocol (STP) in SONiC, supporting PVST and MSTP";
 
+	revision 2026-10-22 {
+		description
+			"Add the bridge_priority and port_priority typedefs: a bridge
+			 priority is a multiple of 4096 from 0 to 61440 and a port priority
+			 a multiple of 16 from 0 to 240, which the daemon rounds down to
+			 anyway, so a value such as 4097, 100 or 17 is refused instead of
+			 silently truncated.";
+	}
+
 	revision 2025-03-15 {
 		description
 			"Initial YANG model written for PVST & MSTP configurations xFlow & BRCM";
 		reference
 			"Initial implementation for SONiC STP support";
-}
+	}
+
+	typedef bridge_priority {
+		type uint16 {
+			range "0 | 4096 | 8192 | 12288 | 16384 | 20480 | 24576 | 28672 | 32768 | 36864 | 40960 | 45056 | 49152 | 53248 | 57344 | 61440" {
+				error-message "Invalid Bridge Priority value, must be a multiple of 4096 from 0 to 61440";
+			}
+		}
+		description
+			"The manageable part of a bridge identifier: its upper four bits,
+			 so only multiples of 4096 up to 61440.";
+	}
+
+	typedef port_priority {
+		type uint8 {
+			range "0 | 16 | 32 | 48 | 64 | 80 | 96 | 112 | 128 | 144 | 160 | 176 | 192 | 208 | 224 | 240" {
+				error-message "Invalid Port Priority value, must be a multiple of 16 from 0 to 240";
+			}
+		}
+		description
+			"The manageable part of a port identifier: its upper four bits,
+			 so only multiples of 16 up to 240.";
+	}
 
 	grouping vlanModeAttr {
 		description
@@ -67,11 +98,7 @@ module sonic-spanning-tree {
 		}
 
 		leaf priority {
-			type uint16 {
-				range "0..61440" {
-					error-message "Invalid Bridge Priority value";
-				}
-			}
+			type bridge_priority;
 			default 32768;
 			description
 				"Bridge Identifier priority component";
@@ -94,11 +121,7 @@ module sonic-spanning-tree {
 		}
 
 		leaf priority {
-			type uint8 {
-				range "0..240" {
-					error-message "Invalid Port Priority value";
-				}
-			}
+			type port_priority;
 			default 128;
 			description
 				"Port priority in STP calculations";
@@ -457,11 +480,7 @@ module sonic-spanning-tree {
 				}
 
 				leaf bridge_priority {
-					type uint16 {
-						range "0..61440" {
-							error-message "Invalid Bridge Priority value";
-						}
-					}
+					type bridge_priority;
 					default 32768;
 					description
 						"The manageable component of the Bridge Identifier";
