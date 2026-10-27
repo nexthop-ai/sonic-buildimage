@@ -78,3 +78,15 @@ class TestPdPluginTemplate:
                 pytest.fail(
                     f"{platform_variant}: pd-plugin.json.j2 with all flags {value}: {e}"
                 )
+
+    def test_dpm_rail_mask_has_a_value(self, platform_name, platform_path):
+        template_path = os.path.join(platform_path, "pddf", "pd-plugin.json.j2")
+        for value in (False, True):
+            variables = {name: value for name in _declared_flag_names(platform_path)}
+            pd_plugin = json.loads(_render(template_path, variables))
+            for dpm_name, dpm_spec in pd_plugin.get("DPM", {}).items():
+                for rule in dpm_spec.get("dpm_signal_to_fault_cause", []):
+                    assert ("vh_uv_mask" in rule) == ("vh_uv_value" in rule), (
+                        f"{platform_name}: DPM {dpm_name} rule {rule.get('hw_cause')} "
+                        f"must set vh_uv_mask and vh_uv_value together"
+                    )

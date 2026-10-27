@@ -19,6 +19,7 @@ from sonic_platform.dpm_base import (
     DpmBase,
     DpmPowerUpEntry,
     RebootCause,
+    pick_power_fault_cause,
     timestamp_as_string,
 )
 from sonic_py_common import syslogger
@@ -606,21 +607,156 @@ class Adm1266(DpmBase, type=DpmType.ADM1266, max_powerup_counter=65535):
         with open(self._powerup_counter_path, "r") as file:
             return int(file.read())
 
+<<<<<<< HEAD
     def get_powerup_entries(self) -> list[DpmPowerUpEntry]:
         records = self.read_records(Adm1266BlackBoxRecord)
         records.sort(key=lambda record: record.uid)
         grouped_by_powerup = groupby(records, lambda record: record.powerup_counter)
+=======
+    def _get_power_fault_cause_from_signal(
+        self,
+        record: Adm1266BlackBoxRecord,
+        dpm_signal_to_fault_cause: list[dict[str, Any]],
+    ) -> RebootCause | None:
+        """Returns the power fault cause for the record from the signal-pattern mappings.
+
+        An entry may also constrain the rail undervoltage flags via the optional
+        vh_uv_mask key and its required vh_uv_value, for events the PDIO/GPIO
+        signals cannot distinguish. Omitting both matches any rail state. A rail undervoltage is a
+        symptom of a power down, so an entry with vh_uv_mask yields a fallback cause
+        that any non-fallback match outranks, wherever the entries sit in the list.
+        """
+        return pick_power_fault_cause(
+            self._get_power_fault_cause_from_entry(record, entry) for entry in dpm_signal_to_fault_cause
+        )
+
+    @staticmethod
+    def _get_power_fault_cause_from_entry(
+        record: Adm1266BlackBoxRecord,
+        entry: dict[str, Any],
+    ) -> RebootCause | None:
+        """Returns the cause for one signal-pattern mapping, or None if the record does not match it."""
+        pdio_mask = int(entry["pdio_mask"], 0)
+        pdio_value = int(entry["pdio_value"], 0)
+        gpio_mask = int(entry["gpio_mask"], 0)
+        gpio_value = int(entry["gpio_value"], 0)
+        if (record.pdio_in.val & pdio_mask) != pdio_value or (record.gpio_in.val & gpio_mask) != gpio_value:
+            return None
+
+        vh_uv_mask = entry.get("vh_uv_mask")
+        if vh_uv_mask is not None:
+            vh_uv_value = int(entry["vh_uv_value"], 0)
+            if (record.vh_under_voltage.val & int(vh_uv_mask, 0)) != vh_uv_value:
+                return None
+
+        return RebootCause(
+            type=RebootCause.Type.HARDWARE,
+            source=record.name,
+            timestamp=record.timestamp,
+            cause=entry["hw_cause"],
+            description=entry["hw_desc"],
+            chassis_reboot_cause_category=entry["reboot_cause"],
+            is_fallback=vh_uv_mask is not None,
+        )
+
+    def _process_record(self, record: Adm1266BlackBoxRecord) -> None:
+        """Enriches the record using this DPM's platform spec and computes its power fault cause.
+
+        Sets, on the record:
+        - Nickname of each VH/VP/GPI/GPO/PDI/PDO pin
+        - Power fault cause (if the PDI & GPI signal matches a known pattern)
+        """
+        platform_spec = self._platform_spec
+
+        # Set nicknames for each pin.
+        if "pin_to_name" in platform_spec:
+            pin_to_name = platform_spec["pin_to_name"]
+            record.vh_over_voltage.set_pin_nickname(pin_to_name)
+            record.vh_under_voltage.set_pin_nickname(pin_to_name)
+            record.vp_over_voltage.set_pin_nickname(pin_to_name)
+            record.vp_under_voltage.set_pin_nickname(pin_to_name)
+            record.gpio_in.set_pin_nickname(pin_to_name)
+            record.gpio_out.set_pin_nickname(pin_to_name)
+            record.pdio_in.set_pin_nickname(pin_to_name)
+            record.pdio_out.set_pin_nickname(pin_to_name)
+
+        # Analyze the signal pattern to determine the power fault cause.
+        record._power_fault_cause = self._get_power_fault_cause_from_signal(
+            record, platform_spec.get("dpm_signal_to_fault_cause", {})
+        )
+
+    def get_blackbox_raw(self) -> bytes:
+        """Read the blackbox data from the DPM memory.
+
+        Returns:
+            List of bytes, or empty if unsupported.
+        """
+
+        raw_bytes = b""
+        with open(self._nvmem_path, "rb") as f:
+            raw_bytes = f.read()
+
+        return raw_bytes
+
+    def clear_blackbox(self):
+        """Clears the blackbox data via the adm1266 driver's debugfs knob.
+
+        The nvmem device is read-only; the driver exposes the clear
+        operation as a separate write-only debugfs file.
+        """
+        with open(self._clear_blackbox_path, "w") as file:
+            file.write("1")
+
+    def decode_blackbox_records(self, raw: bytes) -> list[BlackBoxRecordBase]:
+        """Decode blackbox data into records
+
+        By default, no blackbox access is provided at the base Dpm level; subclasses for chips
+        that support blackbox parsing override this to return their own BlackBoxRecordBase subclass.
+
+        Returns:
+            List of records, specific to the DPM device
+        """
+
+        return cast(list[BlackBoxRecordBase], self._decode_records(raw))
+
+    def _decode_records(self, raw: bytes) -> list[Adm1266BlackBoxRecord]:
+        """`decode_blackbox_records` without the base class's erased element type."""
+        SIZE = Adm1266BlackBoxRecord.RECORD_SIZE_IN_BYTES
+        records = []
+        for start in range(0, len(raw), SIZE):
+            raw_record = raw[start : start + SIZE]
+            parsed_record = Adm1266BlackBoxRecord.from_bytes(raw_record, self.get_name())
+            if parsed_record.is_valid():
+                self._process_record(parsed_record)
+                records.append(parsed_record)
+
+        return records
+
+    def get_powerup_entries(self, records: list[BlackBoxRecordBase]) -> list[PowerUpEntry]:
+        adm1266_records = sorted(cast(list[Adm1266BlackBoxRecord], records), key=lambda record: record.uid)
+        grouped_by_powerup = groupby(adm1266_records, lambda record: record.powerup_counter)
+>>>>>>> a38f9f829 (NOS-19469: Rank the 12V rail undervoltage reboot cause below specific DPM faults (#11119))
 
         powerups = []
         for _, group in grouped_by_powerup:
             group_list = list(group)
-            last_record = group_list[-1]  # record with the highest UID determines the cause
+            last_record = group_list[-1]  # highest UID determines the cause, unless only a fallback
+            power_fault_cause = last_record._power_fault_cause
+            if power_fault_cause and power_fault_cause.is_fallback:
+                power_fault_cause = pick_power_fault_cause(
+                    record._power_fault_cause for record in reversed(group_list)
+                )
 
             powerups.append(
                 DpmPowerUpEntry(
                     powerup_counter=last_record.powerup_counter,
+<<<<<<< HEAD
                     power_fault_cause=last_record.get_power_fault_cause(),
                     dpm_records=cast(list[DpmRecord], group_list),
+=======
+                    power_fault_cause=power_fault_cause,
+                    records=cast(list[BlackBoxRecordBase], group_list),
+>>>>>>> a38f9f829 (NOS-19469: Rank the 12V rail undervoltage reboot cause below specific DPM faults (#11119))
                 )
             )
         return powerups

@@ -11,6 +11,15 @@ logging the causes to a history file.
 import datetime
 import os
 import re
+<<<<<<< HEAD
+=======
+import traceback
+from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
+from enum import Enum
+from typing import Any
+>>>>>>> a38f9f829 (NOS-19469: Rank the 12V rail undervoltage reboot cause below specific DPM faults (#11119))
 
 from dateutil import parser
 from typing import Any
@@ -19,6 +28,132 @@ from sonic_platform.dpm_logger import DpmLogger
 from sonic_platform.dpm_base import DpmBase, DpmPowerUpEntry, RebootCause, UNKNOWN_TIMESTAMP
 from sonic_py_common import syslogger
 
+<<<<<<< HEAD
+=======
+from sonic_platform.blackbox_manager import BlackBoxManager, device_key
+from sonic_platform.dpm import UNKNOWN_TIMESTAMP, Dpm, DpmType
+
+
+@dataclass
+class DataBase(ABC):
+    gen_time: str
+    schema_version: int
+
+    @abstractmethod
+    def is_empty(self) -> bool:
+        """Returns True if this data object contains no reboot causes or device records."""
+
+
+@dataclass
+class CauseV1:
+    source: str
+    timestamp: str
+    cause: str
+    description: str
+
+
+@dataclass
+class DeviceV1:
+    name: str
+    type: str
+    records: list[dict[str, str]]
+
+
+@dataclass
+class DataV1(DataBase):
+    causes: list[CauseV1]
+    devices: list[DeviceV1]
+
+    def __post_init__(self):
+        # Convert causes dicts into CauseV1 objects
+        self.causes = [c if isinstance(c, CauseV1) else CauseV1(**c) for c in self.causes]
+        # Convert dpms dicts into DeviceV1 objects
+        self.devices = [d if isinstance(d, DeviceV1) else DeviceV1(**d) for d in self.devices]
+
+    def is_empty(self) -> bool:
+        """Returns True if there are no causes and all devices have no records.
+
+        A DataV1 instance is considered empty when both of the following hold:
+          - the causes list is empty, and
+          - for every device entry, its records list is empty.
+        """
+        return not self.causes and not any(dev.records for dev in self.devices)
+
+
+def data_from_dict(data: dict) -> DataBase | None:
+    """Reconstructs a DataBase object from a raw dict loaded from the blackbox logger.
+
+    Returns None if the dict does not match a known schema.
+    """
+    try:
+        if data.get("schema_version") == 1:
+            return DataV1(**data)
+    except (TypeError, ValueError, KeyError) as e:
+        logger.log_warning(f"Failed to parse reboot-cause data: {e}")
+    return None
+
+
+@dataclass
+class RebootCause:
+    """Encapsulates the reboot cause information.
+
+    This can be a HW power fault cause or a SW-triggered cause.
+    """
+
+    class Type(Enum):
+        HARDWARE = "HW"
+        SOFTWARE = "SW"
+
+    type: Type
+    # Name of the source that detected the reboot cause. For HW reboot causes,
+    # this is generally the device name.
+    source: str
+    # Timestamp of the reboot cause. This could be the time elapsed since power-on,
+    # or a UTC timestamp recorded by the `source`.
+    timestamp: datetime.timedelta | datetime.datetime
+    # Concise string representing the cause.
+    cause: str
+    # Longer string describing the cause.
+    description: str
+    # Should match one of the ChassisBase.REBOOT_CAUSE_* constants (e.g., "REBOOT_CAUSE_POWER_LOSS").
+    chassis_reboot_cause_category: str
+    # True for a symptom-level cause (e.g. a rail undervoltage) that any specific cause outranks.
+    is_fallback: bool = False
+
+
+def pick_power_fault_cause(causes: Iterable[RebootCause | None]) -> RebootCause | None:
+    """Returns the first non-fallback cause, else the first fallback cause, else None."""
+    first_fallback = None
+    for cause in causes:
+        if cause is None:
+            continue
+        if not cause.is_fallback:
+            return cause
+        if first_fallback is None:
+            first_fallback = cause
+    return first_fallback
+
+
+@dataclass
+class PowerUpEntry:
+    """Encapsulates all information related to a single powerup.
+
+    This specific powerup may or may not have experienced a reboot.
+    """
+
+    # Number of times the device has power cycled.
+    # Note that this can wrap around, depending on the device's counter width.
+    powerup_counter: int
+    # If a power fault is None (i.e., not detected), it could be that
+    # 1. power cycle has not happened on this powerup; or
+    # 2. power cycle was caused by an unknown hardware event
+    #    or by another hardware component that this device is not aware of.
+    #    If it is the latter, other device(s) may have information about the fault.
+    power_fault_cause: RebootCause | None
+    # List of raw records from the device that relate to this powerup.
+    records: list[BlackBoxRecordBase]
+
+>>>>>>> a38f9f829 (NOS-19469: Rank the 12V rail undervoltage reboot cause below specific DPM faults (#11119))
 
 SYSLOG_IDENTIFIER = "sonic_platform.reboot_cause_manager"
 logger = syslogger.SysLogger(SYSLOG_IDENTIFIER)
@@ -139,7 +274,8 @@ def squash_dpms_powerups_to_cause_per_reboot(
         does not have the capability to detect the cause, or the DPM did not log anything.
 
     To determine the reboot cause for each powerup, we look at each column from top to bottom,
-    and arbitrarily take the first known fault cause that we encounter. This works because HWs
+    and arbitrarily take the first known fault cause that we encounter. A fallback cause is
+    taken only when no DPM reports a non-fallback cause for that powerup. This works because HWs
     are generally designed to not log the same cause across DPMs. Except for CPUCARD-driven
     event where the SWITCHCARD also logs a record (as exampled in DPM2's fault_4).
     To handle this case, we place the CPUCARD's DPM before the SWITCHCARD's DPM in `pd-plugin.json`.
@@ -164,13 +300,10 @@ def squash_dpms_powerups_to_cause_per_reboot(
     # Second, for each powerup (`p`), pick the first-seen DPM that reports a power fault.
     results = []
     for p in range(num_power_cycles):
-        picked = next(
-            (
-                powerup.power_fault_cause
-                for powerups in dpm_to_all_previous_powerups.values()
-                if (powerup := powerups[p]) and powerup.power_fault_cause
-            ),
-            None,
+        picked = pick_power_fault_cause(
+            powerup.power_fault_cause
+            for powerups in dpm_to_all_previous_powerups.values()
+            if (powerup := powerups[p])
         )
         if picked:
             results.append(picked)
@@ -329,15 +462,68 @@ class RebootCauseManager:
     def summarize_reboot_causes(self) -> list[RebootCause]:
         """Returns a list of reboot causes, one per reboot.
 
+<<<<<<< HEAD
         Reboot causes are derived from the knowledge of DPM records (HW)
         and the reboot cause file (SW).
         """
         hw_reboot_causes, dpm_to_powerups = self.read_hw_reboot_causes()
+=======
+        Reboot causes are derived from the knowledge of DPM records (HW), read
+        through the blackbox manager, and the reboot cause file (SW). The DPM
+        records are collected into the blackbox log only once processed, as a
+        DPM reports an invalid powerup counter while its blackbox is clearing.
+        If the DPM records cannot be decoded with the pd-plugin.json fault rules,
+        no HW cause is reported and no DPM is processed or collected, so a fixed
+        config can still decode them together.
+        """
+        processed = self._load_processed_powerups()
+        try:
+            dpm_to_powerups = self._read_powerups_from_all_dpms(processed)
+            hw_reboot_causes = squash_dpms_powerups_to_cause_per_reboot(dpm_to_powerups)
+            decoded = True
+        except (KeyError, ValueError) as e:
+            logger.log_error(
+                "Keeping all DPM records: failed to decode them with the pd-plugin.json fault rules: "
+                + "".join(traceback.format_exception(e))
+            )
+            hw_reboot_causes, dpm_to_powerups = [], {}
+            decoded = False
+>>>>>>> a38f9f829 (NOS-19469: Rank the 12V rail undervoltage reboot cause below specific DPM faults (#11119))
         sw_reboot_cause = self._read_sw_reboot_cause()
         ret_causes = merge_sw_and_hw_causes(sw_reboot_cause, hw_reboot_causes)
 
         # Save all records to history.
         DpmLogger().save(ret_causes, dpm_to_powerups)
 
+<<<<<<< HEAD
         self._clear_records_on_all_dpms()
         return squash_sw_and_hw_causes(ret_causes)
+=======
+        self._mark_powerups_processed(reboot_data.gen_time, dpm_to_powerups, processed)
+        if decoded and (blackbox_manager := self._dpm_blackbox_manager) is not None:
+            blackbox_manager.collect_blackbox(DPM_BLACKBOX_SOURCE)
+
+        squashed = squash_sw_and_hw_causes(ret_causes)
+        self._log_problematic_causes(squashed, dpm_to_powerups)
+        return squashed
+
+    def load(self) -> DataBase | None:
+        """Loads the most recent reboot-cause entry as a DataBase object."""
+        data = self.blackbox_logger.load()
+        return data_from_dict(data) if data is not None else None
+
+    def load_all(self) -> tuple[list[DataBase | SkippedEntries], int, int]:
+        """Loads all reboot-cause entries, reconstructing dicts into DataBase objects.
+
+        Returns (items, total, skipped), where items interleaves DataBase entries
+        with SkippedEntries markers in chronological order.
+        """
+        items, total, skipped = self.blackbox_logger.load_all()
+        reconstructed: list[DataBase | SkippedEntries] = []
+        for item in items:
+            if isinstance(item, SkippedEntries):
+                reconstructed.append(item)
+            elif (data := data_from_dict(item)) is not None:
+                reconstructed.append(data)
+        return reconstructed, total, skipped
+>>>>>>> a38f9f829 (NOS-19469: Rank the 12V rail undervoltage reboot cause below specific DPM faults (#11119))
