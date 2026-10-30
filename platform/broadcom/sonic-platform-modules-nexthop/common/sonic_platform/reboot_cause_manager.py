@@ -11,6 +11,17 @@ logging the causes to a history file.
 import datetime
 import os
 import re
+<<<<<<< HEAD
+=======
+import subprocess
+import traceback
+from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime, timedelta
+from enum import Enum
+from typing import Any
+>>>>>>> cb4aa24c5 (NOS-21526: [platform] Fall back to the AMD FCH reset reason for unexplained hardware reboots (#12072))
 
 from dateutil import parser
 from typing import Any
@@ -32,6 +43,158 @@ UNKNOWN_HW_REBOOT_CAUSE = RebootCause(
     chassis_reboot_cause_category="REBOOT_CAUSE_HARDWARE_OTHER",
 )
 
+<<<<<<< HEAD
+=======
+
+@dataclass(frozen=True)
+class AmdResetCause:
+    """A reboot cause name and its chassis reboot-cause category."""
+
+    cause: str
+    category: str
+
+
+_AMD_RESET_REASON_RE = re.compile(r"Previous system reset reason \[(0x[0-9a-fA-F]+)\]: (.+?)\s*$")
+_AMD_RESET_REASON_MAP = (
+    ("thermal", AmdResetCause("Thermal", "REBOOT_CAUSE_THERMAL_OVERLOAD_OTHER")),
+    ("watchdog", AmdResetCause("Watchdog", "REBOOT_CAUSE_WATCHDOG")),
+)
+_AMD_SOFTWARE_RESET_REASONS = (
+    "software wrote",
+    "software issued pci reset",
+    "acpi power state transition",
+)
+
+
+def read_amd_reset_reason() -> RebootCause | None:
+    """Returns a HARDWARE RebootCause for this boot's CPU reset reason, or None if
+    absent or only a software-initiated reset.
+
+    A thermal or watchdog reason maps to its reboot-cause category, thermal
+    first; otherwise the reset is a "Hardware - Other" cause named after its
+    decoded reasons. A reset whose every reason is software-initiated (a 0xCF9
+    write, a software PCI reset or an ACPI power state transition) is what a
+    plain reboot or shutdown leaves behind, so it is no hardware cause.
+
+    The "x86/CPU/AMD: Print the reason for the last reset" kernel patch decodes
+    FCH::PM::S5_RESET_STATUS at boot into one kernel log line per set bit, such as
+    "x86/amd: Previous system reset reason [0x02000800]: hardware watchdog timer expired".
+    All of these lines describe the same reset, and the register has no sysfs
+    node, so they are parsed from dmesg. A CPU watchdog hard reset cuts no power
+    rail, so no DPM records it; this is the only record of such a reset.
+    """
+    try:
+        out = subprocess.run(["dmesg"], capture_output=True, text=True, check=False).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    hits = [hit for line in out.splitlines() if (hit := _AMD_RESET_REASON_RE.search(line))]
+    if not hits:
+        return None
+    raw = hits[-1].group(1)
+    reasons = list(dict.fromkeys(hit.group(2).strip() for hit in hits if hit.group(1) == raw))
+    if all(any(sw in reason.lower() for sw in _AMD_SOFTWARE_RESET_REASONS) for reason in reasons):
+        return None
+    decoded = "; ".join(reasons)
+    mapped = next(
+        (
+            mapped
+            for needle, mapped in _AMD_RESET_REASON_MAP
+            if any(needle in reason.lower() for reason in reasons)
+        ),
+        AmdResetCause(decoded, "REBOOT_CAUSE_HARDWARE_OTHER"),
+    )
+    return RebootCause(
+        type=RebootCause.Type.HARDWARE,
+        source="cpu",
+        timestamp=UNKNOWN_TIMESTAMP,
+        cause=mapped.cause,
+        description=f"CPU reset register reason {raw}: {decoded}",
+        chassis_reboot_cause_category=mapped.category,
+    )
+
+
+def _is_unknown_hw_cause(cause: RebootCause) -> bool:
+    return (
+        cause.type == RebootCause.Type.HARDWARE
+        and cause.cause == "unknown"
+        and cause.chassis_reboot_cause_category == "REBOOT_CAUSE_HARDWARE_OTHER"
+    )
+
+
+# Reboot causes to log warning on
+HARMFUL_HW_REBOOT_CAUSES = {
+    "REBOOT_CAUSE_THERMAL_OVERLOAD_CPU",
+    "REBOOT_CAUSE_THERMAL_OVERLOAD_ASIC",
+    "REBOOT_CAUSE_THERMAL_OVERLOAD_OTHER",
+    "REBOOT_CAUSE_INSUFFICIENT_FAN_SPEED",
+    "REBOOT_CAUSE_WATCHDOG",
+    "REBOOT_CAUSE_POWER_LOSS",
+    "REBOOT_CAUSE_HARDWARE_OTHER"
+}
+
+HARMFUL_SW_REBOOT_CAUSES = {
+    "Over-Temperature Event",
+    "Kernel Panic"
+}
+
+
+def is_harmful_cause(cause: RebootCause) -> bool:
+    """Returns True if the reboot cause is from a problematic source"""
+    if cause.type == RebootCause.Type.SOFTWARE and any(
+        sw_cause in cause.cause for sw_cause in HARMFUL_SW_REBOOT_CAUSES
+    ):
+        return True
+    return cause.chassis_reboot_cause_category in HARMFUL_HW_REBOOT_CAUSES
+
+
+def timestamp_as_string(timestamp: timedelta | datetime) -> str:
+    if timestamp == UNKNOWN_TIMESTAMP:
+        return "unknown"
+
+    if isinstance(timestamp, datetime):
+        if timestamp.tzinfo is None:
+            return timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")
+    return f"{timestamp.total_seconds():.6f}s after power-on"
+
+
+def to_data(
+    causes: Iterable[RebootCause],
+    device_to_powerups: dict[Dpm, list[PowerUpEntry]],
+) -> DataBase:
+    """Converts causes and device records to a DataBase object.
+
+    Args:
+        causes: List of RebootCause objects, as observed from
+                SW reboot cause and HW device records.
+        dpm_to_powerups: Dictionary of device to list of powerups,
+                         where each powerup contains a list of device records.
+    """
+    gen_time = datetime.now(tz=UTC)
+    return DataV1(
+        gen_time=gen_time.strftime("%Y-%m-%d %H:%M:%S %Z"),
+        schema_version=1,
+        causes=[
+            CauseV1(
+                c.source,
+                timestamp_as_string(c.timestamp),
+                c.cause,
+                c.description if c.type == RebootCause.Type.HARDWARE else "n/a",
+            )
+            for c in causes
+        ],
+        devices=[
+            DeviceV1(
+                device.get_name(),
+                device.get_type().value,  # type: ignore[reportOptionalMemberAccess]
+                [record.as_dict() for powerup in powerups for record in powerup.records],
+            )
+            for device, powerups in device_to_powerups.items()
+        ],
+    )
+
+>>>>>>> cb4aa24c5 (NOS-21526: [platform] Fall back to the AMD FCH reset reason for unexplained hardware reboots (#12072))
 
 def ordinal(n: int) -> str:
     """Returns the ordinal string of a number, e.g., "1st", "2nd", "3rd", "4th", etc."""
@@ -332,7 +495,29 @@ class RebootCauseManager:
         Reboot causes are derived from the knowledge of DPM records (HW)
         and the reboot cause file (SW).
         """
+<<<<<<< HEAD
         hw_reboot_causes, dpm_to_powerups = self.read_hw_reboot_causes()
+=======
+        processed = self._load_processed_powerups()
+        try:
+            dpm_to_powerups = self._read_powerups_from_all_dpms(processed)
+            hw_reboot_causes = squash_dpms_powerups_to_cause_per_reboot(dpm_to_powerups)
+            decoded = True
+        except (KeyError, ValueError) as e:
+            logger.log_error(
+                "Keeping all DPM records: failed to decode them with the pd-plugin.json fault rules: "
+                + "".join(traceback.format_exception(e))
+            )
+            hw_reboot_causes, dpm_to_powerups = [], {}
+            decoded = False
+        amd_cause = read_amd_reset_reason()
+        if amd_cause is not None:
+            if not hw_reboot_causes:
+                hw_reboot_causes = [amd_cause]
+            elif _is_unknown_hw_cause(hw_reboot_causes[-1]):
+                amd_cause.timestamp = hw_reboot_causes[-1].timestamp
+                hw_reboot_causes[-1] = amd_cause
+>>>>>>> cb4aa24c5 (NOS-21526: [platform] Fall back to the AMD FCH reset reason for unexplained hardware reboots (#12072))
         sw_reboot_cause = self._read_sw_reboot_cause()
         ret_causes = merge_sw_and_hw_causes(sw_reboot_cause, hw_reboot_causes)
 

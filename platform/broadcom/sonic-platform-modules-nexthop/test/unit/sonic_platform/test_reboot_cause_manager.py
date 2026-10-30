@@ -23,6 +23,11 @@ def reboot_cause_manager_module(mock_dpm_logger):
     """Loads the module before each test. This is to let conftest.py run first."""
     from sonic_platform import reboot_cause_manager
 
+<<<<<<< HEAD
+=======
+    monkeypatch.setattr(reboot_cause_manager, "REBOOT_CAUSE_HISTORY_DIR", str(tmp_path / "reboot-cause"))
+    monkeypatch.setattr(reboot_cause_manager, "read_amd_reset_reason", lambda: None)
+>>>>>>> cb4aa24c5 (NOS-21526: [platform] Fall back to the AMD FCH reset reason for unexplained hardware reboots (#12072))
     yield reboot_cause_manager
 
 
@@ -1065,3 +1070,349 @@ class TestRebootCauseManager:
                     chassis_reboot_cause_category="REBOOT_CAUSE_POWER_LOSS",
                 ),
             ]
+<<<<<<< HEAD
+=======
+
+
+@pytest.mark.parametrize(
+    "powerup, current, last_processed, expected",
+    [
+        (10, 12, 11, False),
+        (11, 12, 11, True),
+        (12, 12, 11, True),
+        (13, 12, 11, False),
+        (11, 11, 11, True),
+        (65534, 2, 65533, True),
+        (1, 2, 65533, True),
+        (65532, 2, 65533, False),
+    ],
+)
+def test_is_unprocessed_powerup(reboot_cause_manager_module, powerup, current, last_processed, expected):
+    assert reboot_cause_manager_module.is_unprocessed_powerup(powerup, current, last_processed, 65535) is expected
+
+
+class TestRebootCauseManagerDpmBlackboxLog:
+    """DPM records reach reboot-cause processing only through the 'dpm' blackbox log."""
+
+    PDDF_DATA: ClassVar[dict] = {
+        "DPM1": {"i2c": {"topo_info": {"parent_bus": "0x0", "dev_addr": "0x40", "dev_type": "adm1266"}}},
+        "PLATFORM": {"num_dpms": 1},
+    }
+    PLUGIN_DATA: ClassVar[dict] = {
+        "DPM": {
+            "test-dpm": {
+                "type": "adm1266",
+                "dpm": "DPM1",
+                "dpm_signal_to_fault_cause": [
+                    {
+                        "pdio_mask": "0x0001",
+                        "gpio_mask": "0x0000",
+                        "pdio_value": "0x0001",
+                        "gpio_value": "0x0000",
+                        "hw_cause": "PSU_VIN_LOSS",
+                        "hw_desc": "Both PSUs lost input power",
+                        "reboot_cause": "REBOOT_CAUSE_POWER_LOSS",
+                    }
+                ],
+            }
+        }
+    }
+
+    @staticmethod
+    def _power_loss(uid, powerup_counter):
+        return create_raw_adm1266_blackbox_record(uid=uid, powerup_counter=powerup_counter, pdio_in=0b1)
+
+    @pytest.fixture
+    def dpm_files(self, tmp_path):
+        """Writable stand-ins for the DPM's nvmem, powerup counter and clear knob."""
+        paths = {name: tmp_path / name for name in ("nvmem", "powerup_counter", "clear_blackbox")}
+        paths["nvmem"].write_bytes(b"")
+        paths["clear_blackbox"].write_text("")
+        return paths
+
+    def _manager(self, make_reboot_cause_manager, dpm_files, nvmem: bytes, powerup_counter: int):
+        dpm_files["nvmem"].write_bytes(nvmem)
+        dpm_files["powerup_counter"].write_text(str(powerup_counter))
+        manager = make_reboot_cause_manager(mock_pddf_data(self.PDDF_DATA), self.PLUGIN_DATA)
+        [dpm] = manager._dpm_devices
+        dpm._nvmem_path = str(dpm_files["nvmem"])
+        dpm._powerup_counter_path = str(dpm_files["powerup_counter"])
+        dpm._clear_blackbox_path = str(dpm_files["clear_blackbox"])
+        return manager
+
+    def test_summarize_collects_dpm_records_into_log_and_clears_dpm(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        record = self._power_loss(uid=1, powerup_counter=10)
+        manager = self._manager(make_reboot_cause_manager, dpm_files, record, powerup_counter=11)
+
+        [cause] = manager.summarize_reboot_causes()
+
+        assert cause.cause == "PSU_VIN_LOSS"
+        assert dpm_files["clear_blackbox"].read_text() == "1"
+        assert manager._blackbox_manager.logged_records("dpm") == {"test-dpm:adm1266": [record.hex()]}
+
+    def test_summarize_reads_powerup_counters_before_clearing_the_dpm(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        manager = self._manager(make_reboot_cause_manager, dpm_files, self._power_loss(uid=1, powerup_counter=10), 11)
+        [dpm] = manager._dpm_devices
+        clear_blackbox = dpm.clear_blackbox
+
+        def clear_then_report_invalid_counter():
+            # A DPM reads an invalid powerup counter while its blackbox clears.
+            clear_blackbox()
+            dpm_files["powerup_counter"].write_text("65535")
+
+        dpm.clear_blackbox = clear_then_report_invalid_counter
+
+        assert [c.cause for c in manager.summarize_reboot_causes()] == ["PSU_VIN_LOSS"]
+        with open(manager._processed_powerups_path) as file:
+            assert json.load(file)["powerups"] == {"test-dpm": 11}
+
+    def test_summarize_reads_records_the_poll_already_collected(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        first = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=10)
+        assert first.summarize_reboot_causes() == []
+        # The poll moved the power-loss record into the log before this boot's processing.
+        record = self._power_loss(uid=1, powerup_counter=10)
+        first._blackbox_manager.write_blackbox_log("dpm", {"test-dpm:adm1266": [record.hex()]})
+
+        second = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=11)
+        [cause] = second.summarize_reboot_causes()
+
+        assert cause.cause == "PSU_VIN_LOSS"
+
+    def test_summarize_skips_powerups_processed_at_an_earlier_boot(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        first = self._manager(make_reboot_cause_manager, dpm_files, self._power_loss(uid=1, powerup_counter=10), 11)
+        assert [c.cause for c in first.summarize_reboot_causes()] == ["PSU_VIN_LOSS"]
+
+        # Next boot: the earlier record is still in the log; the new one is on the DPM.
+        second = self._manager(make_reboot_cause_manager, dpm_files, self._power_loss(uid=2, powerup_counter=11), 12)
+        [cause] = second.summarize_reboot_causes()
+
+        assert cause.cause == "PSU_VIN_LOSS"
+        third = self._manager(make_reboot_cause_manager, dpm_files, b"", 12)
+        assert third.summarize_reboot_causes() == []
+
+    def test_summarize_keeps_the_processed_powerup_of_a_dpm_that_fails_to_read(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        first = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=10)
+        first.summarize_reboot_causes()
+
+        second = self._manager(make_reboot_cause_manager, dpm_files, self._power_loss(uid=1, powerup_counter=10), 11)
+        [dpm] = second._dpm_devices
+        with patch.object(dpm, "get_blackbox_raw", side_effect=OSError(errno.EIO, "Input/output error")):
+            assert second.summarize_reboot_causes() == []
+        with open(second._processed_powerups_path) as file:
+            assert json.load(file)["powerups"] == {"test-dpm": 10}
+
+        third = self._manager(make_reboot_cause_manager, dpm_files, self._power_loss(uid=1, powerup_counter=10), 12)
+        assert [c.cause for c in third.summarize_reboot_causes()] == ["PSU_VIN_LOSS", "unknown"]
+
+    def test_summarize_ignores_logged_records_after_another_image_processed_reboots(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        first = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=10)
+        first.summarize_reboot_causes()
+        first._blackbox_manager.write_blackbox_log(
+            "dpm", {"test-dpm:adm1266": [self._power_loss(uid=1, powerup_counter=10).hex()]}
+        )
+        # An image without this manager then processed (and cleared) powerup 10's reboot.
+        first.blackbox_logger.save_data({"gen_time": "another image", "schema_version": 1, "causes": [], "devices": []})
+
+        second = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=12)
+
+        assert second.summarize_reboot_causes() == []
+
+    def test_summarize_ignores_logged_records_without_processing_state(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        manager = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=11)
+        manager._blackbox_manager.write_blackbox_log(
+            "dpm", {"test-dpm:adm1266": [self._power_loss(uid=1, powerup_counter=10).hex()]}
+        )
+
+        assert manager.summarize_reboot_causes() == []
+
+    def test_summarize_ignores_logged_records_when_powerup_counter_jumped(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        first = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=10)
+        first.summarize_reboot_causes()
+        first._blackbox_manager.write_blackbox_log(
+            "dpm", {"test-dpm:adm1266": [self._power_loss(uid=1, powerup_counter=10).hex()]}
+        )
+
+        # e.g. a replaced DPM, whose counter is unrelated to the saved one.
+        second = self._manager(make_reboot_cause_manager, dpm_files, b"", powerup_counter=5)
+
+        assert second.summarize_reboot_causes() == []
+
+    def test_read_hw_reboot_causes_changes_no_state(
+        self, reboot_cause_manager_module, make_reboot_cause_manager, dpm_files
+    ):
+        record = self._power_loss(uid=1, powerup_counter=10)
+        manager = self._manager(make_reboot_cause_manager, dpm_files, record, powerup_counter=11)
+
+        [cause], _ = manager.read_hw_reboot_causes()
+
+        assert cause.cause == "PSU_VIN_LOSS"
+        assert dpm_files["clear_blackbox"].read_text() == ""
+        assert manager._blackbox_manager.logged_records("dpm") == {}
+        assert not os.path.exists(manager._processed_powerups_path)
+
+
+class TestAmdResetReason:
+    WATCHDOG_LINE = "[    0.123] x86/amd: Previous system reset reason [0x02000800]: hardware watchdog timer expired\n"
+    SHUTDOWN_LINE = "[    0.123] x86/amd: Previous system reset reason [0x00080000]: internal CPU shutdown event occurred\n"
+
+    @pytest.fixture
+    def rcm(self, mock_save_data, tmp_path, monkeypatch):
+        from sonic_platform import (
+            adm1266,  # noqa: F401
+            reboot_cause_manager,
+        )
+
+        monkeypatch.setattr(reboot_cause_manager, "REBOOT_CAUSE_HISTORY_DIR", str(tmp_path / "reboot-cause"))
+        return reboot_cause_manager
+
+    def _dmesg(self, rcm, monkeypatch, out):
+        monkeypatch.setattr(rcm.subprocess, "run", lambda *a, **kw: MagicMock(stdout=out))
+
+    def test_watchdog_line_maps_to_a_watchdog_cause(self, rcm, monkeypatch):
+        self._dmesg(rcm, monkeypatch, "noise\n" + self.WATCHDOG_LINE)
+        cause = rcm.read_amd_reset_reason()
+        assert cause is not None
+        assert (cause.cause, cause.source, cause.chassis_reboot_cause_category) == (
+            "Watchdog",
+            "cpu",
+            "REBOOT_CAUSE_WATCHDOG",
+        )
+        assert "0x02000800" in cause.description
+
+    def test_unmapped_reason_is_a_hardware_other_cause(self, rcm, monkeypatch):
+        self._dmesg(rcm, monkeypatch, self.SHUTDOWN_LINE)
+        cause = rcm.read_amd_reset_reason()
+        assert cause is not None
+        assert (cause.cause, cause.source, cause.chassis_reboot_cause_category) == (
+            "internal CPU shutdown event occurred",
+            "cpu",
+            "REBOOT_CAUSE_HARDWARE_OTHER",
+        )
+        assert cause.description == "CPU reset register reason 0x00080000: internal CPU shutdown event occurred"
+
+    def test_every_line_of_the_reset_is_read_thermal_first(self, rcm, monkeypatch):
+        self._dmesg(
+            rcm,
+            monkeypatch,
+            "x86/amd: Previous system reset reason [0x00080200]: internal CPU thermal limit was tripped\n"
+            "x86/amd: Previous system reset reason [0x00080200]: software wrote 0x6 to reset control register 0xCF9\n",
+        )
+        cause = rcm.read_amd_reset_reason()
+        assert cause is not None
+        assert (cause.cause, cause.chassis_reboot_cause_category) == ("Thermal", "REBOOT_CAUSE_THERMAL_OVERLOAD_OTHER")
+        assert cause.description == (
+            "CPU reset register reason 0x00080200: internal CPU thermal limit was tripped; "
+            "software wrote 0x6 to reset control register 0xCF9"
+        )
+
+    def test_missing_reason_is_none(self, rcm, monkeypatch):
+        self._dmesg(rcm, monkeypatch, "nothing to see\n")
+        assert rcm.read_amd_reset_reason() is None
+
+    def test_dmesg_failure_is_none(self, rcm, monkeypatch):
+        def boom(*a, **kw):
+            raise OSError("no dmesg")
+
+        monkeypatch.setattr(rcm.subprocess, "run", boom)
+        assert rcm.read_amd_reset_reason() is None
+
+    def test_summarize_reports_the_amd_cause_when_no_dpm_recorded_one(self, rcm, monkeypatch, tmp_path):
+        from sonic_platform.blackbox_manager import BlackBoxManager
+
+        self._dmesg(rcm, monkeypatch, self.WATCHDOG_LINE)
+        sw_file = tmp_path / "reboot-cause.txt"
+        sw_file.write_text("Unknown")
+        manager = rcm.RebootCauseManager(
+            mock_pddf_data({}),
+            {"REBOOT_CAUSE": {"reboot_cause_file": str(sw_file)}},
+            [],
+            BlackBoxManager(),
+        )
+        causes = manager.summarize_reboot_causes()
+        assert [c.cause for c in causes] == ["Watchdog"]
+
+    @pytest.mark.parametrize(
+        "reason",
+        [
+            "software wrote 0x6 to reset control register 0xCF9",
+            "software issued PCI reset",
+            "ACPI power state transition occurred",
+        ],
+    )
+    def test_a_software_only_reset_is_none(self, rcm, monkeypatch, reason):
+        self._dmesg(rcm, monkeypatch, f"x86/amd: Previous system reset reason [0x00080800]: {reason}\n")
+        assert rcm.read_amd_reset_reason() is None
+
+    def test_summarize_reports_an_unmapped_hardware_reason_when_no_dpm_recorded_one(self, rcm, monkeypatch, tmp_path):
+        from sonic_platform.blackbox_manager import BlackBoxManager
+
+        self._dmesg(
+            rcm,
+            monkeypatch,
+            "x86/amd: Previous system reset reason [0x08000800]: "
+            "an uncorrected error caused a data fabric sync flood event\n",
+        )
+        sw_file = tmp_path / "reboot-cause.txt"
+        sw_file.write_text("Unknown")
+        manager = rcm.RebootCauseManager(
+            mock_pddf_data({}),
+            {"REBOOT_CAUSE": {"reboot_cause_file": str(sw_file)}},
+            [],
+            BlackBoxManager(),
+        )
+        hw = [c for c in manager.summarize_reboot_causes() if c.source == "cpu"]
+        assert [(c.cause, c.chassis_reboot_cause_category) for c in hw] == [
+            ("an uncorrected error caused a data fabric sync flood event", "REBOOT_CAUSE_HARDWARE_OTHER")
+        ]
+
+    @pytest.mark.parametrize("latest_known", [False, True])
+    def test_summarize_names_only_the_latest_dpm_cause_when_unknown(
+        self, rcm, monkeypatch, tmp_path, latest_known
+    ):
+        from dataclasses import replace
+        from datetime import UTC, datetime
+
+        from sonic_platform.blackbox_manager import BlackBoxManager
+
+        self._dmesg(rcm, monkeypatch, self.SHUTDOWN_LINE)
+        older = replace(rcm.UNKNOWN_HW_REBOOT_CAUSE, timestamp=datetime(2026, 10, 29, 11, tzinfo=UTC))
+        latest = replace(
+            rcm.UNKNOWN_HW_REBOOT_CAUSE,
+            timestamp=datetime(2026, 10, 29, 12, tzinfo=UTC),
+            cause="Power Loss" if latest_known else "unknown",
+            chassis_reboot_cause_category="REBOOT_CAUSE_POWER_LOSS" if latest_known else "REBOOT_CAUSE_HARDWARE_OTHER",
+        )
+        monkeypatch.setattr(rcm, "squash_dpms_powerups_to_cause_per_reboot", lambda _: [older, latest])
+        sw_file = tmp_path / "reboot-cause.txt"
+        sw_file.write_text("Unknown")
+        manager = rcm.RebootCauseManager(
+            mock_pddf_data({}),
+            {"REBOOT_CAUSE": {"reboot_cause_file": str(sw_file)}},
+            [],
+            BlackBoxManager(),
+        )
+        causes = manager.summarize_reboot_causes()
+        assert [(c.cause, c.timestamp) for c in causes if c.type == rcm.RebootCause.Type.HARDWARE] == [
+            ("unknown", datetime(2026, 10, 29, 11, tzinfo=UTC)),
+            (
+                "Power Loss" if latest_known else "internal CPU shutdown event occurred",
+                datetime(2026, 10, 29, 12, tzinfo=UTC),
+            ),
+        ]
+>>>>>>> cb4aa24c5 (NOS-21526: [platform] Fall back to the AMD FCH reset reason for unexplained hardware reboots (#12072))
