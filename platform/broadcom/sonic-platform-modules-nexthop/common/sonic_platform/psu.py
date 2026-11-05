@@ -15,6 +15,16 @@ class Psu(PddfPsu):
     def __init__(self, index, pddf_data=None, pddf_plugin_data=None):
         PddfPsu.__init__(self, index, pddf_data, pddf_plugin_data)
 
+    def get_model(self):
+        if not self.get_presence():
+            return "N/A"
+        return PddfPsu.get_model(self)
+
+    def get_serial(self):
+        if not self.get_presence():
+            return "N/A"
+        return PddfPsu.get_serial(self)
+
     def get_revision(self):
         return "N/A"
 
