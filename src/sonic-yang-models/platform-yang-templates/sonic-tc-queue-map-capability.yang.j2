@@ -1,0 +1,57 @@
+module sonic-tc-queue-map-capability {
+    yang-version 1.1;
+    namespace "http://github.com/sonic-net/sonic-tc-queue-map-capability";
+    prefix tqm-capability;
+
+    import sonic-tc-queue-map {
+        prefix tqm;
+    }
+
+    description "TC to queue map platform-specific model - generated from feature_capabilities.json";
+
+    revision 2026-10-26 {
+        description "Initial revision Generated from feature_capabilities.json at installation time";
+    }
+
+    {#
+       The base model allows TC 0-15 and queue index 0-9, but some ASICs support fewer (Broadcom DNX:
+       8 TCs and 8 VOQs per port). Out-of-range entries reach the SAI only after CONFIG_DB has been
+       written; on DNX they overflow fixed-size arrays and crash syncd. The deviations below reject
+       them at YANG validation time instead.
+    #}
+    {% if qos_capabilities is defined and qos_capabilities.max_tc is defined %}
+    {% set max_tc = qos_capabilities.max_tc %}
+
+    // Platform-specific deviation - TC_TO_QUEUE_MAP tc is limited to the TCs this ASIC supports
+    deviation "/tqm:sonic-tc-queue-map/tqm:TC_TO_QUEUE_MAP/tqm:TC_TO_QUEUE_MAP_LIST/tqm:TC_TO_QUEUE_MAP/tqm:tc" {
+        deviate replace {
+            type uint8 {
+                range "0..{{ max_tc }}" {
+                    error-message "Invalid Traffic Class for this platform. tc should be in the range [0, {{ max_tc }}]";
+                }
+            }
+        }
+        description "Platform-specific deviation for tc";
+    }
+    {% else %}
+    // No TC capability data - skip tc validation.
+    {% endif %}
+
+    {% if qos_capabilities is defined and qos_capabilities.max_queue_index is defined %}
+    {% set max_queue_index = qos_capabilities.max_queue_index %}
+
+    // Platform-specific deviation - TC_TO_QUEUE_MAP qindex is limited to the queues this ASIC has per port
+    deviation "/tqm:sonic-tc-queue-map/tqm:TC_TO_QUEUE_MAP/tqm:TC_TO_QUEUE_MAP_LIST/tqm:TC_TO_QUEUE_MAP/tqm:qindex" {
+        deviate replace {
+            type string {
+                pattern "[0-{{ max_queue_index }}]?" {
+                    error-message "Invalid queue index for this platform. qindex should be in the range [0, {{ max_queue_index }}]";
+                }
+            }
+        }
+        description "Platform-specific deviation for qindex";
+    }
+    {% else %}
+    // No queue index capability data - skip qindex validation.
+    {% endif %}
+}

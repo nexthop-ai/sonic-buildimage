@@ -1,0 +1,17 @@
+{
+    "srv6_capabilities": {
+        "supported_encap_modes": ["regular", "reduced"],
+        "default_encap_mode": "reduced"
+    },
+    "bfd_offload_capabilities": {
+        "supported": true,
+        "default_status": "enabled"
+    },
+    "sflow_capabilities": {
+        "hw_accelerated": true
+    },
+    "qos_capabilities": {
+        "max_tc": 7,
+        "max_queue_index": 7
+    }
+}
