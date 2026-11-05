@@ -149,17 +149,19 @@ class SonicYangPathMixin:
         if len(configdb_path_tokens)-1 == token_index:
             return xpath_tokens
 
+        # A child container named exactly like the next token wins over the list
+        # match below: a table may hold both (TELEMETRY_CLIENT has container Global
+        # next to TELEMETRY_CLIENT_LIST), and "Global" is not a list key.
+        child_container = self.__find_child_by_name(model_snode, configdb_path_tokens[token_index+1], (ly.SNode.CONTAINER,))
+        if child_container is not None:
+            new_xpath_tokens = self.__get_xpath_tokens_from_container(child_container, configdb_path_tokens, token_index+1, schema_xpath, configdb)
+            xpath_tokens.extend(new_xpath_tokens)
+            return xpath_tokens
+
         # check if the configdb token is referring to a list
         list_snode = self.__get_list_model(model_snode, configdb_path_tokens, token_index)
         if list_snode is not None:
             new_xpath_tokens = self.__get_xpath_tokens_from_list(list_snode, configdb_path_tokens, token_index+1, schema_xpath, configdb)
-            xpath_tokens.extend(new_xpath_tokens)
-            return xpath_tokens
-
-        # check if it is targetting a child container
-        child_container = self.__find_child_by_name(model_snode, configdb_path_tokens[token_index+1], (ly.SNode.CONTAINER,))
-        if child_container is not None:
-            new_xpath_tokens = self.__get_xpath_tokens_from_container(child_container, configdb_path_tokens, token_index+1, schema_xpath, configdb)
             xpath_tokens.extend(new_xpath_tokens)
             return xpath_tokens
 

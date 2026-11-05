@@ -361,12 +361,49 @@
          "configdb_path": "/VLAN_MEMBER/Vlan1000|Ethernet8/tagging_mode",
          "schema_xpath": true,
          "xpath": "/test-vlan:test-vlan/VLAN_MEMBER/VLAN_MEMBER_LIST/tagging_mode"
+      },
+      {
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Global/src_ip",
+         "schema_xpath": false,
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/Global/src_ip"
+      },
+      {
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Global/src_ip",
+         "schema_xpath": true,
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/Global/src_ip"
+      },
+      {
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Global",
+         "schema_xpath": false,
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/Global"
+      },
+      {
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Subscription|counters/dst_addr",
+         "schema_xpath": false,
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/CONTAINER_AND_LIST_TEST_LIST[prefix='Subscription'][name='counters']/dst_addr"
+      },
+      {
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/DestinationGroup|DCI",
+         "schema_xpath": false,
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/CONTAINER_AND_LIST_TEST_LIST[prefix='DestinationGroup'][name='DCI']"
       }
    ],
    "xpath_to_configdb_path": [
       {
          "xpath": "/test-vlan:test-vlan/VLAN_MEMBER/VLAN_MEMBER_LIST[vlanid='Vlan1000'][port='Ethernet8']/tagging_mode",
          "configdb_path": "/VLAN_MEMBER/Vlan1000|Ethernet8/tagging_mode"
+      },
+      {
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/Global/src_ip",
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Global/src_ip"
+      },
+      {
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/Global",
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Global"
+      },
+      {
+         "xpath": "/test-yang-structure:test-yang-structure/CONTAINER_AND_LIST_TEST/CONTAINER_AND_LIST_TEST_LIST[prefix='Subscription'][name='counters']/dst_addr",
+         "configdb_path": "/CONTAINER_AND_LIST_TEST/Subscription|counters/dst_addr"
       }
    ],
    "yang_dir" : "./tests/libyang-python-tests/sample-yang-models/"

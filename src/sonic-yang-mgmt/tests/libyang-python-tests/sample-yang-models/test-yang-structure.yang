@@ -99,6 +99,42 @@ module test-yang-structure {
       /* end of YANG_LIST_TEST_LIST */
     }
     /* end of container YANG_STRUCT_TEST */
+
+    container CONTAINER_AND_LIST_TEST {
+
+      description "table with a global-settings container next to a keyed list";
+
+      container Global {
+        leaf src_ip {
+          type inet:ip-address;
+        }
+
+        leaf retry_interval {
+          type uint32;
+        }
+      }
+
+      list CONTAINER_AND_LIST_TEST_LIST {
+
+        key "prefix name";
+
+        leaf prefix {
+          type string {
+            pattern "Subscription|DestinationGroup";
+          }
+        }
+
+        leaf name {
+          type string;
+        }
+
+        leaf dst_addr {
+          type string;
+        }
+      }
+      /* end of CONTAINER_AND_LIST_TEST_LIST */
+    }
+    /* end of container CONTAINER_AND_LIST_TEST */
   }
   /* end of container test-yang-container */
 }
