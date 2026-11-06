@@ -9,6 +9,10 @@ module sonic-telemetry_client {
         prefix inet;
     }
 
+    import sonic-mgmt_vrf {
+        prefix mvrf;
+    }
+
     organization
         "SONiC";
 
@@ -16,7 +20,22 @@ module sonic-telemetry_client {
         "SONiC";
 
     description
+<<<<<<< HEAD
         "TELEMETRY_CLIENT yang Module for SONiC OS";
+=======
+        "TELEMETRY_CLIENT configuration";
+
+    revision 2026-11-06 {
+        description
+            "Add vrf leaf to Global";
+    }
+
+    revision 2026-10-30 {
+        description
+            "Widen dst_addr from IPv4-only endpoints to host:port endpoints
+             whose host may be a bracketed IPv6 address.";
+    }
+>>>>>>> e3691abd3 (NOS-17116: [yang] Add vrf leaf to TELEMETRY_CLIENT Global (#12011))
 
     revision 2023-01-12 {
         description
@@ -52,8 +71,29 @@ module sonic-telemetry_client {
         }
     }
 
+<<<<<<< HEAD
     typedef ipv4-port {
         description "One or more IPv4 address and port pairs in host:port format, comma-separated.";
+=======
+    typedef vrf-device {
+        description "VRF the dial-out client makes its connections in.";
+        type enumeration {
+            enum default;
+            enum mgmt;
+        }
+    }
+
+    typedef ip-port {
+        description
+            "One or more collector endpoints in host:port format, separated by
+             commas. An IPv4 host is a dotted quad (10.0.0.1:8080). An IPv6
+             host is any textual form inet:ipv6-address accepts -- full,
+             compressed, IPv4-embedded or zone-scoped -- in square brackets
+             ([fd00:1::1]:8080, [::ffff:10.0.0.1]:8080, [fe80::1%eth0]:8080).
+             The two patterns mirror ietf-inet-types ipv6-address: the first
+             bounds the characters and the group count of each host, the
+             second its shape (eight groups, or exactly one '::').";
+>>>>>>> e3691abd3 (NOS-17116: [yang] Add vrf leaf to TELEMETRY_CLIENT Global (#12011))
         type string {
             pattern
                 '((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}'
@@ -87,6 +127,15 @@ module sonic-telemetry_client {
                     type boolean;
                     default true;
                     description "Whether the dial-out connection is unidirectional.";
+                }
+
+                leaf vrf {
+                    type vrf-device;
+                    must "(current() != 'mgmt')
+                    or (/mvrf:sonic-mgmt_vrf/mvrf:MGMT_VRF_CONFIG/mvrf:vrf_global/mvrf:mgmtVrfEnabled = 'true')" {
+                        error-message "Must condition not satisfied. Try enable Management VRF.";
+                    }
+                    description "VRF the dial-out connections to the collectors are made in. Only 'default' and 'mgmt' are supported.";
                 }
             }
 

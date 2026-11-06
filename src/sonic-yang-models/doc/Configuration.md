@@ -2857,7 +2857,8 @@ and is listed in this table.
             "encoding": "JSON_IETF",
             "retry_interval": "30",
             "src_ip": "30.57.185.38",
-            "unidirectional": "true"
+            "unidirectional": "true",
+            "vrf": "mgmt"
         },
         "DestinationGroup|HS": {
             "dst_addr": "30.57.186.214:8081,30.57.185.39:8081"
