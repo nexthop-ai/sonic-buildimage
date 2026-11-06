@@ -85,9 +85,33 @@ class PddfChassis(ChassisBase):
             self._psu_list.append(psu)
 
         # OPTICs
+<<<<<<< HEAD
         for index in range(self.platform_inventory.get('num_ports', 0)):
             sfp = Sfp(index, self.pddf_obj, self.plugin_data)
             self._sfp_list.append(sfp)
+=======
+        # Indexed by physical port, with None at ports driven by the other
+        # technology (CPO vs. pluggable). A platform with one kind of port
+        # leaves the other list empty.
+        num_ports = self.platform_inventory.get('num_ports', 0)
+        port_is_cpo = [
+            self.pddf_obj.get_device_type('PORT{}'.format(i + 1)) == 'CPO'
+            for i in range(num_ports)
+        ]
+
+        if any(port_is_cpo):
+            assert cpo_present, "Cpo subclass has not been defined"
+            self._cpo_list = [
+                Cpo(i, self.pddf_obj, self.plugin_data) if is_cpo else None
+                for i, is_cpo in enumerate(port_is_cpo)
+            ]
+
+        if not all(port_is_cpo):
+            self._sfp_list = [
+                Sfp(i, self.pddf_obj, self.plugin_data) if not is_cpo else None
+                for i, is_cpo in enumerate(port_is_cpo)
+            ]
+>>>>>>> 461c9f22a (NOS-3924: Do not populate _cpo_list for non-CPO platforms (#12466))
 
         # THERMALs
         for i in range(self.platform_inventory.get('num_temps', 0)):

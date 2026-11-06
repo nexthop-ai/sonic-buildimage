@@ -1,4 +1,35 @@
+<<<<<<< HEAD
 #!/usr/bin/env python
+=======
+# Copyright 2026 Nexthop Systems Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+"""Presence-detection behaviour tests.
+
+What is pinned here is the contract of nexthop.fpga_presence_monitor and its
+use by Chassis.get_change_event():
+
+* a device whose presence changed is reported once, as
+  {device_type: {index: '1' inserted | '0' removed}};
+* a device with a live UIO presence interrupt is reported when that UIO fires,
+  and a device without one is polled instead;
+* a timed wait returns when its deadline passes; an indefinite wait keeps
+  waiting instead of returning empty or spinning.
+
+Everything is driven through wait_for_event() and the fake hardware below --
+never through the monitor's attributes -- so it stays free to change how it
+tracks UIO devices, registers them with epoll, or caches presence.
+
+Additionally, tests for the logic that instantiates the correct ports
+(pluggable vs. CPO) are also added here.
+"""
+
+import copy
+import io
+import math
+import select
+from unittest.mock import Mock, create_autospec
+>>>>>>> 461c9f22a (NOS-3924: Do not populate _cpo_list for non-CPO platforms (#12466))
 
 import pytest
 import sys
@@ -8,11 +39,15 @@ import time
 from fixtures.fake_swsscommon import fake_swsscommon_modules
 from fixtures.mock_imports_unit_tests import mock_syslog_modules
 from fixtures.test_helpers_chassis import setup_patch_for_chassis_init
+<<<<<<< HEAD
 from unittest.mock import Mock, patch, create_autospec
 
 
 # Test constants
 NUM_TEST_SFPS = 32
+=======
+from fixtures.test_helpers_common import mock_pddf_data
+>>>>>>> 461c9f22a (NOS-3924: Do not populate _cpo_list for non-CPO platforms (#12466))
 
 # Xcvr presence states used by xcvrd
 XCVR_INSERTED = "1"
@@ -115,6 +150,7 @@ class TestChassisSfpIntegration:
             inserted_sfps = mock_sfps[0 : NUM_TEST_SFPS // 2]
             removed_sfps = mock_sfps[NUM_TEST_SFPS // 2 :]
 
+<<<<<<< HEAD
             sfp_test_helper.update_state(inserted_sfps, XCVR_INSERTED)
             sfp_test_helper.update_state(removed_sfps, XCVR_REMOVED)
 
@@ -223,3 +259,66 @@ class TestChassisSfpIntegration:
             expected = sfp_test_helper.get_change_events()
 
             assert result == expected
+=======
+        warnings = [call.args[0] for call in logger.log_warning.call_args_list]
+        assert any("PDDF" in w and SFP_KEY in w for w in warnings), warnings
+
+
+# ==========================================================================
+# Splitting front panel ports between the SFP and CPO lists
+# ==========================================================================
+
+class TestPortLists:
+    class _StubPort:
+        def __init__(self, index, pddf_data, pddf_plugin_data):
+            self.index = index
+
+    class StubSfp(_StubPort):
+        pass
+
+    class StubCpo(_StubPort):
+        pass
+
+    @pytest.fixture
+    def chassis_with_ports(self, chassis_module, monkeypatch):
+        """Factory for a Chassis whose PDDF data declares the given port types.
+
+        The real Sfp/Cpo need far more PDDF data than port classification
+        does, so PddfChassis builds stubs instead.
+        """
+        from sonic_platform_pddf_base import pddf_chassis
+
+        monkeypatch.setattr(pddf_chassis, "Sfp", self.StubSfp)
+        monkeypatch.setattr(pddf_chassis, "Cpo", self.StubCpo)
+
+        def _build(port_types):
+            pddf_data = mock_pddf_data({"PLATFORM": {"num_ports": len(port_types)}})
+            pddf_data.get_device_type.side_effect = (
+                lambda port_key: port_types[int(port_key[len("PORT"):]) - 1])
+            # Non-empty plugin data, or PddfChassis discards pddf_data and
+            # loads the on-switch JSON instead.
+            with setup_patch_for_chassis_init(pddf_plugin_data={}):
+                return chassis_module.Chassis(
+                    pddf_data=pddf_data, pddf_plugin_data={"PLATFORM": {}})
+
+        return _build
+
+    @pytest.mark.parametrize("port_types, sfp_types, cpo_types", [
+        pytest.param(["OSFP", "OSFP"], [StubSfp, StubSfp], [],
+                     id="pluggable-only"),
+        pytest.param(["CPO", "CPO"], [], [StubCpo, StubCpo],
+                     id="cpo-only"),
+        pytest.param(["CPO", "OSFP", "CPO"],
+                     [type(None), StubSfp, type(None)],
+                     [StubCpo, type(None), StubCpo],
+                     id="mixed"),
+    ])
+    def test_ports_are_listed_by_physical_port(
+            self, chassis_with_ports, port_types, sfp_types, cpo_types):
+        """A platform with one kind of port leaves the other list empty; a
+        mixed one pads both with None at the other kind's ports."""
+        chassis = chassis_with_ports(port_types)
+
+        assert [type(sfp) for sfp in chassis._sfp_list] == sfp_types
+        assert [type(cpo) for cpo in chassis._cpo_list] == cpo_types
+>>>>>>> 461c9f22a (NOS-3924: Do not populate _cpo_list for non-CPO platforms (#12466))
