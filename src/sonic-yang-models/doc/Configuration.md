@@ -2862,6 +2862,9 @@ and is listed in this table.
         "DestinationGroup|HS": {
             "dst_addr": "30.57.186.214:8081,30.57.185.39:8081"
         },
+        "DestinationGroup|HS_V6": {
+            "dst_addr": "[fd00:1::1]:8081,[fd00:1::2]:8081"
+        },
         "Subscription|HS_RDMA": {
             "dst_group": "HS",
             "path_target": "COUNTERS_DB",

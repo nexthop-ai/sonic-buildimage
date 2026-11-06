@@ -138,5 +138,341 @@
         ]
       }
     }
+  },
+  "DST_ADDR_IPV6": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[fd00:1::1]:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_MULTIPLE": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "30.57.186.214:8081,[fd00:1::1]:8080,[::1]:8082,[2001:db8:0:0:0:0:0:1]:8083"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_UNBRACKETED": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "fd00:1::1:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_NO_PORT": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[fd00:1::1]"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_BAD_HOST": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[fd00:1::zz]:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_V4_EMBEDDED": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[::ffff:10.0.0.1]:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_ZONE": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[fe80::1%eth0]:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_TOO_MANY_GROUPS": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[1:2:3:4:5:6:7:8::1:2:3:4:5:6:7:8]:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_NINE_GROUPS": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[1:2:3:4:5:6:7:8::]:80"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_IPV6_TWO_DOUBLE_COLONS": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[1::2::3]:8080"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_NO_SEPARATOR": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[::1]:80[::2]:80"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
+  },
+  "DST_ADDR_TRAILING_COMMA": {
+    "sonic-telemetry_client:sonic-telemetry_client": {
+      "sonic-telemetry_client:TELEMETRY_CLIENT": {
+        "Global": {
+          "encoding": "JSON_IETF",
+          "retry_interval": "30",
+          "src_ip": "fd00:1::38",
+          "unidirectional": "true"
+        },
+        "TELEMETRY_CLIENT_LIST": [
+          {
+            "prefix": "DestinationGroup",
+            "name": "HS",
+            "dst_addr": "[::1]:80,"
+          },
+          {
+            "prefix": "Subscription",
+            "name": "HS_RDMA",
+            "dst_group": "HS",
+            "path_target": "COUNTERS_DB",
+            "paths": "COUNTERS/Ethernet*,COUNTERS_PORT_NAME_MAP",
+            "report_interval": "5000",
+            "report_type": "periodic"
+          }
+        ]
+      }
+    }
   }
 }
