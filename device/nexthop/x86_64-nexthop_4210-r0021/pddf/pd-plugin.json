@@ -305,26 +305,17 @@
             "i2c": {
                 "valmap": {
                     "D1U74T-W-2400-12-HB4C": "exhaust",
-<<<<<<< HEAD:device/nexthop/x86_64-nexthop_4210-r0021/pddf/pd-plugin.json
-                    "D1U74T-W-3200-12-HB4C": "exhaust"
-=======
                     "D1U74T-W-3200-12-HB4C": "exhaust",
                     "NWR002-KE0G": "exhaust",
                     "FSQ015": "exhaust",
                     "NWS006-KE0G": "exhaust"
->>>>>>> e67b14573 (NOS-20184: Add AcBel NWS006-KE0G and NWR002-KE0G PSU fan direction and max speed (#11528)):device/nexthop/x86_64-nexthop_4210-r0021/pddf/pd-plugin.json.j2
                 }
             }
         },
         "PSU_FAN_MAX_SPEED_MAP": {
-<<<<<<< HEAD:device/nexthop/x86_64-nexthop_4210-r0021/pddf/pd-plugin.json
-=======
-            "D1U74T-W-2400-12-HB4C": "32500",
-            "D1U74T-W-3200-12-HB4C": "32500",
             "NWR002-KE0G": "36500",
             "FSQ015": "33000",
             "NWS006-KE0G": "33000",
->>>>>>> e67b14573 (NOS-20184: Add AcBel NWS006-KE0G and NWR002-KE0G PSU fan direction and max speed (#11528)):device/nexthop/x86_64-nexthop_4210-r0021/pddf/pd-plugin.json.j2
             "default": "32500"
         }
     },
