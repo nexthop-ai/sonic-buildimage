@@ -2275,5 +2275,8 @@ sai_ecmp_group_members_increment=8
 #Disable hardware PFC watchdog
 sai_pfc_dlr_init_capability=0
 
+#Accumulate FEC counters across polls; the DNX SAI read path clears the MIB on every read otherwise
+sai_fec_stats_cumulative=1
+
 #reduce the chance of stuck-clear interrupt
 appl_param_clear_fail_threshold=5
