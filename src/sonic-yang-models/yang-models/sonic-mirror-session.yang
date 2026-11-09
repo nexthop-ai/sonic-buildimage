@@ -175,7 +175,11 @@ module sonic-mirror-session {
                     type session_direction;
                     default "BOTH";
                     description
+<<<<<<< HEAD
                         "Direction configuration for mirroring. Can be configured for both SPAN/ERSPAN.
+=======
+                        "Direction configuration for mirroring. Can be configured for SPAN/ERSPAN/SFLOW.
+>>>>>>> 887af7165 (NOS-21742: allow TX and BOTH direction for SFLOW mirror sessions in the YANG model (#12176))
                         Supports rx/tx/both as direction config.
                            RX: Captures frames ingressing on source port.
                            TX: Captures frames egressing on source port.
