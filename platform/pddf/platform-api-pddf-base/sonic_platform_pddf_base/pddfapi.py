@@ -51,11 +51,20 @@ class PddfApi():
     #################################################################################################################
     #   GENERIC DEFS
     #################################################################################################################
+<<<<<<< HEAD
     def runcmd(self, cmd):
         rc = os.system(cmd)
         if rc != 0:
             print("%s -- command failed" % cmd)
         return rc
+=======
+    def write_file(self, path, value):
+        try:
+            with open(path, 'w') as f:
+                f.write(value)
+        except Exception as e:
+            logger.log_error("Failed to write %r to %s: %s" % (value, path, e))
+>>>>>>> aa48ff38b (NOS-20035: Use Python APIs to read and write sysfs files in pddfapi (#12834))
 
     def get_cmd_output(self, cmd):
         result = subprocess.run(['/bin/bash', '-c', cmd], capture_output=True)
@@ -174,11 +183,12 @@ class PddfApi():
             else:
                 status = "[FAILED] attr_devname is not configured"
                 return (status)
-            if not os.path.exists(attr_path):
+            try:
+                with open(attr_path) as f:
+                    gpio_value = f.read()
+            except FileNotFoundError:
                 status = "[FAILED] {} does not exist".format(attr_path)
                 return (status)
-            cmd = 'cat ' + attr_path
-            gpio_value = subprocess.check_output(cmd, shell=True, universal_newlines=True)
             value |= int(gpio_value) << bit
             bit += 1
 
@@ -224,8 +234,7 @@ class PddfApi():
                     attr_path = self.get_gpio_attr_path(self.data[attr['attr_devname']], hex(offset))
                     i += 1
                     try:
-                        cmd = "echo {} > {}".format(_value, attr_path)
-                        self.runcmd(cmd)
+                        self.write_file(attr_path, "{}\n".format(_value))
                     except Exception as e:
                         msg = "Invalid gpio path : " + attr_path
                         return (False, msg)
@@ -832,8 +841,7 @@ class PddfApi():
         try:
             self.create_attr('device_name', self.data[device_name]['dev_info']['device_name'], "pddf/devices/led")
             self.create_attr('index', self.data[device_name]['dev_attr']['index'], "pddf/devices/led")
-            cmd = "echo 'verify'  > /sys/kernel/pddf/devices/led/dev_ops"
-            self.runcmd(cmd)
+            self.write_file("/sys/kernel/pddf/devices/led/dev_ops", "verify\n")
         finally:
             self._release_led_ctrl_lock()
 
@@ -1176,8 +1184,7 @@ class PddfApi():
             return self.multifpgapci_parse(dev, ops)
 
     def create_attr(self, key, value, path):
-        cmd = "echo '%s' > /sys/kernel/%s/%s" % (value,  path, key)
-        self.runcmd(cmd)
+        self.write_file("/sys/kernel/%s/%s" % (path, key), "%s\n" % value)
 
     def led_parse(self, ops):
         getattr(self, ops['cmd']+"_led_platform_device")("PLATFORM", ops)
