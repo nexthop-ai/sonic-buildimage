@@ -235,14 +235,17 @@ class TestLedControl:
         LedControl = led_control_module.LedControl
 
         # Patch the module-level functions in the led_control module
+<<<<<<< HEAD
         with patch.object(led_control_module, "get_port_config") as mock_get_port_config, \
              patch.object(led_control_module, "get_chassis", return_value=MagicMock()) as mock_get_chassis, \
+=======
+        with patch("sonic_platform.platform.Platform") as mock_platform_cls, \
+>>>>>>> 6d28c47fb (NOS-18542: [platform] Track runtime port config changes in port-ledd (#12670))
              patch.object(LedControl, "_get_xcvr_presence") as mock_get_xcvr_presence, \
              patch.object(LedControl, "_get_port_status") as mock_get_port_status, \
              patch.object(LedControl, "_get_port_num") as mock_get_port_num, \
              patch.object(LedControl, "_get_interfaces_for_port") as mock_get_interfaces_for_port:
             # Mock the physical and logical port mappings
-            mock_get_port_config.return_value = ({"placeholder": {}}, {}, {})
             mock_get_port_num.return_value = get_port_num_return
             mock_get_interfaces_for_port.return_value = list(port_status_map.keys())
 
@@ -331,11 +334,9 @@ class TestLedControl:
         # Get the LedControl class from the module
         LedControl = led_control_module.LedControl
 
-        with patch.object(led_control_module, "get_port_config") as mock_get_port_config, \
-             patch.object(LedControl, "_get_interfaces_for_port") as mock_get_interfaces_for_port, \
+        with patch.object(LedControl, "_get_interfaces_for_port") as mock_get_interfaces_for_port, \
              patch.object(LedControl, "_get_xcvr_info") as mock_get_xcvr_info:
 
-            mock_get_port_config.return_value = ({"placeholder": {}}, {}, {})
             mock_get_interfaces_for_port.return_value = list(xcvr_info_map.keys())
             mock_get_xcvr_info.side_effect = lambda port: xcvr_info_map.get(port)
 
@@ -373,43 +374,11 @@ class TestLedControl:
             },
             {
                 "Ethernet0": 1,
-                "Ethernet1": 1,
-                "Ethernet2": 1,
-                "Ethernet3": 1,
-                "Ethernet4": 1,
-                "Ethernet5": 1,
-                "Ethernet6": 1,
-                "Ethernet7": 1,
                 "Ethernet8": 2,
-                "Ethernet9": 2,
-                "Ethernet10": 2,
-                "Ethernet11": 2,
-                "Ethernet12": 2,
-                "Ethernet13": 2,
-                "Ethernet14": 2,
-                "Ethernet15": 2,
             },
             {
-                1: [
-                    "Ethernet0",
-                    "Ethernet1",
-                    "Ethernet2",
-                    "Ethernet3",
-                    "Ethernet4",
-                    "Ethernet5",
-                    "Ethernet6",
-                    "Ethernet7",
-                ],
-                2: [
-                    "Ethernet8",
-                    "Ethernet9",
-                    "Ethernet10",
-                    "Ethernet11",
-                    "Ethernet12",
-                    "Ethernet13",
-                    "Ethernet14",
-                    "Ethernet15",
-                ],
+                1: ["Ethernet0"],
+                2: ["Ethernet8"],
             },
         ),
         # SFPs
@@ -441,17 +410,9 @@ class TestLedControl:
                 66: ["Ethernet513"],
             },
         ),
-        # Breakout example
+        # Breakout, subports listed out of order
         (
             {
-                "Ethernet8": {
-                    "alias": "Port2/1",
-                    "dhcp_rate_limit": "300",
-                    "index": "2",
-                    "lanes": "1,2,3,4",
-                    "speed": "400000",
-                    "subport": "1"
-                },
                 "Ethernet12": {
                     "alias": "Port2/2",
                     "dhcp_rate_limit": "300",
@@ -459,6 +420,14 @@ class TestLedControl:
                     "lanes": "5,6,7,8",
                     "speed": "400000",
                     "subport": "2"
+                },
+                "Ethernet8": {
+                    "alias": "Port2/1",
+                    "dhcp_rate_limit": "300",
+                    "index": "2",
+                    "lanes": "1,2,3,4",
+                    "speed": "400000",
+                    "subport": "1"
                 },
                 "Ethernet16": {
                     "alias": "Port3/1",
@@ -479,43 +448,13 @@ class TestLedControl:
             },
             {
                 "Ethernet8": 2,
-                "Ethernet9": 2,
-                "Ethernet10": 2,
-                "Ethernet11": 2,
                 "Ethernet12": 2,
-                "Ethernet13": 2,
-                "Ethernet14": 2,
-                "Ethernet15": 2,
                 "Ethernet16": 3,
-                "Ethernet17": 3,
-                "Ethernet18": 3,
-                "Ethernet19": 3,
                 "Ethernet20": 3,
-                "Ethernet21": 3,
-                "Ethernet22": 3,
-                "Ethernet23": 3,
             },
             {
-                2: [
-                    "Ethernet8",
-                    "Ethernet9",
-                    "Ethernet10",
-                    "Ethernet11",
-                    "Ethernet12",
-                    "Ethernet13",
-                    "Ethernet14",
-                    "Ethernet15",
-                ],
-                3: [
-                    "Ethernet16",
-                    "Ethernet17",
-                    "Ethernet18",
-                    "Ethernet19",
-                    "Ethernet20",
-                    "Ethernet21",
-                    "Ethernet22",
-                    "Ethernet23",
-                ],
+                2: ["Ethernet8", "Ethernet12"],
+                3: ["Ethernet16", "Ethernet20"],
             },
         ),
     ],
@@ -527,14 +466,48 @@ class TestLedControl:
         expected_logical_to_physical,
         expected_physical_to_logical,
     ):
-        """Test port mapping functionality."""
-        # Get the LedControl class from the module
+        """PORT_TABLE entries map each logical port to its front-panel port by index."""
         LedControl = led_control_module.LedControl
 
-        with patch.object(led_control_module, "get_port_config") as mock_get_port_config:
-            mock_get_port_config.return_value = (ports_dict, {}, {})
-
+        with patch.object(LedControl, "_update_port_led"):
             led_control = LedControl()
+            for port, attributes in ports_dict.items():
+                led_control.port_set(port, attributes)
 
             assert led_control.logical_to_physical_map == expected_logical_to_physical
             assert led_control.physical_to_logical_map == expected_physical_to_logical
+
+    def test_runtime_breakout(self, led_control_module):
+        """A dynamic 1x800G -> 2x400G breakout remaps the port and updates its LED."""
+        LedControl = led_control_module.LedControl
+
+        with patch("sonic_platform.platform.Platform") as mock_platform_cls, \
+             patch.object(LedControl, "_get_port_status", return_value=("down", "down")):
+            led_control = LedControl()
+            set_system_led = mock_platform_cls.return_value.get_chassis.return_value.set_system_led
+
+            led_control.port_set("Ethernet0", {"index": "1", "lanes": "1,2,3,4,5,6,7,8"})
+            led_control.port_del("Ethernet0")
+            led_control.port_set("Ethernet4", {"index": "1", "lanes": "5,6,7,8"})
+            led_control.port_set("Ethernet0", {"index": "1", "lanes": "1,2,3,4"})
+
+            assert led_control.physical_to_logical_map[1] == ["Ethernet0", "Ethernet4"]
+            assert led_control._get_port_num("Ethernet4") == 1
+            set_system_led.assert_called_with("PORT_LED_1", "off")
+
+    def test_deleted_port_resolves_for_trailing_events(self, led_control_module):
+        """A port removed from PORT_TABLE still resolves for its STATE_DB delete, without logging an error."""
+        LedControl = led_control_module.LedControl
+
+        with patch.object(led_control_module.sonic_logger, "log_error") as mock_log_error, \
+             patch.object(LedControl, "_update_port_led") as mock_update_port_led:
+            led_control = LedControl()
+            led_control.port_set("Ethernet0", {"index": "1", "lanes": "1,2,3,4"})
+            led_control.port_set("Ethernet4", {"index": "1", "lanes": "5,6,7,8"})
+
+            led_control.port_del("Ethernet4")
+            led_control.port_link_state_change("Ethernet4")
+
+            assert led_control.physical_to_logical_map[1] == ["Ethernet0"]
+            mock_update_port_led.assert_called_with(1)
+            mock_log_error.assert_not_called()

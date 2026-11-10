@@ -18,9 +18,6 @@ LED_CLASS_NAME = "LedControl"
 
 SELECT_TIMEOUT = 1000
 
-APP_ADMIN_STATUS_KEY = "admin_status"
-APP_OPER_STATUS_KEY = "oper_status"
-
 
 class PortLedd(daemon_base.DaemonBase):
 
@@ -65,12 +62,10 @@ class PortLedd(daemon_base.DaemonBase):
         if self._ignore_key(key):
             return
 
-        if op == "DEL":
-            self.led_control.port_link_state_change(key)
-        elif op == "SET" and fvp:
-            fvp_dict = dict(fvp)
-            if APP_ADMIN_STATUS_KEY in fvp_dict or APP_OPER_STATUS_KEY in fvp_dict:
-                self.led_control.port_link_state_change(key)
+        if op == "SET" and fvp:
+            self.led_control.port_set(key, dict(fvp))
+        elif op == "DEL":
+            self.led_control.port_del(key)
 
         return
 
