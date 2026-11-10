@@ -82,7 +82,7 @@
 SONIC_CACHE_RECIPE_VER := 2
 # Git object hash of slave.mk when SONIC_CACHE_RECIPE_VER was last set/bumped.
 # Used by the guard below to detect unreviewed slave.mk changes.
-SONIC_CACHE_RECIPE_VER_BASELINE := f04dd95738b99a2e525d462457718a826ace1bd3
+SONIC_CACHE_RECIPE_VER_BASELINE := 3b144cad2d76658fa31da0998e4465429d0696fc
 
 # Guard: warn if slave.mk changed since SONIC_CACHE_RECIPE_VER was last reviewed.
 # This catches the case where someone modifies slave.mk build recipes without
@@ -513,6 +513,7 @@ rfs_secret_fp = $(if $(strip $(1)),$(shell printf '%s' '$(call rfs_shell_escape,
 RFS_INLINE_ENV_FLAGS := $(USERNAME) $(CHANGE_DEFAULT_PASSWORD) $(BMC_NOS_ACCOUNT_USERNAME) \
                         $(MASTER_KUBERNETES_VERSION) $(MASTER_CRI_DOCKERD) \
                         $(TRUSTED_GPG_URLS) $(BUILD_PACKAGES_URL) \
+                        $(ENABLE_BMC_ZTP) \
                         $(call rfs_secret_fp,$(PASSWORD)) \
                         $(call rfs_secret_fp,$(BMC_ROOT_ACCOUNT_DEFAULT_PASSWORD))
 
