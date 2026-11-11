@@ -4826,6 +4826,14 @@
           "attr_cmpval": "0xff"
         },
         {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
+        },
+        {
           "attr_name": "psu_p_out",
           "attr_devaddr": "0x58",
           "attr_devtype": "pmbus",
@@ -5008,7 +5016,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "python3 -m nexthop.psu_fw_version --bus 89 --address 0x58"
       },
       {
         "attr_name": "model",
@@ -5115,6 +5123,14 @@
           "attr_offset": "0x9a",
           "attr_mask": "0x0",
           "attr_cmpval": "0xff"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
         },
         {
           "attr_name": "psu_p_out",
@@ -5299,7 +5315,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "python3 -m nexthop.psu_fw_version --bus 90 --address 0x58"
       },
       {
         "attr_name": "model",
@@ -5406,6 +5422,14 @@
           "attr_offset": "0x9a",
           "attr_mask": "0x0",
           "attr_cmpval": "0xff"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
         },
         {
           "attr_name": "psu_p_out",
@@ -5590,7 +5614,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "python3 -m nexthop.psu_fw_version --bus 91 --address 0x58"
       },
       {
         "attr_name": "model",
@@ -5697,6 +5721,14 @@
           "attr_offset": "0x9a",
           "attr_mask": "0x0",
           "attr_cmpval": "0xff"
+        },
+        {
+          "attr_name": "psu_fw_version",
+          "attr_devaddr": "0x58",
+          "attr_devtype": "pmbus",
+          "attr_offset": "0xd9",
+          "attr_mask": "0x0",
+          "attr_cmpval": "0x00"
         },
         {
           "attr_name": "psu_p_out",
@@ -5881,7 +5913,7 @@
     "attr_list": [
       {
         "attr_name": "version",
-        "get_cmd": "echo 'N/A'"
+        "get_cmd": "python3 -m nexthop.psu_fw_version --bus 92 --address 0x58"
       },
       {
         "attr_name": "model",
