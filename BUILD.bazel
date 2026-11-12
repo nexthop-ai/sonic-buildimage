@@ -1,0 +1,2335 @@
+# Configure the environment for a broadcom build
+
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+load("//bazel_lib:log_utils.bzl", "log_setup")
+load("//bazel_lib:pyright.bzl", "pyright_test")
+load(
+    ":constants.bzl",
+    "BOOKWORM_ONLY_RELEASE_BUILD",
+    "LINUX_HEADERS_RELEASE",
+    "SUPPORTED_RELEASE_BUILDS",
+    "TRIXIE_ONLY_RELEASE_BUILD",
+)
+load(":nhbazel/lib/active_rollout.bzl", "active_image")
+load(":nhbazel/lib/constants.bzl", "SRC_GLOB_EXCLUDE")
+load(":nhbazel/lib/platform_flag.bzl", "platform_setting", "platform_value", "sim_value", "syncd_rpc_arg", "target_setting")
+load(":nhbazel/lib/prebuilt_manifest.bzl", "derived_prebuilt_manifest")
+load(":nhbazel/lib/release_utils.bzl", "build_release_chain")
+load(":nhbazel/platform/aspeed/aspeed.bzl", "ASPEED_IMAGE", "aspeed_artifacts", "aspeed_emmc_image", "aspeed_image", "aspeed_prebuilt_tokens")
+load(":nhbazel/platform/broadcom/broadcom.bzl", "BROADCOM_IMAGE", "broadcom_artifacts", "broadcom_dbg_dockers", "broadcom_image", "broadcom_post_image", "broadcom_prebuilt_tokens", "broadcom_rpc_dockers")
+load(":nhbazel/platform/broadcom/docker-syncd-brcm-dnx.bzl", "docker_syncd_brcm_dnx")
+load(":nhbazel/platform/broadcom/docker-syncd-brcm.bzl", "docker_syncd_brcm")
+load(":nhbazel/platform/broadcom/sai.bzl", "stage_sai")
+load(":nhbazel/platform/broadcom/saithrift.bzl", "build_saithrift", "stage_saithrift")
+load(":nhbazel/platform/broadcom/sswsyncd.bzl", "build_sswsyncd", "stage_sswsyncd")
+load(":nhbazel/platform/generic/generic.bzl", "GENERIC_IMAGE", "generic_artifacts", "generic_image", "generic_prebuilt_tokens")
+load(":nhbazel/platform/vs/docker-dash-engine.bzl", "docker_dash_engine")
+load(":nhbazel/platform/vs/vs.bzl", "VS_IMAGE", "vs_artifacts", "vs_post_image", "vs_prebuilt_tokens", "vs_targets")
+load(":nhbazel/rules/asyncsnmp.bzl", "build_asyncsnmp", "stage_asyncsnmp")
+load(":nhbazel/rules/bash.bzl", "build_bash", "stage_bash")
+load(":nhbazel/rules/dash-ha.bzl", "build_dash_ha", "stage_dash_ha")
+load(":nhbazel/rules/dbsyncd.bzl", "build_dbsyncd", "stage_dbsyncd")
+load(":nhbazel/rules/dhcpmon.bzl", "build_dhcpmon", "stage_dhcpmon")
+load(":nhbazel/rules/dhcprelay.bzl", "build_dhcprelay", "stage_dhcprelay")
+load(":nhbazel/rules/docker-base-trixie.bzl", "docker_base_trixie")
+load(":nhbazel/rules/docker-bmp-watchdog.bzl", "docker_bmp_watchdog")
+load(":nhbazel/rules/docker-bmp.bzl", "docker_bmp")
+load(":nhbazel/rules/docker-config-engine-trixie.bzl", "docker_config_engine_trixie")
+load(":nhbazel/rules/docker-dash-ha.bzl", "docker_dash_ha")
+load(":nhbazel/rules/docker-database.bzl", "docker_database")
+load(":nhbazel/rules/docker-dhcp-relay.bzl", "docker_dhcp_relay")
+load(":nhbazel/rules/docker-eventd.bzl", "docker_eventd")
+load(":nhbazel/rules/docker-fpm-frr.bzl", "docker_fpm_frr")
+load(":nhbazel/rules/docker-gnmi-sidecar.bzl", "docker_gnmi_sidecar")
+load(":nhbazel/rules/docker-gnmi-watchdog.bzl", "docker_gnmi_watchdog")
+load(":nhbazel/rules/docker-gnmi.bzl", "docker_gnmi")
+load(":nhbazel/rules/docker-iccpd.bzl", "docker_iccpd")
+load(":nhbazel/rules/docker-lldp.bzl", "docker_lldp")
+load(":nhbazel/rules/docker-macsec.bzl", "docker_macsec")
+load(":nhbazel/rules/docker-mux.bzl", "docker_mux")
+load(":nhbazel/rules/docker-nat.bzl", "docker_nat")
+load(":nhbazel/rules/docker-orchagent.bzl", "docker_orchagent")
+load(":nhbazel/rules/docker-otel.bzl", "docker_otel")
+load(":nhbazel/rules/docker-p4rt.bzl", "docker_p4rt")
+load(":nhbazel/rules/docker-platform-monitor.bzl", "docker_platform_monitor")
+load(":nhbazel/rules/docker-restapi-sidecar.bzl", "docker_restapi_sidecar")
+load(":nhbazel/rules/docker-restapi-watchdog.bzl", "docker_restapi_watchdog")
+load(":nhbazel/rules/docker-restapi.bzl", "docker_restapi")
+load(":nhbazel/rules/docker-router-advertiser.bzl", "docker_router_advertiser")
+load(":nhbazel/rules/docker-sflow.bzl", "docker_sflow")
+load(":nhbazel/rules/docker-snmp.bzl", "docker_snmp")
+load(":nhbazel/rules/docker-sonic-mgmt-framework.bzl", "docker_sonic_mgmt_framework")
+load(":nhbazel/rules/docker-sonic-mgmt.bzl", "docker_sonic_mgmt")
+load(":nhbazel/rules/docker-sonic-redfish.bzl", "docker_sonic_redfish")
+load(":nhbazel/rules/docker-stp.bzl", "docker_stp")
+load(":nhbazel/rules/docker-swss-layer-trixie.bzl", "docker_swss_layer_trixie")
+load(":nhbazel/rules/docker-sysmgr.bzl", "docker_sysmgr")
+load(":nhbazel/rules/docker-teamd.bzl", "docker_teamd")
+load(":nhbazel/rules/eventd.bzl", "build_eventd", "stage_eventd")
+load(":nhbazel/rules/fips.bzl", "build_fips", "stage_fips")
+load(":nhbazel/rules/flashrom.bzl", "build_flashrom", "stage_flashrom")
+load(":nhbazel/rules/frr.bzl", "build_frr", "stage_frr")
+load(":nhbazel/rules/iccpd.bzl", "build_iccpd", "stage_iccpd")
+load(":nhbazel/rules/ifupdown2.bzl", "build_ifupdown2", "stage_ifupdown2")
+load(":nhbazel/rules/initramfs-tools.bzl", "build_initramfs_tools", "stage_initramfs_tools")
+load(":nhbazel/rules/iproute2.bzl", "build_iproute2", "stage_iproute2")
+load(":nhbazel/rules/isc-dhcp.bzl", "build_isc_dhcp", "stage_isc_dhcp")
+load(":nhbazel/rules/kdump-tools.bzl", "build_kdump_tools", "stage_kdump_tools")
+load(":nhbazel/rules/libnl3.bzl", "build_libnl3", "stage_libnl3")
+load(":nhbazel/rules/libteam.bzl", "build_libteam", "stage_libteam")
+load(":nhbazel/rules/libyang3-py3.bzl", "build_libyang3_py3", "stage_libyang3_py3")
+load(":nhbazel/rules/libyang3.bzl", "build_libyang3", "stage_libyang3")
+load(":nhbazel/rules/linkmgrd.bzl", "build_linkmgrd", "stage_linkmgrd")
+load(
+    ":nhbazel/rules/linux-kernel-manager.bzl",
+    "download_linux_headers_from_s3",
+    "fetch_linux_kernel_mk",
+    "generate_kernel_version_info",
+    "stage_linux_headers",
+)
+load(
+    ":nhbazel/rules/linux-kernel.bzl",
+    "build_linux_headers",
+    "linux_headers_provider",
+)
+load(":nhbazel/rules/lldpd.bzl", "build_lldpd", "stage_lldpd")
+load(":nhbazel/rules/lm-sensors.bzl", "build_lm_sensors", "stage_lm_sensors")
+load(":nhbazel/rules/makedumpfile.bzl", "build_makedumpfile", "stage_makedumpfile")
+load(":nhbazel/rules/monit.bzl", "build_monit", "stage_monit")
+load(":nhbazel/rules/nhcli.bzl", "build_nhcli", "stage_nhcli")
+load(":nhbazel/rules/openssh.bzl", "build_openssh", "stage_openssh")
+load(":nhbazel/rules/p4lang.bzl", "build_p4lang", "stage_p4lang")
+load(":nhbazel/rules/p4rt.bzl", "build_sonic_p4rt", "stage_sonic_p4rt")
+load(":nhbazel/rules/ptf-py3.bzl", "build_ptf", "stage_ptf")
+load(":nhbazel/rules/radius.bzl", "build_radius", "stage_radius")
+load(":nhbazel/rules/rasdaemon.bzl", "build_rasdaemon", "stage_rasdaemon")
+load(":nhbazel/rules/redis-dump-load-py3.bzl", "build_redis_dump_load_py3", "stage_redis_dump_load_py3")
+load(":nhbazel/rules/restapi.bzl", "build_restapi", "stage_restapi")
+load(":nhbazel/rules/sairedis.bzl", "build_sonic_sairedis", "stage_sonic_sairedis")
+load(":nhbazel/rules/scapy.bzl", "build_scapy", "stage_scapy")
+load(":nhbazel/rules/sedutil.bzl", "build_sedutil", "stage_sedutil")
+load(":nhbazel/rules/sflow.bzl", "build_sflow", "stage_sflow")
+load(":nhbazel/rules/snmpd.bzl", "build_snmpd", "stage_snmpd")
+load(":nhbazel/rules/socat.bzl", "build_socat", "stage_socat")
+load(":nhbazel/rules/sonic-bgpcfgd.bzl", "build_sonic_bgpcfgd", "stage_sonic_bgpcfgd")
+load(":nhbazel/rules/sonic-bmcctld.bzl", "build_sonic_bmcctld", "stage_sonic_bmcctld")
+load(":nhbazel/rules/sonic-bmp.bzl", "build_sonic_bmp", "stage_sonic_bmp")
+load(":nhbazel/rules/sonic-bmpcfgd.bzl", "build_sonic_bmpcfgd", "stage_sonic_bmpcfgd")
+load(":nhbazel/rules/sonic-chassisd.bzl", "build_sonic_chassisd", "stage_sonic_chassisd")
+load(":nhbazel/rules/sonic-config.bzl", "build_sonic_config", "stage_sonic_config")
+load(":nhbazel/rules/sonic-containercfgd.bzl", "build_sonic_containercfgd", "stage_sonic_containercfgd")
+load(":nhbazel/rules/sonic-ctrmgrd-rs.bzl", "build_sonic_ctrmgrd_rs", "stage_sonic_ctrmgrd_rs")
+load(":nhbazel/rules/sonic-ctrmgrd.bzl", "build_sonic_ctrmgrd", "stage_sonic_ctrmgrd")
+load(":nhbazel/rules/sonic-dash-api.bzl", "build_sonic_dash_api", "stage_sonic_dash_api")
+load(":nhbazel/rules/sonic-device-data.bzl", "build_sonic_device_data", "stage_sonic_device_data")
+load(":nhbazel/rules/sonic-dhcp-utilities.bzl", "build_sonic_dhcp_utilities", "stage_sonic_dhcp_utilities")
+load(":nhbazel/rules/sonic-fib.bzl", "build_libfib", "stage_libfib")
+load(":nhbazel/rules/sonic-frr-mgmt-framework.bzl", "build_sonic_frr_mgmt_framework", "stage_sonic_frr_mgmt_framework")
+load(":nhbazel/rules/sonic-host-services-data.bzl", "build_sonic_host_services_data", "stage_sonic_host_services_data")
+load(":nhbazel/rules/sonic-host-services-rs.bzl", "build_sonic_host_services_rs", "stage_sonic_host_services_rs")
+load(":nhbazel/rules/sonic-host-services.bzl", "build_sonic_host_services", "stage_sonic_host_services")
+load(":nhbazel/rules/sonic-host-userd.bzl", "build_sonic_host_userd", "stage_sonic_host_userd")
+load(":nhbazel/rules/sonic-ledd.bzl", "build_sonic_ledd", "stage_sonic_ledd")
+load(":nhbazel/rules/sonic-mgmt-common.bzl", "build_sonic_mgmt_common", "stage_sonic_mgmt_common")
+load(":nhbazel/rules/sonic-mgmt-framework.bzl", "build_sonic_mgmt_framework", "stage_sonic_mgmt_framework")
+load(":nhbazel/rules/sonic-nettools.bzl", "build_sonic_nettools", "stage_sonic_nettools")
+load(":nhbazel/rules/sonic-pcied.bzl", "build_sonic_pcied", "stage_sonic_pcied")
+load(":nhbazel/rules/sonic-platform-common.bzl", "build_sonic_platform_common", "stage_sonic_platform_common")
+load(":nhbazel/rules/sonic-psud.bzl", "build_sonic_psud", "stage_sonic_psud")
+load(":nhbazel/rules/sonic-py-common.bzl", "build_sonic_py_common", "stage_sonic_py_common")
+load(":nhbazel/rules/sonic-redfish.bzl", "build_sonic_redfish", "stage_sonic_redfish")
+load(":nhbazel/rules/sonic-sensormond.bzl", "build_sonic_sensormond", "stage_sonic_sensormond")
+load(":nhbazel/rules/sonic-stormond.bzl", "build_sonic_stormond", "stage_sonic_stormond")
+load(":nhbazel/rules/sonic-stp.bzl", "build_sonic_stp", "stage_sonic_stp")
+load(":nhbazel/rules/sonic-supervisord-utilities-rs.bzl", "build_sonic_supervisord_utilities_rs", "stage_sonic_supervisord_utilities_rs")
+load(":nhbazel/rules/sonic-supervisord-utilities.bzl", "build_sonic_supervisord_utilities", "stage_sonic_supervisord_utilities")
+load(":nhbazel/rules/sonic-syseepromd.bzl", "build_sonic_syseepromd", "stage_sonic_syseepromd")
+load(":nhbazel/rules/sonic-thermalctld.bzl", "build_sonic_thermalctld", "stage_sonic_thermalctld")
+load(":nhbazel/rules/sonic-utilities-data.bzl", "build_sonic_utilities_data", "stage_sonic_utilities_data")
+load(":nhbazel/rules/sonic-utilities.bzl", "build_sonic_utilities", "stage_sonic_utilities")
+load(":nhbazel/rules/sonic-xcvrd.bzl", "build_sonic_xcvrd", "stage_sonic_xcvrd")
+load(":nhbazel/rules/sonic-yang-mgmt.bzl", "build_sonic_yang_mgmt", "stage_sonic_yang_mgmt")
+load(":nhbazel/rules/sonic-yang-models.bzl", "build_sonic_yang_models", "stage_sonic_yang_models")
+load(":nhbazel/rules/sonic-ycabled.bzl", "build_sonic_ycabled", "stage_sonic_ycabled")
+load(":nhbazel/rules/sonic-ztp.bzl", "build_sonic_ztp", "stage_sonic_ztp")
+load(":nhbazel/rules/supervisor.bzl", "build_supervisor", "stage_supervisor")
+load(":nhbazel/rules/swss-common.bzl", "build_swss_common", "stage_swss_common")
+load(":nhbazel/rules/swss.bzl", "build_swss", "stage_swss")
+load(":nhbazel/rules/swsssdk-py3.bzl", "build_swsssdk_py3", "stage_swsssdk_py3")
+load(":nhbazel/rules/syncd.bzl", "build_syncd", "stage_syncd", "syncd_sai_dev")
+load(":nhbazel/rules/syslog-counter.bzl", "build_syslog_counter", "stage_syslog_counter")
+load(":nhbazel/rules/sysmgr.bzl", "build_sysmgr", "stage_sysmgr")
+load(":nhbazel/rules/system-health.bzl", "build_system_health", "stage_system_health")
+load(":nhbazel/rules/systemd-sonic-generator.bzl", "build_systemd_sonic_generator", "stage_systemd_sonic_generator")
+load(":nhbazel/rules/tacacs.bzl", "build_tacacs", "stage_tacacs")
+load(":nhbazel/rules/telemetry.bzl", "build_telemetry", "stage_telemetry")
+load(":nhbazel/rules/wpasupplicant.bzl", "build_wpasupplicant", "stage_wpasupplicant")
+load(":nhbazel/rules/xrec.bzl", "build_libxrec", "stage_libxrec")
+load(":nhbazel/tests/closure_selftest.bzl", "closure_selftest", "docker_closure_selftest")
+load(":nhbazel/tests/image_analyze_test.bzl", "image_analyze_tests")
+load(
+    ":slave_utils.bzl",
+    "sonic_configure",
+    "sonic_configure_sources",
+    "sonic_configure_with_required_builds",
+    "sonic_slave_base_image",
+    "sonic_slave_run",
+)
+
+# Export files so they can be used by subpackages
+exports_files(
+    [
+        "rules/linux-kernel.mk",
+        "rules/libnl3.mk",
+        "rules/libyang3.mk",
+        "rules/p4lang.mk",
+        "rules/snmpd.mk",
+        "rules/libteam.mk",
+        "rules/socat.mk",
+        "rules/lm-sensors.mk",
+        "rules/sonic-yang-models-py3.mk",
+        "rules/sonic-yang-mgmt-py3.mk",
+        "Makefile",
+        # Read by the frozen configure in hotpatches/.
+        "Makefile.work",
+        "extract_versions.py",
+        # Read by image_matrix_test / image_debug_parity_test: the broadcom/generic/aspeed image
+        # macro calls (the source of truth for which image targets exist) live in this BUILD file.
+        "BUILD.bazel",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Every package's sources, for a target that rebuilds a package it names only
+# at build time: the patchlet macro in src/patchbrd/patchlet.bzl depends on
+# this so an edit to a package's sources re-runs the patchlet. It is the glob
+# every image make reads (_IMAGE_GLOB, nhbazel/lib/image.bzl:33), and it is that
+# wide because a platform package's sources sit under platform/ while a
+# daemon's sit under src/, and the manifest names the package at build time.
+# SRC_GLOB_EXCLUDE keeps build output such as *.o and *.pyc out of it, so a
+# build does not invalidate its own patchlet.
+#
+# glob stops at package boundaries, so a subdirectory carrying its own BUILD
+# file is absent: src/patchbrd is one, and the patchlet macro names its files
+# as explicit genrule deps for that reason.
+filegroup(
+    name = "package_sources",
+    srcs = glob(
+        [
+            "device/**",
+            "dockers/**",
+            "files/**",
+            "installer/**",
+            "platform/**",
+            "rules/**",
+            "scripts/**",
+            "src/**",
+        ],
+        exclude = SRC_GLOB_EXCLUDE,
+    ),
+    tags = ["not-for-ci"],
+    visibility = ["//visibility:public"],
+)
+
+# Note: Versions are extracted from rules/*.mk files at build time (no hardcoded versions).
+
+filegroup(
+    name = "asic_init_files",
+    srcs = [
+        "platform/broadcom/sonic-platform-modules-nexthop/common/utils/fpga",
+        "platform/broadcom/sonic-platform-modules-nexthop/nh-4010/utils/asic_init.sh",
+    ] + glob([
+        "platform/broadcom/sonic-platform-modules-nexthop/common/nexthop/**",
+    ]),
+    visibility = ["//fboss_extras/nexthop_product_support:__subpackages__"],
+)
+
+# ============================================================================
+# Initialize all submodules
+# ============================================================================
+genrule(
+    name = "sonic_init",
+    srcs = [
+        ".gitmodules",
+        "Makefile",
+        "Makefile.work",
+    ],
+    outs = ["sonic-init.ok"],
+    cmd = log_setup("sonic-init.log") + """
+        echo "=== Initializing SONiC ==="
+
+        # Get the absolute path to the sonic-buildimage directory
+        SONIC_DIR="$$(realpath sonic-buildimage)"
+        echo "SONiC directory: $$SONIC_DIR"
+
+        # Run init for build
+        echo "Running init..."
+        make -C "$$SONIC_DIR" fix-submodule-paths
+
+        echo "=== SONiC Initialization Complete ==="
+
+        # Dump git submodule status
+        echo "=== Git Submodule Status ==="
+        git -C "$$SONIC_DIR" submodule status
+
+        # Produce a stable sentinel file for downstream deps
+        echo "ok" > "$(location sonic-init.ok)"
+    """,
+    tags = [
+        "local",
+        "no-remote-cache",
+        "no-sandbox",
+        "not-for-ci",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# ============================================================================
+# Bazel cacheable slave base images
+# ============================================================================
+# sonic_configure_* restores these tarballs into the Docker
+# daemon before running `make configure`. Builds are chained via
+# serialize_after because the base builds share src/sonic-build-hooks
+# scratch space.
+[sonic_slave_base_image(
+    debian_release = release,
+    serialize_after = None if i == 0 else SUPPORTED_RELEASE_BUILDS[i - 1],
+) for i, release in enumerate(SUPPORTED_RELEASE_BUILDS)]
+
+# ============================================================================
+# Configure SONiC and create tarballs for all required slave images
+# This is the main entry point that:
+# 1. Runs 'make configure' with appropriate NOxxx=1 flags
+# 2. Builds Docker slave images
+# 3. Creates tarballs for each slave image
+# ============================================================================
+# Platform selector (nhbazel/lib/platform_flag.bzl). //sonic-buildimage:platform is a
+# string build setting (default broadcom), set on the command line
+# (builder.py / `--//sonic-buildimage:platform=vs`). :platform_value writes the current
+# value to a file genrules can read; the platform_<p> config_settings below let
+# target_compatible_with (compatible_with_platform) scope a //sonic-buildimage/... pattern
+# build to one platform.
+platform_setting(
+    name = "platform",
+    build_setting_default = "broadcom",
+    visibility = ["//visibility:public"],
+)
+
+# The "never-satisfied" constraint that compatible_with_platform / compatible_with_target use
+# for their //conditions:default (incompatible) branch. This is a local equivalent of
+# @platforms//:incompatible -- the root module doesn't declare a `platforms` bazel_dep, so
+# @platforms isn't a visible repo, and referencing it errors the moment a target is analyzed
+# as incompatible (e.g. a broadcom target under a generic :all build). No platform provides
+# this constraint_value, so any target requiring it is incompatible everywhere.
+constraint_setting(
+    name = "sonic_incompatible_setting",
+    visibility = ["//visibility:private"],
+)
+
+constraint_value(
+    name = "incompatible",
+    constraint_setting = ":sonic_incompatible_setting",
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "platform_broadcom",
+    flag_values = {":platform": "broadcom"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "platform_vs",
+    flag_values = {":platform": "vs"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "platform_generic",
+    flag_values = {":platform": "generic"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "platform_aspeed",
+    flag_values = {":platform": "aspeed"},
+    visibility = ["//visibility:public"],
+)
+
+platform_value(
+    name = "platform_value",
+    visibility = ["//visibility:public"],
+)
+
+# The SIM=BCM<chip> make-var for a bcm<chip> image variant (empty otherwise), read by the
+# syncd deb build onto its make line so the bcmsim $(SYNCD) rule registers under a vs configure.
+sim_value(
+    name = "sim_value",
+    visibility = ["//visibility:public"],
+)
+
+# 'ENABLE_SYNCD_RPC=y' for non-vs platforms (broadcom needs syncd-rpc), empty for vs (its bcmsim
+# docker installs plain $(SYNCD)). Read onto the syncd make line so vs skips thrift/saithrift.
+syncd_rpc_arg(
+    name = "syncd_rpc_arg",
+    visibility = ["//visibility:public"],
+)
+
+# Image VARIANT selector (//sonic-buildimage:target, default "default"). Orthogonal to
+# platform: it selects which <platform>_<target> image genrule a `//sonic-buildimage:all`
+# pattern resolves to (so :all builds ONE variant, not every SIM). The target_<t>
+# config_settings below back compatible_with_target(); builder.py passes
+# --//sonic-buildimage:target=<t> (default/aboot for broadcom; default/bcm78914/bcm78910 for
+# vs). Does NOT affect :sonic_configure -- platform alone drives configure.
+target_setting(
+    name = "target",
+    build_setting_default = "default",
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "target_default",
+    flag_values = {":target": "default"},
+    visibility = ["//visibility:public"],
+)
+
+# platform=vs AND target=default: the plain software-SAI vs image. docker_image() uses this to
+# suppress the broadcom vendor-SAI mount (NH_LOCAL_SAI_PATH_*) for vs_default, while keeping it
+# for the vs bcm* SIM variants (and broadcom).
+config_setting(
+    name = "vs_target_default",
+    flag_values = {
+        ":platform": "vs",
+        ":target": "default",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "target_aboot",
+    flag_values = {":target": "aboot"},
+    visibility = ["//visibility:public"],
+)
+
+# platform=broadcom AND target=<t>, one per broadcom image variant: the post-image dbg/rpc dockers
+# (lib/post_image_docker.bzl) key their ordering dep (which image genrule) and compatibility on
+# the exact variant, so `:all --//…:target=aboot` orders them after :broadcom_aboot. (vs has
+# vs_target_default above.)
+config_setting(
+    name = "broadcom_target_default",
+    flag_values = {
+        ":platform": "broadcom",
+        ":target": "default",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "broadcom_target_aboot",
+    flag_values = {
+        ":platform": "broadcom",
+        ":target": "aboot",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "target_bcm78914",
+    flag_values = {":target": "bcm78914"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "target_bcm78910",
+    flag_values = {":target": "bcm78910"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "target_bcm99430",
+    flag_values = {":target": "bcm99430"},
+    visibility = ["//visibility:public"],
+)
+
+# ONE platform-neutral configure target (:sonic_configure). It reads :platform_value and
+# runs `make configure PLATFORM=<that>`, then writes the platform into the CONTENT of
+# sonic_configure.ok, which every deb/wheel/docker/image rule depends on -- so the lane's
+# transition (its platform) re-keys the whole graph. Configure ALL release envs (a
+# package's slave tree must exist for whichever release it builds in).
+sonic_configure(
+    debian_releases = SUPPORTED_RELEASE_BUILDS,
+)
+
+# What make configure reads, for the frozen configure hotpatches/BUILD.bazel declares.
+sonic_configure_sources(name = "configure_sources")
+
+# Compat aliases for //nhbroadcomsai:build_sai.bzl, which still names the pre-refactor
+# per-platform configure targets (:sonic_configure_vs for bcmsim, :sonic_configure_broadcom
+# otherwise). Both now resolve to the single platform-neutral :sonic_configure -- the
+# ACTUAL platform comes from the consuming lane's transition (a bcmsim SAI built under the
+# :vs_bcm<chip> lane configures vs; a regular SAI under a broadcom lane configures broadcom),
+# not from the alias name. Lets nhbroadcomsai stay unedited.
+alias(
+    name = "sonic_configure_vs",
+    actual = ":sonic_configure",
+    # Compat alias for the non-hermetic :sonic_configure genrule; without this
+    # tag the alias stays in the ci lane's top-level set and re-pulls the whole
+    # sonic_init -> slave_base_image -> configure chain (~33 min). Image lanes
+    # still resolve it fine (they don't filter not-for-ci).
+    tags = ["not-for-ci"],
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "sonic_configure_broadcom",
+    actual = ":sonic_configure",
+    # Compat alias for the non-hermetic :sonic_configure genrule; without this
+    # tag the alias stays in the ci lane's top-level set and re-pulls the whole
+    # sonic_init -> slave_base_image -> configure chain (~33 min). Image lanes
+    # still resolve it fine (they don't filter not-for-ci).
+    tags = ["not-for-ci"],
+    visibility = ["//visibility:public"],
+)
+
+# ============================================================================
+# Kernel version information
+# ============================================================================
+# Fetch linux-kernel.mk from git for bookworm
+fetch_linux_kernel_mk()
+
+# Generate kernel version info for the current LINUX_HEADERS_RELEASE (trixie)
+# This uses rules/linux-kernel.mk from the source tree
+generate_kernel_version_info()
+
+# Generate kernel version info for bookworm
+# When LINUX_HEADERS_RELEASE="trixie", this uses the fetched linux-kernel.mk from git
+generate_kernel_version_info(debian_release = "bookworm")
+
+# Create an alias for backward compatibility
+# This points to the kernel_version_info for the current LINUX_HEADERS_RELEASE
+alias(
+    name = "kernel_version_info",
+    actual = ":kernel_version_info_" + LINUX_HEADERS_RELEASE,
+    # Aliases the not-for-ci kernel_version_info_<release> genrule; without this
+    # tag the alias stays in the ci lane's top-level set and re-pulls that genrule.
+    tags = ["not-for-ci"],
+    visibility = ["//visibility:public"],
+)
+
+# ============================================================================
+# Linux kernel headers configuration
+# ============================================================================
+# LINUX_HEADERS_RELEASE is defined in constants.bzl
+# Generate linux headers for the selected release
+# Note: Trixie includes kbuild package, bookworm does not
+build_linux_headers(
+    debian_release = LINUX_HEADERS_RELEASE,
+    include_kbuild = (LINUX_HEADERS_RELEASE == "trixie"),
+    platform = "broadcom",
+)
+
+download_linux_headers_from_s3()
+
+stage_linux_headers(
+    name = "for_sai",
+    debian_release = "bookworm",
+)
+
+stage_linux_headers(name = "for_broadcom")
+
+# Linux headers providers
+# The only reason today that we download linux headers is if SAI requires
+# a version that's different than what is present in the source code.
+# Creates a genrule to use downloaded linux headers (:linux_headers_for_sai)
+linux_headers_provider(
+    debian_release = "bookworm",
+    platform = "broadcom",
+)
+
+# Creates a genrule to build linux headers for broadcom (:linux_headers)
+linux_headers_provider(
+    platform = "broadcom",
+)
+
+# ============================================================================
+# Build libnl3 and libyang3 library packages
+# ============================================================================
+# These are foundational libraries used by libswsscommon and other SONiC components
+# Versions are automatically extracted from rules/*.mk files at build time
+
+# Closure-composition machinery self-test (design.md §4): runs at load time, so a
+# regression in pkg()/deps_closure()/dedup fails `bazel build --nobuild`. No-op on
+# success. See nhbazel/lib/closure.bzl + closure_selftest.bzl.
+closure_selftest()
+
+# Same load-time gate for the docker reroute closure: verifies a docker's
+# NHBAZEL_PREBUILT_* tokens are the transitive union of its own deps + its base chain
+# (docker.bzl cumulative_prebuilt_tokens). See closure_selftest.bzl:docker_closure_selftest.
+docker_closure_selftest()
+
+# Drift gate: every native build rule in an nhbazel .bzl (and every rule hand-written
+# in this BUILD.bazel) must be tagged "not-for-ci", so the monobuild ci lane
+# (bazel test //sonic-buildimage/... --config=ci) selects only the hermetic
+# nhbazel/tests drift tests and never runs a docker/make/configure genrule. The .bzl
+# glob mirrors the test's own nhbazel/** discovery (excluding nhbazel/tests, whose
+# targets are the tests that SHOULD run); BUILD.bazel is staged so the hand-written
+# rules (compat aliases, sonic_init) are checked too. See ci_tag_drift_test.py.
+py_test(
+    name = "ci_tag_drift_test",
+    srcs = ["nhbazel/tests/ci_tag_drift_test.py"],
+    data = glob(
+        [
+            "nhbazel/**/*.bzl",
+            "*.bzl",
+        ],
+        exclude = ["nhbazel/tests/**"],
+    ) + ["BUILD.bazel"],
+    main = "nhbazel/tests/ci_tag_drift_test.py",
+)
+
+# Drift gate (design.md §5): assert each migrated package's pkg() `deps` matches
+# its rules/<pkg>.mk dependency set, per release. Red test on drift -- the
+# enforcement the closure model's correctness depends on. Grows as packages
+# migrate (see PKG_MK in pkg_deps_drift_test.py).
+# Post-build verification of the final image log (design.md §7.4): checks SONIC_IMAGE_VERSION
+# (tag / Nexthop.<build_id>), secureboot mode, CI metadata, debug tools. builder.py runs
+# `bazel run //sonic-buildimage:image_verifier -- --log <sonic-<p>-bin.log> ...` when this
+# target exists, else falls back to its own copy of the checks.
+py_binary(
+    name = "image_verifier",
+    srcs = ["nhbazel/scripts/image_verifier.py"],
+    main = "nhbazel/scripts/image_verifier.py",
+    visibility = ["//visibility:public"],
+)
+
+# Post-build packaging of the final image (design.md §7.4): save the broadcom kernel vmlinux
+# into target/ and write <image>.sha256 for every image. A `bazel run` tool (not a genrule):
+# it mutates the source-tree target/ (the artifact-upload dir) and reads the kernel-build
+# vmlinux SIDE EFFECT, neither of which is a hermetic bazel output. builder.py runs
+# `bazel run //sonic-buildimage:image_finalizer -- --platform <p> --target-dir <dir> ...`
+# when this target exists, else falls back to its own Python copy.
+py_binary(
+    name = "image_finalizer",
+    srcs = ["nhbazel/scripts/image_finalizer.py"],
+    main = "nhbazel/scripts/image_finalizer.py",
+    visibility = ["//visibility:public"],
+)
+
+# Post-build verification that the syncd-rpc dockers built against the local nhbroadcomsai SAI,
+# not the stock S3 libsaibcm. builder.py runs
+# `bazel run //sonic-buildimage:syncd_rpc_verifier -- --log <build_post_log.txt> --artifacts ...`
+# right after the post-build syncd-rpc make when this target exists; older branches skip the check.
+py_binary(
+    name = "syncd_rpc_verifier",
+    srcs = ["nhbazel/scripts/syncd_rpc_verifier.py"],
+    main = "nhbazel/scripts/syncd_rpc_verifier.py",
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "syncd_rpc_verifier_test",
+    srcs = ["nhbazel/tests/syncd_rpc_verifier_test.py"],
+    data = ["nhbazel/scripts/syncd_rpc_verifier.py"],
+    main = "nhbazel/tests/syncd_rpc_verifier_test.py",
+)
+
+pyright_test(
+    name = "pyright_test",
+    size = "large",
+    config = "pyrightconfig.json",
+    data = glob([
+        "platform/broadcom/sonic-platform-modules-nexthop/**",
+        "platform/nexthop-common/**",
+        "platform/pddf/platform-api-pddf-base/**/*.py",
+        "src/sonic-config-engine/**/*.py",
+        "src/sonic-platform-common/**/*.py",
+        "src/sonic-py-common/**/*.py",
+    ]) + ["//sonic-buildimage/device/nexthop:nexthop_device_files"],
+    requirements = "nhbazel/tests/pyright-requirements.txt",
+)
+
+py_test(
+    name = "image_verifier_test",
+    srcs = ["nhbazel/tests/image_verifier_test.py"],
+    data = ["nhbazel/scripts/image_verifier.py"],
+    main = "nhbazel/tests/image_verifier_test.py",
+)
+
+py_test(
+    name = "pkg_deps_drift_test",
+    srcs = ["nhbazel/tests/pkg_deps_drift_test.py"],
+    data = glob([
+        "rules/*.mk",
+        "platform/broadcom/*.mk",
+        "nhbazel/rules/*.bzl",
+        "nhbazel/platform/broadcom/*.bzl",
+        # pkg_deps_drift_test scans nhbazel/platform/vs too (main()); stage its .bzl so the
+        # dir exists in the test runfiles (else scan_bzl_registry os.listdir 404s).
+        "nhbazel/platform/vs/*.bzl",
+        # scan_scalar_constants() resolves symbolic releases= (e.g. GRUB2_RELEASE in
+        # constants.bzl) so grub2 isn't dropped from the gate -- stage the lib .bzl.
+        "nhbazel/lib/*.bzl",
+    ]) + [
+        # check_reroute_coverage() reads this reroute file directly (not a glob match).
+        "rules/nh-bazel-prebuilt",
+    ],
+    main = "nhbazel/tests/pkg_deps_drift_test.py",
+)
+
+# Drift guard: every docker in a platform IMAGE list (Bazel membership) whose .mk gates
+# install on an INCLUDE_*/ENABLE_* flag must have that flag enabled in rules/config -- else
+# Bazel pre-builds a docker the .bin make won't install (membership vs rules/config drift).
+py_test(
+    name = "docker_gate_drift_test",
+    srcs = ["nhbazel/tests/docker_gate_drift_test.py"],
+    data = glob([
+        "rules/docker-*.mk",
+        "platform/broadcom/docker-*.mk",
+        "platform/vs/docker-*.mk",
+        "nhbazel/platform/*/*.bzl",
+    ]) + [
+        "nhbazel/rules/docker-shared.bzl",
+        "rules/config",
+    ],
+    main = "nhbazel/tests/docker_gate_drift_test.py",
+)
+
+# Drift guard (docker analog of pkg_deps_drift_test): every fine-grained docker's Bazel
+# `base` must match its .mk `_LOAD_DOCKERS` (both resolved to the base image's .gz stem, so a
+# base OR release mismatch fails). Vendor/template dockers (broadcom/vs syncd*) whose .mk stem
+# is a make variable are skipped (reported). Deps-sync is a separate, larger guard (TODO).
+py_test(
+    name = "docker_base_drift_test",
+    srcs = ["nhbazel/tests/docker_base_drift_test.py"],
+    data = glob([
+        "nhbazel/rules/docker-*.bzl",
+        "nhbazel/platform/*/docker-*.bzl",
+        "rules/docker-*.mk",
+        "platform/*/docker-*.mk",
+    ]),
+    main = "nhbazel/tests/docker_base_drift_test.py",
+)
+
+# Drift guard (docker analog of pkg_deps_drift_test): every fine-grained docker's Bazel `release`
+# (docker_image 2nd positional) must match its .mk `SONIC_<REL>_DOCKERS` membership. docker_base_drift
+# only pins release via the base stem, so a BASE-LESS docker (docker-ptf, FROM debian:<rel> directly)
+# was unchecked -- that gap let docker-ptf keep release="bookworm" after upstream #27889 flipped it to
+# SONIC_TRIXIE_DOCKERS. Vendor/template dockers whose .mk stem is a make var are skipped (reported).
+py_test(
+    name = "docker_release_drift_test",
+    srcs = ["nhbazel/tests/docker_release_drift_test.py"],
+    # The .bzl glob is recursive to match the test's own `nhbazel/**/docker-*.bzl` discovery, so a
+    # docker .bzl added at a novel depth is staged into the sandbox and actually checked (not
+    # silently skipped). The .mk globs mirror the test's _docker_mks().
+    data = glob([
+        "nhbazel/**/docker-*.bzl",
+        "rules/docker-*.mk",
+        "platform/*/docker-*.mk",
+    ]),
+    main = "nhbazel/tests/docker_release_drift_test.py",
+)
+
+# Drift guard (docker analog of pkg_deps_drift_test, deps side): every migrated package a shared
+# app docker's .mk installs DIRECTLY (its own _DEPENDS/_PYTHON_WHEELS/... lines) must be captured
+# in docker_image(deps=...) -- else Bazel won't stage it when the docker is activated and it
+# builds inline, racing the shared tree. One direction (.mk-own subset of Bazel deps): Bazel may
+# list extra (transitive/base-provided) deps without failing. make-var -> package is auto-derived
+# from each package's own .mk (main + derived debs). Vendor/sim dockers (nhbazel/platform/*) are
+# out of scope.
+py_test(
+    name = "docker_deps_drift_test",
+    srcs = ["nhbazel/tests/docker_deps_drift_test.py"],
+    data = glob([
+        "nhbazel/rules/*.bzl",
+        "nhbazel/platform/*/*.bzl",
+        "rules/*.mk",
+        "platform/*/*.mk",
+    ]),
+    main = "nhbazel/tests/docker_deps_drift_test.py",
+)
+
+# Guard: a host root's build-only deps (co-producer stage_only / explicit extra_srcs package
+# edges) must be covered by its platform's compat set -- the host roots' install closure UNION
+# their declared pkg() build_deps -- so per-platform gating can't make a host root's build input
+# incompatible and cascade the image (the saithrift -> sairedis bug). A new saithrift-class edge
+# that forgets build_deps fails here, not as an incompatible-image build failure.
+py_test(
+    name = "host_root_closure_test",
+    srcs = ["nhbazel/tests/host_root_closure_test.py"],
+    data = glob([
+        "nhbazel/rules/*.bzl",
+        "nhbazel/platform/*/*.bzl",
+    ]),
+    main = "nhbazel/tests/host_root_closure_test.py",
+)
+
+# Drift guard: each pkg's Bazel source glob (build_deb/build_wheel glob_dirs) must cover exactly
+# the source trees its dpkg-cache rules/<pkg>.dep declares -- the .mk _SRC_PATH tree plus any
+# extra $(SONIC_*_FILES_LIST) (e.g. sonic-device-data's device/**). A glob that omits such a tree
+# makes Bazel serve a stale deb when it changes. Supersedes the old src_path_drift_test (same
+# _SRC_PATH check, plus the .dep extra trees). See dep_glob_drift_test.py.
+py_test(
+    name = "dep_glob_drift_test",
+    srcs = ["nhbazel/tests/dep_glob_drift_test.py"],
+    data = glob([
+        "nhbazel/rules/*.bzl",
+        "nhbazel/platform/*/*.bzl",
+        "nhbazel/lib/*.bzl",
+        "rules/*.mk",
+        "platform/*/*.mk",
+        "rules/*.dep",
+        "platform/*/*.dep",
+    ]) + ["Makefile.cache"],
+    main = "nhbazel/tests/dep_glob_drift_test.py",
+)
+
+# Drift guard (image level): every installable docker a platform's Bazel IMAGE list pre-builds
+# must actually be shipped by that platform's `.bin`/`.swi` image -- i.e. present in the make's
+# per-platform docker set (rules/config-gated for broadcom/vs; the explicit allowlist for aspeed;
+# empty for generic). Catches an IMAGE-list docker the platform's image will not install (Bazel
+# wastes a build and the reroute stages a docker nothing COPYs). Complements docker_gate_drift.
+py_test(
+    name = "image_docker_set_drift_test",
+    srcs = ["nhbazel/tests/image_docker_set_drift_test.py"],
+    data = glob([
+        "nhbazel/rules/docker-shared.bzl",
+        "nhbazel/platform/*/*.bzl",
+        "rules/docker-*.mk",
+        "platform/*/docker-*.mk",
+        "platform/*/one-image.mk",
+    ]) + [
+        "rules/config",
+    ],
+    main = "nhbazel/tests/image_docker_set_drift_test.py",
+)
+
+# Drift guard: every host deb build_debian.sh installs from the Bazel-built $debs_path must be
+# rerouted+staged for aspeed (token in ASPEED_PACKAGES) or acknowledged inline (ASPEED_INLINE_
+# ALLOWED). Catches the grub2 class -- a host deb the image installs, arm64-capable + reroute
+# wired, but missing from the arm64-reuse allowlist so aspeed rebuilds it inline. The host-rootfs
+# installs live in build_debian.sh (upstream shell), invisible to the pkg/docker deps gates.
+py_test(
+    name = "host_root_install_drift_test",
+    srcs = ["nhbazel/tests/host_root_install_drift_test.py"],
+    data = [
+        "build_debian.sh",
+        "nhbazel/lib/constants.bzl",
+    ],
+    main = "nhbazel/tests/host_root_install_drift_test.py",
+)
+
+# Guard: RELEASE_PLATFORMS memberships that out-of-repo build tooling pins (e.g. nhfirmware_updater
+# builds openFPGALoader on the bookworm slave under --config=generic, so generic must stay a
+# bookworm platform). Fails this monobuild in the same PR that drops a pinned membership.
+py_test(
+    name = "release_platforms_guard_test",
+    srcs = ["nhbazel/tests/release_platforms_guard_test.py"],
+    data = ["nhbazel/lib/constants.bzl"],
+    main = "nhbazel/tests/release_platforms_guard_test.py",
+)
+
+# Completeness guard: the reconstructed set of image targets (from the broadcom/generic/aspeed
+# macro calls in BUILD.bazel + vs_targets()'s vs_default_image/vs_bcmsim per VS_SIMS) must match
+# the pinned canonical matrix. Catches a dropped/renamed image, or a new one added without
+# acknowledging it.
+py_test(
+    name = "image_matrix_test",
+    srcs = ["nhbazel/tests/image_matrix_test.py"],
+    data = [
+        "BUILD.bazel",
+        "nhbazel/platform/vs/sims.bzl",
+        "nhbazel/platform/vs/vs.bzl",
+    ],
+    main = "nhbazel/tests/image_matrix_test.py",
+)
+
+# Parity guard: every debug image (<p>_<t>_debug) must mirror a base image (<p>_<t>) -- a debug
+# image is the same sonic_image() with debug=True, sharing membership/platform/target, so an
+# orphan debug (base dropped) means its membership no longer parallels a shipped base.
+py_test(
+    name = "image_debug_parity_test",
+    srcs = ["nhbazel/tests/image_debug_parity_test.py"],
+    data = [
+        "BUILD.bazel",
+        "nhbazel/platform/vs/sims.bzl",
+        "nhbazel/platform/vs/vs.bzl",
+    ],
+    main = "nhbazel/tests/image_debug_parity_test.py",
+)
+
+# Guard: the ACTIVE_PREBUILT rollout dial must be closure-closed (an active host package's deps
+# are also active) -- so dialing packages on leaf-first can't leave a Bazel-built consumer with
+# make-built deps. No-op when ACTIVE_PREBUILT is None (fully migrated).
+py_test(
+    name = "active_deps_test",
+    srcs = ["nhbazel/tests/active_deps_test.py"],
+    data = glob([
+        "nhbazel/rules/*.bzl",
+        "nhbazel/platform/*/*.bzl",
+    ]) + ["nhbazel/lib/active_rollout.bzl"],
+    main = "nhbazel/tests/active_deps_test.py",
+)
+
+# Runtime gate-routing test (design.md §5.6): fake package + the real §3.4.1 gate
+# block + real make list-routing, asserting copy-vs-build actuation the drift gate
+# can't see. Shells out to system `make`, so runs local/no-sandbox.
+py_test(
+    name = "make_gate_routing_test",
+    srcs = ["nhbazel/tests/make_gate_routing_test.py"],
+    data = [
+        "nhbazel/tests/fake.mk",
+        "nhbazel/tests/harness.mk",
+    ],
+    main = "nhbazel/tests/make_gate_routing_test.py",
+)
+
+# Makefile.http-proxy hands the runner region's proxy (signal.env) to a make that has none.
+# Shells out to system `make`.
+py_test(
+    name = "make_http_proxy_test",
+    srcs = ["nhbazel/tests/make_http_proxy_test.py"],
+    data = ["Makefile.http-proxy"],
+    main = "nhbazel/tests/make_http_proxy_test.py",
+)
+
+# Single-file re-routing test (design.md §3.4/§12): a PRISTINE (un-gated) package +
+# the real rules/nh-bazel-prebuilt macros -> asserts the reroute moves it MAKE/DPKG
+# -> COPY only when its token is present (the gate-free alternative to per-.mk gates).
+py_test(
+    name = "make_reroute_routing_test",
+    srcs = ["nhbazel/tests/make_reroute_routing_test.py"],
+    data = [
+        "Makefile.cache",  # dpkg_depend, evaluated with the slave.mk copy rules
+        "Makefile.work",  # test 4 evaluates its real DOCKER_RUN forward
+        "nhbazel/lib/constants.bzl",  # read by the manifest drift guard
+        "nhbazel/tests/fake_pristine.mk",
+        "nhbazel/tests/reroute_harness.mk",
+        "rules/nh-bazel-prebuilt",
+        "slave.mk",  # nh_exempt_staged_dockers call site + copy rules demanding .dep metadata
+        ":derived_prebuilt_manifest",  # manifest guard cross-checks the derived prebuilt tokens
+    ],
+    main = "nhbazel/tests/make_reroute_routing_test.py",
+)
+
+# Cache-precedence test (design.md §3.5 / §5.6): a converted (gated) package
+# bypasses the dpkg cache; a non-converted one uses it only when on. Models the
+# cache (Makefile.cache's real keys are git-tree-dependent, not hermetic).
+py_test(
+    name = "make_cache_precedence_test",
+    srcs = ["nhbazel/tests/make_cache_precedence_test.py"],
+    data = [
+        "nhbazel/tests/cache_harness.mk",
+        "nhbazel/tests/fake.mk",
+    ],
+    main = "nhbazel/tests/make_cache_precedence_test.py",
+)
+
+# Copy-artifact content key: a SONIC_COPY_DEBS / SONIC_COPY_WHEELS package's .flags carry a
+# hash of the staged file (+ derived debs), so a dependent's dpkg-cache key moves when the
+# file changes under the same filename. Runs the real rules/nh-copy-content through a harness.
+py_test(
+    name = "make_copy_content_test",
+    srcs = ["nhbazel/tests/make_copy_content_test.py"],
+    data = [
+        "nhbazel/tests/copy_content_harness.mk",
+        "rules/nh-copy-content",
+    ],
+    main = "nhbazel/tests/make_copy_content_test.py",
+)
+
+# Copy-artifact dpkg metadata: the real Makefile.cache gives a SONIC_COPY_WHEELS package the
+# .flags/.dep/.dep.sha paths and rules a SONIC_COPY_DEBS package gets, and a dependent's
+# GET_MOD_DEP_SHA folds them, so a staged wheel's or deb's content change moves the dependent's
+# key. Hermetic: the harness's own files are the only inputs the key hashes.
+py_test(
+    name = "make_cache_metadata_test",
+    srcs = ["nhbazel/tests/make_cache_metadata_test.py"],
+    data = [
+        "Makefile.cache",
+        "nhbazel/tests/cache_metadata_harness.mk",
+        "nhbazel/tests/cache_metadata_pkg.dep",
+        "rules/nh-copy-content",
+    ],
+    main = "nhbazel/tests/make_cache_metadata_test.py",
+)
+
+# One label for the whole pre-build static gate -- every closure / dependency / docker /
+# routing drift test: `bazel test //sonic-buildimage:closure_tests`. builder.py runs this before
+# the (multi-hour) image build so any drift fails in seconds, not hours in.
+test_suite(
+    name = "closure_tests",
+    tests = [
+        ":active_deps_test",  # ACTIVE_PREBUILT dial is closure-closed (active dep of active pkg)
+        ":dep_glob_drift_test",  # pkg source glob covers the trees its dpkg-cache .dep declares
+        ":docker_base_drift_test",  # docker base == .mk _LOAD_DOCKERS
+        ":docker_deps_drift_test",  # docker's .mk install deps captured in docker_image(deps)
+        ":docker_gate_drift_test",  # IMAGE-list docker's config gate enabled in rules/config
+        ":docker_release_drift_test",  # docker release == .mk SONIC_<REL>_DOCKERS membership
+        ":host_root_closure_test",  # host root's build-only deps covered by its platform compat set
+        ":host_root_install_drift_test",  # build_debian.sh host installs reconciled vs ASPEED_PACKAGES
+        ":image_debug_parity_test",  # every <p>_<t>_debug image mirrors a base <p>_<t>
+        ":image_docker_set_drift_test",  # IMAGE-list dockers are shipped by the platform's image
+        ":image_matrix_test",  # the set of image targets matches the pinned canonical matrix
+        ":make_cache_metadata_test",  # real Makefile.cache folds copy deb/wheel metadata into a dependent's key
+        ":make_cache_precedence_test",  # dpkg cache precedence: converted pkg bypasses, else uses when on
+        ":make_copy_content_test",  # copy deb/wheel .flags carry the staged file's content hash
+        ":make_gate_routing_test",  # real make copy-vs-build routing under the gate block
+        ":make_http_proxy_test",  # Makefile.http-proxy hands signal.env's proxy to a make without one
+        ":make_reroute_routing_test",  # real reroute macros move a pristine pkg MAKE -> COPY on token
+        ":pkg_deps_drift_test",  # pkg() deps == rules/<pkg>.mk deps
+    ],
+)
+
+# Image-analyzability gate: every image target must ANALYZE under its own platform/target flags,
+# so a silently-incompatible image (a gated/broken dep) is caught here instead of `:all` exiting 0
+# with no .bin. NOT in the closure_tests suite -- an incompatible target in a suite/pattern is
+# silently skipped, so this must be requested EXPLICITLY to error:
+#   bazel test //sonic-buildimage:closure_tests //sonic-buildimage:image_analyze_test
+image_analyze_tests(name = "image_analyze_test")
+
+# The per-platform derived active-token map (host-roots closure UNION active-docker closures,
+# per the ACTIVE_PREBUILT / ACTIVE_DOCKERS dials). Passed to every build_release_chain: each
+# package gates its build genrule to the platforms whose manifest lists its reroute token
+# (active_scope_of), so a package no active image consumes drops out of `//sonic-buildimage:all`
+# and the image make builds it inline. Same map feeds derived_prebuilt_manifest below.
+_ACTIVE_TOKENS = {
+    "broadcom": broadcom_prebuilt_tokens(),
+    "generic": generic_prebuilt_tokens(),
+    "vs": vs_prebuilt_tokens(),
+    "aspeed": aspeed_prebuilt_tokens(),
+}
+
+# The COMPAT set = the reroute manifest PLUS each platform's host-root stage_only co-producer
+# build-deps (compat=True adds host_build_dep_tokens, e.g. sairedis via saithrift). This drives
+# the per-platform gate (active_compat) -- NOT the reroute (_ACTIVE_TOKENS). A package builds on
+# platform P iff its token is in P's COMPAT set, so a generic-only host package (swss) is
+# incompatible on broadcom and does not build there, while a broadcom build-dep (sairedis) stays
+# compatible on broadcom even though it is not a broadcom install/reroute token.
+_COMPAT_TOKENS = {
+    "broadcom": broadcom_prebuilt_tokens(compat = True),
+    "generic": generic_prebuilt_tokens(compat = True),
+    "vs": vs_prebuilt_tokens(compat = True),
+    "aspeed": aspeed_prebuilt_tokens(compat = True),
+}
+
+# Build library packages for all supported releases
+# Versions are automatically extracted from rules/*.mk files at build time
+# Each multi-release package is release-chained (bookworm then trixie) so the two
+# release genrules never run concurrently and race on the shared src/<pkg> tree.
+build_release_chain(
+    build_libnl3,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_libyang3,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# python3-libyang (LIBYANG3_PY3) depends on the libyang3 debs (staged via its own copy).
+build_release_chain(
+    build_libyang3_py3,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_libteam,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_socat,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_lm_sensors,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_sonic_yang_models,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# libxrec before swss-common: libswsscommon _DEPENDS LIBXREC_DEV (xrec interpose),
+# and build_swss_common stages libxrec, so :libxrec_build_<release> must exist first.
+build_release_chain(
+    build_libxrec,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_swss_common,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_yang_mgmt,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# libfib (libnexthopgroup) before frr: build_frr stages libfib (FRR _DEPENDS
+# LIBFIB_DEV), so its :libfib_build_<release> must exist first.
+build_release_chain(
+    build_libfib,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_frr,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# nhcli (Nexthop CLI) -- also pulled by the libyang3-dev-done phony; staged into
+# build_libyang alongside frr. Its only dep (libyang3) is built first.
+build_release_chain(
+    build_nhcli,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# sonic-fips: not a source build -- caches the version-pinned FIPS deb download.
+build_release_chain(
+    build_fips,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# Release-specific packages (only built for certain Debian releases)
+build_release_chain(
+    build_snmpd,
+    BOOKWORM_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # trixie uses Debian repos
+
+# libpcre3 removed from master + 202605 (source src/libpcre3 + rules/libpcre3.mk gone; still
+# present on 202511). Its Bazel rule file is kept for backports but is no longer instantiated
+# here -- nothing depends on it: libyang v1, its only closure consumer, is de-referenced on
+# master, so rules/libyang.mk + nhbazel/rules/libyang.bzl are DELETED here too. 202511 still
+# ships libyang v1 -- recreate the .bzl there on backport (see git history / this commit).
+
+# Third-party packages (bash, iproute2, iptables, openssh, redis, monit, lldpd, mpdecimal)
+build_release_chain(
+    build_bash,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_openssh,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_monit,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_lldpd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_iproute2,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# Host packages (ifupdown2, flashrom, kdump-tools, isc-dhcp, initramfs-tools)
+build_release_chain(
+    build_ifupdown2,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_flashrom,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_sonic_redfish,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bmcweb needs gcc-13/C++20 (trixie only); aspeed-scoped
+
+build_release_chain(
+    build_kdump_tools,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_isc_dhcp,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+build_release_chain(
+    build_initramfs_tools,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+# Leaf host packages (trixie-only; no Bazel-built build deps to stage).
+build_release_chain(
+    build_radius,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sflow,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_tacacs,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_rasdaemon,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_makedumpfile,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sedutil,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# trixie FIRST, then bookworm order_after trixie: the trixie host images stage the trixie deb,
+# and the serialization edge points bookworm->trixie (not the reverse) so a trixie image does
+# NOT transitively pull the bookworm build. Only the bookworm consumers (docker-sonic-mgmt /
+# docker-sonic-vs) pull the bookworm deb (task #26).
+build_release_chain(
+    build_sonic_device_data,
+    [
+        "trixie",
+        "bookworm",
+    ],
+    active = _COMPAT_TOKENS,
+)
+
+# wpasupplicant: non-leaf -- stages swss-common + libnl + libxrec.
+build_release_chain(
+    build_wpasupplicant,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# swss-common consumers (stage the libswsscommon install closure).
+build_release_chain(
+    build_dhcprelay,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_dhcpmon,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_eventd,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_dash_ha,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_linkmgrd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_bmp,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_syslog_counter,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_host_userd,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+build_release_chain(
+    build_sonic_stp,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_restapi,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_telemetry,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # sonic-gnmi; trixie-only
+
+build_release_chain(
+    build_iccpd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # out-of-image (INCLUDE_ICCPD=n)
+
+build_release_chain(
+    build_sonic_p4rt,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)  # out-of-image (INCLUDE_P4RT=n)
+
+build_release_chain(
+    build_sonic_ctrmgrd_rs,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_supervisord_utilities_rs,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_host_services_rs,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_mgmt_common,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_nettools,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_systemd_sonic_generator,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# p4lang (P4Runtime pi/bmv2/p4c): consumed ONLY by the vs software-SAI dash-sai chain
+# (syncd-vs.mk -> dash-sai -> p4lang), i.e. vs_default. Fine-grained + release-chained so it
+# builds ONCE per release (each genrule scoped to vs+default) instead of racing inline on the
+# shared src/p4lang tree inside the sairedis make (build 138273). sairedis COPYs the staged deb
+# under target=default (sairedis.bzl); every other lane never loads syncd-vs.mk so never needs it.
+# Must precede sonic-sairedis so the staged p4lang label is defined before sairedis references it.
+build_release_chain(
+    build_p4lang,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+[stage_p4lang(
+    name = "vs",
+    debian_release = r,
+) for r in SUPPORTED_RELEASE_BUILDS]
+
+# SAI stack: sonic-sairedis (foundation for swss/syncd).
+build_release_chain(
+    build_sonic_sairedis,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_swss,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# Trixie-only: broadcom and the whole vs closure (incl. vs-BCMSIM) are trixie; only docker-ptf
+# stays bookworm and it doesn't use the vendor syncd/saithrift.
+build_release_chain(
+    build_saithrift,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sswsyncd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_syncd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# Shared syncd/saithrift vendor-SAI-dev alias (trixie). Routes the SAI-dev compile input per
+# (platform, target): broadcom -> vendor SAI; vs BCMSIM -> the SIM family's bcmsim SAI-dev.
+# See syncd_sai_dev().
+syncd_sai_dev()
+
+build_release_chain(
+    build_sonic_dash_api,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sysmgr,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+build_release_chain(
+    build_sonic_ztp,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_host_services_data,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+build_release_chain(
+    build_sonic_mgmt_framework,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# Python wheels (SONIC_PYTHON_WHEELS; cache by presence, no .mk gate).
+build_release_chain(
+    build_redis_dump_load_py3,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_scapy,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_swsssdk_py3,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_py_common,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_config,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_platform_common,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+# pmon platform-daemon wheels (each its own subdir under src/sonic-platform-daemons).
+build_release_chain(
+    build_sonic_chassisd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_pcied,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_psud,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_ledd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_xcvrd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_thermalctld,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_syseepromd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_sensormond,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_ycabled,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_stormond,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_bmcctld,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+# config/host daemon wheels (each its own src tree). containercfgd is both releases.
+build_release_chain(
+    build_sonic_containercfgd,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_ctrmgrd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_bmpcfgd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_dhcp_utilities,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_system_health,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_frr_mgmt_framework,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_asyncsnmp,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_bgpcfgd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_utilities,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+build_release_chain(
+    build_sonic_host_services,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+build_release_chain(
+    build_dbsyncd,
+    TRIXIE_ONLY_RELEASE_BUILD,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_sonic_utilities_data,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)  # SONiC pkg, not in Debian repos; vs image is bookworm
+
+build_release_chain(
+    build_sonic_supervisord_utilities,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_supervisor,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+build_release_chain(
+    build_ptf,
+    SUPPORTED_RELEASE_BUILDS,
+    active = _COMPAT_TOKENS,
+)
+
+# Copy rules to place .debs/.whls in target/ for the main image build
+[stage_libnl3(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_libyang3(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_libyang3_py3(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_libteam(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_socat(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_lm_sensors(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_sonic_yang_models(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_swss_common(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_libxrec(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sonic_yang_mgmt(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_libfib(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_frr(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_nhcli(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_fips(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_ifupdown2(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_flashrom(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_kdump_tools(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_isc_dhcp(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_initramfs_tools(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_radius(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sflow(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_tacacs(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_rasdaemon(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_makedumpfile(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sedutil(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_device_data(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_wpasupplicant(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_dhcprelay(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_dhcpmon(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_eventd(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_dash_ha(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_linkmgrd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_bmp(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_syslog_counter(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_host_userd(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]  # bookworm too: docker-sonic-vs (bookworm) COPYs it
+
+[stage_sonic_stp(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_restapi(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_telemetry(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_iccpd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_p4rt(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_ctrmgrd_rs(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_supervisord_utilities_rs(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sonic_host_services_rs(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_mgmt_common(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_nettools(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_systemd_sonic_generator(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+# Vendor SAI (libsaibcm) staged once into target/debs/trixie; depended on by
+# the broadcom image genrule and the saithrift/syncd build genrules.
+stage_sai(
+    name = "broadcom",
+    debian_release = "trixie",
+)
+
+[stage_sonic_sairedis(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_swss(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_saithrift(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sswsyncd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_syncd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_dash_api(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sysmgr(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]  # bookworm too: docker-sonic-vs (bookworm) COPYs it
+
+[stage_sonic_ztp(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_host_services_data(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]  # bookworm too: docker-sonic-vs (bookworm) COPYs it
+
+[stage_sonic_mgmt_framework(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_redis_dump_load_py3(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_scapy(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_swsssdk_py3(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sonic_py_common(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sonic_config(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sonic_platform_common(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_chassisd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_pcied(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_psud(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_ledd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_xcvrd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_thermalctld(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_syseepromd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_sensormond(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_ycabled(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_stormond(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_bmcctld(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_containercfgd(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_sonic_ctrmgrd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_bmpcfgd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_dhcp_utilities(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_system_health(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_frr_mgmt_framework(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_asyncsnmp(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_bgpcfgd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_utilities(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_host_services(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]  # bookworm too: docker-sonic-vs (bookworm) COPYs it
+
+[stage_dbsyncd(
+    name = "broadcom",
+    debian_release = release,
+) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+[stage_sonic_utilities_data(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]  # bookworm too: docker-sonic-vs (bookworm) COPYs it
+
+[stage_sonic_supervisord_utilities(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_supervisor(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_ptf(
+    name = "broadcom",
+    debian_release = release,
+) for release in SUPPORTED_RELEASE_BUILDS]
+
+[stage_snmpd(
+    name = "broadcom",
+    debian_release = release,
+) for release in BOOKWORM_ONLY_RELEASE_BUILD]
+
+# Third-party package copy rules
+[stage_bash(debian_release = release) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_openssh(debian_release = release) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_monit(debian_release = release) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_lldpd(debian_release = release) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bookworm uses Debian repos (slave not provisioned to build from source)
+
+[stage_sonic_redfish(debian_release = release) for release in TRIXIE_ONLY_RELEASE_BUILD]  # bmcweb/sonic-dbus-bridge (trixie only, aspeed)
+
+[stage_iproute2(debian_release = release) for release in TRIXIE_ONLY_RELEASE_BUILD]
+
+# extracts them into target/debs/<release> so the broadcom make skips the
+# ~30 min grub2 build. The broadcom genrules depend on the .ok sentinel.
+
+# Aggregate barrier: build + stage the Bazel-managed debs/wheels, then emit one .ok that
+# the platform image genrule depends on. sonic_broadcom_artifacts = broadcom (full set);
+# sonic_generic_artifacts = generic (host-only trixie subset). All driven by the one
+# membership table in nhbazel/lib/sonic-common-artifacts.bzl (D6).
+broadcom_artifacts()
+
+generic_artifacts()
+
+# vs (shared closure minus the vendor-SAI syncd stack); consumed by both vs_default and vs_bcmsim
+# so the vs image copies these debs instead of rebuilding them.
+vs_artifacts()
+
+# aspeed (curated arm64 trixie subset + sonic-redfish); consumed by the aspeed image so it copies
+# these arm64 debs/wheels instead of rebuilding them from source.
+aspeed_artifacts()
+
+# Text manifest of every derived prebuilt token (all platforms); make_reroute_routing_test
+# cross-checks rules/nh-bazel-prebuilt against it (the derived source of truth). The per-platform
+# token sets come from each platform module -- the membership now lives there, not a central table.
+derived_prebuilt_manifest(
+    "derived_prebuilt_manifest",
+    _ACTIVE_TOKENS,
+)
+
+# Build SONiC Broadcom images using locally built SAI from nhbroadcomsai.
+# See broadcom.bzl for the genrule definition.
+# :broadcom (alias -> :broadcom_default) -> sonic-broadcom.bin + sonic-broadcom-dnx.bin
+# :broadcom_aboot -> sonic-aboot-broadcom.swi + sonic-aboot-broadcom-dnx.swi
+# A debug image is not a separate target: it's :broadcom_default built with
+# INSTALL_DEBUG_TOOLS=y (the debug flavor -- builder.py --debug / --config=debug, §7.4).
+broadcom_image(target = "default")
+
+broadcom_image(
+    debug = True,
+    target = "default",
+)  # -> broadcom_default_debug
+
+broadcom_image(target = "aboot")
+
+# No _pr/_ci lane targets (design.md §7.4): the image build is `:broadcom_default` (dev) or
+# the `//sonic-buildimage/...` pattern under --config=ci-pr / ci-te-candidate, which selects
+# the image + the only-for-ci / only-for-nightly dbg/rpc dockers. The platform_broadcom
+# config_setting + target_compatible_with scope the pattern to broadcom; --config carries the
+# tag filter. builder.py drives it with --//sonic-buildimage:platform=broadcom.
+
+# ============================================================================
+# Generic platform (design.md §7.4): the minimal host-only ONIE image
+# :generic_default -> sonic-generic.bin (no dockers, _INSTALLS=systemd-sonic-generator),
+# plus :docker_sonic_mgmt, the one platform-unique docker. generic is PR-lane only.
+# ============================================================================
+generic_image()
+
+generic_image(debug = True)  # -> generic_default_debug
+
+# The per-platform image-docker label maps, assembled from the platform modules. Passed to
+# every image docker_image() so it derives its own target_compatible_with (compat) -- membership
+# lives in the platform modules, not a central fleet table.
+# Active views (ACTIVE_DOCKERS-gated): a docker gated off drops out of compat + the is_extra
+# gate here, so it becomes never-built and the native make builds it inline.
+_IMAGES = {
+    "broadcom": active_image(BROADCOM_IMAGE),
+    "generic": active_image(GENERIC_IMAGE),
+    "vs": active_image(VS_IMAGE),
+    "aspeed": active_image(ASPEED_IMAGE),
+}
+
+docker_sonic_mgmt()
+
+# ============================================================================
+# Aspeed platform (design.md §7.4): the arm64 ONIE image
+# :aspeed_default     -> sonic-aspeed-arm64.bin (one-image.mk SONIC_ONE_IMAGE). arm64 arch is
+#                        threaded via :sonic_configure (PLATFORM_ARCH=arm64). First cut builds
+#                        the arm64 closure from source in the arm64 slave (no amd64 prebuilt
+#                        reuse); fine-grained arm64 debs/dockers are the task #27 follow-up.
+# :aspeed_emmc        -> sonic-aspeed-arm64-emmc.img.gz (flashable AST2700 eMMC installer).
+# :aspeed_default_all -> filegroup(:aspeed_default, :aspeed_emmc); the main-lane bundle
+#                        builder.py builds so both artifacts land in one invocation (aspeed has
+#                        no post-build phase).
+# ============================================================================
+aspeed_image()
+
+aspeed_image(debug = True)  # -> aspeed_default_debug
+
+aspeed_emmc_image()
+
+# No generic lane target: `:generic_default` (host image) is the dev build; a
+# `//sonic-buildimage/... --config=ci-pr --//sonic-buildimage:platform=generic` pattern adds
+# :docker_sonic_mgmt (tagged only-for-ci). generic targets are platform_generic-compatible.
+
+# :docker_base_trixie -> the SONiC base docker image (§7.5, root of the docker DAG).
+# Fine-grained package deps via the pkg() closures; declared in its own
+# nhbazel/rules/docker-base-trixie.bzl (1:1 with the .mk).
+docker_base_trixie(images = _IMAGES)
+
+# :docker_config_engine_trixie -> FROM docker-base-trixie; adds the
+# libswsscommon + yang + config-engine stack (§7.5, fine-grained pkg() deps).
+docker_config_engine_trixie(images = _IMAGES)
+
+# :docker_swss_layer_trixie -> FROM docker-config-engine-trixie; adds the
+# swss deb family (§7.5). Parent image for the swss/syncd/teamd/bgp app dockers.
+docker_swss_layer_trixie(images = _IMAGES)
+
+# docker-dash-ha (§7.5, INCLUDE_DASH_HA=y) -- trixie app docker; FROM
+# docker-swss-layer-trixie (docker-dash-ha.mk SONIC_TRIXIE_DOCKERS).
+docker_dash_ha(images = _IMAGES)
+
+# swss-layer-trixie app dockers (§7.5). FROM docker-swss-layer-trixie; each adds its
+# own thin install root (fine-grained pkg() closures). iccpd is omitted -- its ICCPD
+# root is unconverted and INCLUDE_ICCPD defaults to n (not in the broadcom image).
+docker_orchagent(images = _IMAGES)
+
+docker_teamd(images = _IMAGES)
+
+# vs-scoped fine-grained dockers (platform=["vs"]): stp + pmon (rules/, common but wired only
+# into the vs image) and dash-engine (platform/vs, vs-only). broadcom builds stp/pmon inline.
+docker_stp(images = _IMAGES)
+
+docker_platform_monitor(images = _IMAGES)
+
+docker_dash_engine(images = _IMAGES)
+
+docker_fpm_frr(images = _IMAGES)
+
+docker_nat(images = _IMAGES)  # INCLUDE_NAT = y
+
+docker_sflow(images = _IMAGES)  # INCLUDE_SFLOW = y
+
+docker_macsec(images = _IMAGES)  # INCLUDE_MACSEC = y
+
+# config-engine-trixie app dockers (§7.5). FROM docker-config-engine-trixie; each
+# adds its own thin install root (fine-grained pkg() closures). Blocked (deferred):
+# docker-gnmi (SONIC_TELEMETRY unconverted), docker-platform-monitor
+# (SONIC_PLATFORM_API + PDDF unconverted).
+docker_database(images = _IMAGES)
+
+docker_snmp(images = _IMAGES)  # INCLUDE_SNMP = y
+
+docker_lldp(images = _IMAGES)
+
+# docker-sonic-redfish (new genrule, aspeed-only). The other aspeed dockers already had
+# genrules -- gnmi/telemetry/sysmgr are just scoped to aspeed in their own .bzl files.
+docker_sonic_redfish(images = _IMAGES)
+
+docker_dhcp_relay(images = _IMAGES)  # INCLUDE_DHCP_RELAY = y
+
+docker_router_advertiser(images = _IMAGES)
+
+docker_eventd(images = _IMAGES)
+
+docker_mux(images = _IMAGES)  # INCLUDE_MUX = y (dual ToR)
+
+docker_sysmgr(images = _IMAGES)
+
+docker_bmp(images = _IMAGES)  # INCLUDE_SYSTEM_BMP = y
+
+docker_restapi(images = _IMAGES)  # INCLUDE_RESTAPI = y
+
+docker_sonic_mgmt_framework(images = _IMAGES)  # INCLUDE_MGMT_FRAMEWORK = y
+
+docker_otel(images = _IMAGES)  # INCLUDE_SYSTEM_OTEL = y
+
+# sidecar/watchdog auxiliaries (§7.5); independent config-engine-trixie children.
+docker_bmp_watchdog(images = _IMAGES)
+
+docker_restapi_sidecar(images = _IMAGES)
+
+docker_restapi_watchdog(images = _IMAGES)
+
+docker_gnmi_sidecar(images = _IMAGES)  # INCLUDE_SYSTEM_GNMI = y
+
+docker_gnmi_watchdog(images = _IMAGES)  # INCLUDE_SYSTEM_GNMI = y
+
+docker_gnmi(images = _IMAGES)  # INCLUDE_SYSTEM_GNMI = y (sonic-gnmi via TELEMETRY pkg)
+
+# Out-of-image dockers (INCLUDE_ICCPD=n / INCLUDE_P4RT=n) -- registered for
+# completeness, NOT wired into broadcom_default (nothing installs them).
+docker_iccpd()
+
+docker_p4rt()
+
+# The Broadcom XGS/DNX SAI syncd containers (platform dockers; bookworm-pinned).
+docker_syncd_brcm(images = _IMAGES)
+
+docker_syncd_brcm_dnx(images = _IMAGES)
+
+# Post-build docker sets -- declared AFTER every base they derive FROM (the app dockers
+# above + docker-syncd-brcm{,-dnx}), because docker_image()'s transitive base-context
+# closure resolves each base via native.existing_rule, which only sees rules defined
+# earlier. base -> ... -> leaf must be in order, so these post-build leaves come last.
+# :broadcom_debug_minimal -> orchagent + fpm-frr + syncd-brcm -dbg (PR lane subset),
+# :broadcom_dbg_full       -> the full ship set of -dbg dockers (CI/ci-te/release lanes),
+# :broadcom_syncd_rpc      -> syncd-brcm-rpc + syncd-brcm-dnx-rpc docker images.
+# All are post-build steps that reuse the Bazel-staged debs instead of rebuilding the
+# swss/SAI stack from source. broadcom_dbg_dockers defines every -dbg docker once and
+# emits both the minimal and full aggregates.
+#
+# A dbg/rpc docker whose parent ACTIVE_DOCKERS gates off can't derive FROM a staged parent; it
+# is instead built AFTER the platform's image make (which built the parent inline), in that
+# make's reroute context. _POST_IMAGE is that context per platform: the image genrule per target
+# variant (the ordering dep) + the image make's env/prebuilt flag (lib/post_image_docker.bzl).
+_POST_IMAGE = {
+    "broadcom": broadcom_post_image(),
+    "vs": vs_post_image(),
+}
+
+broadcom_dbg_dockers(
+    images = _IMAGES,
+    post_image = _POST_IMAGE,
+)
+
+broadcom_rpc_dockers(
+    images = _IMAGES,
+    post_image = _POST_IMAGE,
+)
+
+# :vs_default -> the vs image (sonic-vs.img.gz); + :docker_ptf / :docker_sonic_vs (tagged).
+# All platform=vs-compatible; the ci-pr / ci-te-candidate pattern builds add the dockers.
+# vs_targets() also emits the VS-BCMSIM KVM images (`:vs_bcm<chip>`, one per
+# platform/vs/sims.bzl VS_SIMS row) + their docker-syncd-bcmsim variants -- each is
+# platform=vs target_compatible_with, and builder.py passes --//sonic-buildimage:platform=vs
+# so the bcmsim SAI dep configures vs, not broadcom. _POST_IMAGE: docker-sonic-vs builds after
+# the vs_default image when its base is gated off (see broadcom_dbg_dockers above).
+vs_targets(post_image = _POST_IMAGE)
