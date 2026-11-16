@@ -4,7 +4,7 @@
   },
   "INCORRECT_DST_GROUP": {
     "desc": "INCORRECT DST_GROUP FIELD IN TELEMETRY_CLIENT TABLE.",
-    "eStrKey" : "Must"
+    "eStr": ["dst_group must name an existing DestinationGroup"]
   },
   "SRC_IP_INCORRECT_FORMAT": {
     "desc": "Add src ip which is not in correct ip-prefix format.",
@@ -19,5 +19,82 @@
   "DST_ADDR_INCORRECT_FORMAT": {
     "desc": "Add dst_addr which is not in correct ip-port format.",
     "eStrKey" : "Pattern"
+<<<<<<< HEAD
+=======
+  },
+  "DST_ADDR_IPV6": {
+    "desc": "Add dst_addr with a bracketed IPv6 host:port."
+  },
+  "DST_ADDR_IPV6_MULTIPLE": {
+    "desc": "Add dst_addr mixing IPv4 and bracketed IPv6 host:port entries."
+  },
+  "DST_ADDR_IPV6_UNBRACKETED": {
+    "desc": "Add dst_addr with an unbracketed IPv6 host:port, which is ambiguous.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_IPV6_NO_PORT": {
+    "desc": "Add dst_addr with a bracketed IPv6 host but no port.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_IPV6_BAD_HOST": {
+    "desc": "Add dst_addr with a bracketed host that is not an IPv6 address.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_IPV6_V4_EMBEDDED": {
+    "desc": "Add dst_addr with a bracketed IPv4-embedded IPv6 host (RFC 4291 2.2)."
+  },
+  "DST_ADDR_IPV6_ZONE": {
+    "desc": "Add dst_addr with a bracketed zone-scoped link-local IPv6 host."
+  },
+  "DST_ADDR_IPV6_TOO_MANY_GROUPS": {
+    "desc": "Add dst_addr with a bracketed host of sixteen groups around '::'.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_IPV6_NINE_GROUPS": {
+    "desc": "Add dst_addr with a bracketed host of eight groups plus '::'.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_IPV6_TWO_DOUBLE_COLONS": {
+    "desc": "Add dst_addr with a bracketed host that compresses twice.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_NO_SEPARATOR": {
+    "desc": "Add dst_addr with two endpoints and no comma between them.",
+    "eStrKey": "Pattern"
+  },
+  "DST_ADDR_TRAILING_COMMA": {
+    "desc": "Add dst_addr with a trailing comma after the last endpoint.",
+    "eStrKey": "Pattern"
+  },
+  "GLOBAL_WITH_MGMT_VRF": {
+    "desc": "Global vrf mgmt with management VRF enabled."
+  },
+  "GLOBAL_WITH_DEFAULT_VRF": {
+    "desc": "Global vrf default."
+  },
+  "GLOBAL_WITH_MGMT_VRF_DISABLED": {
+    "desc": "Global vrf mgmt with management VRF disabled - should fail validation.",
+    "eStrKey" : "Must"
+  },
+  "GLOBAL_WITH_MGMT_VRF_NO_MGMT_VRF_CONFIG": {
+    "desc": "Global vrf mgmt with no MGMT_VRF_CONFIG at all - should fail validation.",
+    "eStrKey" : "Must"
+  },
+  "GLOBAL_WITH_INVALID_VRF": {
+    "desc": "Global vrf that is neither default nor mgmt.",
+    "eStrKey" : "InvalidValue",
+    "eStr": ["vrf"]
+  },
+  "TWO_DESTINATION_GROUPS": {
+    "desc": "Subscriptions referencing two different destination groups."
+  },
+  "DST_GROUP_SUBSTRING_OF_GROUP_NAME": {
+    "desc": "dst_group that is only a substring of a destination group name.",
+    "eStr": ["dst_group must name an existing DestinationGroup"]
+  },
+  "DST_GROUP_NAMES_SUBSCRIPTION": {
+    "desc": "dst_group that names a subscription (and is a substring of the first list name) rather than a destination group.",
+    "eStr": ["dst_group must name an existing DestinationGroup"]
+>>>>>>> 216e71b29 (NOS-21773: [yang] TELEMETRY_CLIENT dst_group must name a DestinationGroup (#12195))
   }
 }
