@@ -4,9 +4,14 @@ EXIT_TELEMETRY_VARS_FILE_NOT_FOUND=1
 INCORRECT_TELEMETRY_VALUE=2
 INVALID_LISTENER_MODE=3
 SOCKET_DIRECTORY_ERROR=4
+<<<<<<< HEAD
 INVALID_TLS_CONFIGURATION=5
 TELEMETRY_VARS_FILE=/usr/share/sonic/templates/telemetry_vars.j2
 PATHS_BLACKLIST_FILE=/etc/telemetry/paths_blacklist.txt
+=======
+TELEMETRY_VARS_FILE=${TELEMETRY_VARS_FILE:-/usr/share/sonic/templates/telemetry_vars.j2}
+TELEMETRY_BIN=${TELEMETRY_BIN:-/usr/sbin/telemetry}
+>>>>>>> 717e12919 (NOS-23561: [sonic-gnmi] gnmi-native.sh: default the port when GNMI|gnmi has none, and treat an omitted cert leaf as unset (#13314))
 ESCAPE_QUOTE="'\''"
 
 extract_field() {
@@ -28,6 +33,8 @@ TELEMETRY_VARS=${TELEMETRY_VARS//[\']/\"}
 X509=$(jq -r '.x509 // empty' <<< "$TELEMETRY_VARS")
 GNMI=$(jq -r '.gnmi // empty' <<< "$TELEMETRY_VARS")
 CERTS=$(jq -r '.certs // empty' <<< "$TELEMETRY_VARS")
+# GNMI|certs is preferred over DEVICE_METADATA|x509.
+TLS_CONFIG=${CERTS:-$X509}
 
 DEVICE_TYPE=$(sonic-db-cli CONFIG_DB hget "DEVICE_METADATA|localhost" "type")
 SWITCH_TYPE=$(sonic-db-cli CONFIG_DB hget "DEVICE_METADATA|localhost" "switch_type")
@@ -37,13 +44,9 @@ if [[ "$DEVICE_TYPE" == "SmartSwitchDPU" || "$SWITCH_TYPE" == "dpu" ]]; then
 fi
 DPU_EPHEMERAL_TLS=false
 if [[ "$IS_SMART_SWITCH_DPU" == "true" ]]; then
-    DPU_TLS_CONFIG="$CERTS"
-    if [[ -z "$DPU_TLS_CONFIG" ]]; then
-        DPU_TLS_CONFIG="$X509"
-    fi
-    if [[ -z "$DPU_TLS_CONFIG" ]] ||
-       [[ -z "$(jq -r '.server_crt // empty' <<< "$DPU_TLS_CONFIG")" ]] ||
-       [[ -z "$(jq -r '.server_key // empty' <<< "$DPU_TLS_CONFIG")" ]]; then
+    if [[ -z "$TLS_CONFIG" ]] ||
+       [[ -z "$(jq -r '.server_crt // empty' <<< "$TLS_CONFIG")" ]] ||
+       [[ -z "$(jq -r '.server_key // empty' <<< "$TLS_CONFIG")" ]]; then
         DPU_EPHEMERAL_TLS=true
     fi
 fi
@@ -58,15 +61,26 @@ export CVL_SCHEMA_PATH=/usr/sbin/schema
 
 if [[ "$DPU_EPHEMERAL_TLS" == "true" ]]; then
     TELEMETRY_ARGS+=" --insecure"
+<<<<<<< HEAD
 elif [ -n "$CERTS" ]; then
     SERVER_CRT=$(extract_field "$CERTS" '.server_crt // empty')
     SERVER_KEY=$(extract_field "$CERTS" '.server_key // empty')
     if [[ -z "$SERVER_CRT" || -z "$SERVER_KEY" ]]; then
         echo "TLS configuration requires both server_crt and server_key" >&2
         exit $INVALID_TLS_CONFIGURATION
+=======
+elif [ -n "$TLS_CONFIG" ]; then
+    SERVER_CRT=$(extract_field "$TLS_CONFIG" '.server_crt // empty')
+    SERVER_KEY=$(extract_field "$TLS_CONFIG" '.server_key // empty')
+    if [ -z "$SERVER_CRT" ] || [ -z "$SERVER_KEY" ]; then
+        TELEMETRY_ARGS+=" --insecure"
+    else
+        TELEMETRY_ARGS+=" --server_crt $SERVER_CRT --server_key $SERVER_KEY "
+>>>>>>> 717e12919 (NOS-23561: [sonic-gnmi] gnmi-native.sh: default the port when GNMI|gnmi has none, and treat an omitted cert leaf as unset (#13314))
     fi
     TELEMETRY_ARGS+=" --server_crt $SERVER_CRT --server_key $SERVER_KEY "
 
+<<<<<<< HEAD
     CA_CRT=$(extract_field "$CERTS" '.ca_crt')
     if [ ! -z $CA_CRT ]; then
         TELEMETRY_ARGS+=" --ca_crt $CA_CRT"
@@ -83,6 +97,10 @@ elif [ -n "$X509" ]; then
 
     CA_CRT=$(extract_field "$X509" '.ca_crt')
     if [ ! -z $CA_CRT ]; then
+=======
+    CA_CRT=$(extract_field "$TLS_CONFIG" '.ca_crt // empty')
+    if [ -n "$CA_CRT" ]; then
+>>>>>>> 717e12919 (NOS-23561: [sonic-gnmi] gnmi-native.sh: default the port when GNMI|gnmi has none, and treat an omitted cert leaf as unset (#13314))
         TELEMETRY_ARGS+=" --ca_crt $CA_CRT"
     fi
 else
@@ -90,15 +108,12 @@ else
     NO_TLS_FALLBACK=true
 fi
 
-# If no configuration entry exists for TELEMETRY, create one default port
-if [ -z "$GNMI" ]; then
-    PORT=8080
-else
-    PORT=$(extract_field "$GNMI" '.port')
-    if ! [[ $PORT =~ ^[0-9]+$ ]]; then
-        echo "Incorrect port value ${PORT}, expecting positive integers" >&2
-        exit $INCORRECT_TELEMETRY_VALUE
-    fi
+# The port defaults to 8080 when GNMI|gnmi is absent or has no port field;
+# the entry can exist for other fields alone, such as log_level.
+PORT=$(jq -r '.port // 8080' <<< "${GNMI:-null}")
+if ! [[ $PORT =~ ^[0-9]+$ ]]; then
+    echo "Incorrect port value ${PORT}, expecting positive integers" >&2
+    exit $INCORRECT_TELEMETRY_VALUE
 fi
 
 case "${GNMI_LISTENER_MODE-config}" in
@@ -210,4 +225,4 @@ if [ -f "$PATHS_BLACKLIST_FILE" ]; then
 fi
 
 echo "gnmi args: $TELEMETRY_ARGS"
-exec /usr/sbin/telemetry ${TELEMETRY_ARGS}
+exec "$TELEMETRY_BIN" ${TELEMETRY_ARGS}

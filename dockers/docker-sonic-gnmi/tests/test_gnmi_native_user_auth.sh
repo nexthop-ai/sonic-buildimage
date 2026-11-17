@@ -5,7 +5,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="${SCRIPT_DIR}/gnmi-native.sh"
 TEST_ROOT="$(mktemp -d)"
-TEST_SCRIPT="${TEST_ROOT}/gnmi-native.sh"
 STUB_BIN="${TEST_ROOT}/bin"
 TEMPLATE_FILE="${TEST_ROOT}/telemetry_vars.j2"
 BLACKLIST_FILE="${TEST_ROOT}/paths_blacklist.txt"
@@ -14,6 +13,7 @@ trap 'rm -rf "${TEST_ROOT}"' EXIT
 mkdir -p "${STUB_BIN}"
 touch "${TEMPLATE_FILE}"
 
+<<<<<<< HEAD
 # Run the production launcher with only its fixed template, paths blacklist and
 # telemetry paths redirected to test fixtures. If any of those production lines
 # change, these checks fail instead of silently testing a different
@@ -25,6 +25,12 @@ sed \
     -e 's|^exec /usr/sbin/telemetry ${TELEMETRY_ARGS}$|printf "telemetry args:%s\\n" "${TELEMETRY_ARGS}"|' \
     "${SCRIPT}" > "${TEST_SCRIPT}"
 chmod +x "${TEST_SCRIPT}"
+=======
+cat > "${STUB_BIN}/telemetry" <<'EOF'
+#!/bin/bash
+printf 'telemetry args: %s\n' "$*"
+EOF
+>>>>>>> 717e12919 (NOS-23561: [sonic-gnmi] gnmi-native.sh: default the port when GNMI|gnmi has none, and treat an omitted cert leaf as unset (#13314))
 
 cat > "${STUB_BIN}/sonic-cfggen" <<'EOF'
 #!/bin/bash
@@ -36,7 +42,7 @@ cat > "${STUB_BIN}/sonic-db-cli" <<'EOF'
 exit 0
 EOF
 
-chmod +x "${STUB_BIN}/sonic-cfggen" "${STUB_BIN}/sonic-db-cli"
+chmod +x "${STUB_BIN}/telemetry" "${STUB_BIN}/sonic-cfggen" "${STUB_BIN}/sonic-db-cli"
 
 assert_contains_once() {
     local description="$1"
@@ -94,7 +100,14 @@ run_launcher() {
 run_launcher_config() {
     GNMI_TEST_CONFIG="$1"
     export GNMI_TEST_CONFIG
+<<<<<<< HEAD
     PATH="${STUB_BIN}:${PATH}" "${TEST_SCRIPT}" 2>&1
+=======
+    PATH="${STUB_BIN}:${PATH}" \
+        TELEMETRY_VARS_FILE="${TEMPLATE_FILE}" \
+        TELEMETRY_BIN="${STUB_BIN}/telemetry" \
+        "${SCRIPT}" | tail -n 1
+>>>>>>> 717e12919 (NOS-23561: [sonic-gnmi] gnmi-native.sh: default the port when GNMI|gnmi has none, and treat an omitted cert leaf as unset (#13314))
 }
 
 output="$(run_launcher)"
