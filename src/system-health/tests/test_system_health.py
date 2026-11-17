@@ -10,6 +10,7 @@
         3. Config
 """
 import copy
+import glob
 import json
 import os
 import stat
@@ -448,6 +449,52 @@ def test_service_checker_group_expansion_retries_on_empty(mock_run, mock_docker_
         'dhcp-relay:dhcprelayd',
         'dhcp-relay:dhcp6relay',
     ]
+
+
+# The telemetry sidecar copies its per-branch snapshot of service_checker.py over the host's,
+# so each snapshot must carry the ignore_removed fix too.
+_SIDECAR_SERVICE_CHECKERS = sorted(glob.glob(os.path.join(
+    modules_path, '..', '..', 'dockers', 'docker-telemetry-sidecar', 'systemd_scripts', 'service_checker.py_*')))
+
+
+def _service_checker_class(path):
+    if path is None:
+        return ServiceChecker
+    # Load as a submodule of health_checker so the snapshot's relative imports resolve.
+    module = load_source('health_checker.service_checker_' + path.rsplit('_', 1)[1], path)
+    return module.ServiceChecker
+
+
+def test_sidecar_service_checker_snapshots_found():
+    assert [os.path.basename(p) for p in _SIDECAR_SERVICE_CHECKERS] == [
+        'service_checker.py_202411', 'service_checker.py_202412', 'service_checker.py_202505']
+
+
+@pytest.mark.parametrize('path', [None] + _SIDECAR_SERVICE_CHECKERS,
+                         ids=['host'] + [os.path.basename(p) for p in _SIDECAR_SERVICE_CHECKERS])
+@patch('docker.DockerClient')
+def test_service_checker_ignores_removed_containers(mock_docker_client, path):
+    """A container removed between the list call and docker-py's per-container
+    inspect must not abort the whole listing - without ignore_removed the surviving
+    containers are lost and healthd reports them as not running."""
+    mock_snmp_container = MagicMock()
+    mock_snmp_container.name = 'snmp'
+    mock_snmp_container.labels = {}
+
+    def fake_list(filters=None, ignore_removed=False):
+        # Mirrors docker-py: inspect of a since-removed container raises NotFound
+        # unless ignore_removed is set.
+        if not ignore_removed:
+            raise docker.errors.NotFound('No such container: deadbeef')
+        return [mock_snmp_container]
+
+    mock_docker_client.return_value.containers.list = MagicMock(side_effect=fake_list)
+
+    checker_cls = _service_checker_class(path)
+    # Only the listing is under test, so skip the constructor; 'snmp' is already known.
+    checker = MagicMock(container_critical_processes={'snmp': []})
+    assert checker_cls.get_current_running_containers(checker) == {'snmp'}
+    checker.fill_critical_process_by_container.assert_not_called()
 
 
 @patch('swsscommon.swsscommon.ConfigDBConnector.connect', MagicMock())

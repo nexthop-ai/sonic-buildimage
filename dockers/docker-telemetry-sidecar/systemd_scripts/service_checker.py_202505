@@ -158,7 +158,9 @@ class ServiceChecker(HealthChecker):
         running_containers = set()
         ctrs = DOCKER_CLIENT.containers
         try:
-            lst = ctrs.list(filters={"status": "running"})
+            # A container removed between the list and its per-container inspect 404s and
+            # fails the whole listing; ignore_removed drops it instead.
+            lst = ctrs.list(filters={"status": "running"}, ignore_removed=True)
 
             for ctr in lst:
                 # Check if this is a Kubernetes-managed container
