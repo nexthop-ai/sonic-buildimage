@@ -25,6 +25,8 @@ from swsscommon import swsscommon
 EVENTS_PUBLISHER_SOURCE = "sonic-events-host"
 EVENTS_PUBLISHER_TAG = "event-down-ctr"
 
+INTERNAL_ERROR = 1
+
 def check_docker_image(image_name):
     """
     @summary: This function will check if docker image exists.
@@ -164,14 +166,17 @@ def get_current_running_from_dockers():
               the list of docker containers in running state.
               If namespace == 'sonic': it's rollout-ed via kubernetes so add io.kubernetes.container.name
               If namespace is missing/empty: it's image native container, add ctr.name directly
-    @return:  A set which contains containers that are
-              in running state.
+    @return:  A set which contains containers that are in running state, or
+              None if the running container list could not be retrieved.
     """
-    DOCKER_CLIENT = docker.DockerClient(base_url='unix://var/run/docker.sock')
     running_containers = set()
 
     try:
-        for ctr in DOCKER_CLIENT.containers.list(filters={"status": "running"}):
+        # Constructing the client asks dockerd for its API version, so an unreachable dockerd raises here.
+        DOCKER_CLIENT = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        # A container removed between the list and its per-container inspect 404s and
+        # fails the whole listing; ignore_removed drops it instead.
+        for ctr in DOCKER_CLIENT.containers.list(filters={"status": "running"}, ignore_removed=True):
             labels = ctr.labels or {}
             ns = labels.get("io.kubernetes.pod.namespace")
             dtype = labels.get("io.kubernetes.docker.type")
@@ -185,22 +190,28 @@ def get_current_running_from_dockers():
 
     except docker.errors.APIError as err:
         print(f"Failed to retrieve the running container list. Error: '{err}'")
-        pass
+        return None
     except docker.errors.DockerException as err:
         print(f"Docker client error: '{err}'")
-        pass
+        return None
     return running_containers
 
 def get_current_running_containers(always_running_containers):
     """
-    @summary: This function will get the list of currently running containers.
-              If available in STATE-DB, get from DB else from list of dockers.
+    @summary: This function will get the list of currently running containers:
+              the docker list, which is required, merged with what
+              get_current_running_from_DB reports.
 
-    @return:  A set of currently running containers.
+    @return:  A set of currently running containers, or None if the docker
+              enumeration failed and the running set is therefore unknown.
     """
 
+    running_from_dockers = get_current_running_from_dockers()
+    if running_from_dockers is None:
+        return None
+
     current_running_containers = get_current_running_from_DB(always_running_containers)
-    current_running_containers.update(get_current_running_from_dockers())
+    current_running_containers.update(running_from_dockers)
     return current_running_containers
 
 
@@ -223,6 +234,10 @@ def main():
     """
     expected_running_containers, always_running_containers = get_expected_running_containers()
     current_running_containers = get_current_running_containers(always_running_containers)
+    if current_running_containers is None:
+        # The running set is unknown: fail the check, but do not report every
+        # expected container as down.
+        sys.exit(INTERNAL_ERROR)
 
     expected_running_containers |= always_running_containers
     not_running_containers = expected_running_containers.difference(current_running_containers)
