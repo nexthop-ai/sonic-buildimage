@@ -73,7 +73,7 @@ module sonic-feature{
                 leaf has_global_scope {
                     description "When true, only one instance of this service runs on the device.";
                     type feature-scope-status;
-                    default "false";
+                    default "true";
                 }
 
                 leaf has_per_asic_scope {
