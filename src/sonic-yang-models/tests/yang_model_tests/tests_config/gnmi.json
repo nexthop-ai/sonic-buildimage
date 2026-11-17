@@ -252,5 +252,95 @@
                 }
             }
         }
+<<<<<<< HEAD
+=======
+    },
+    "GNMI_TABLE_WITH_CRT_EXTENSION": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "certs": {
+                    "ca_crt": "/etc/sonic/telemetry/gnmiCA.crt",
+                    "server_crt": "/etc/sonic/telemetry/gnmiserver.crt",
+                    "server_key": "/etc/sonic/telemetry/gnmiserver.key"
+                },
+                "gnmi": {
+                    "client_auth": "true",
+                    "log_level": "2",
+                    "port": "8080"
+                }
+            }
+        }
+    },
+    "GNMI_TABLE_WITH_PEM_EXTENSION": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "certs": {
+                    "ca_crt": "/etc/sonic/telemetry/gnmiCA.pem",
+                    "server_crt": "/etc/sonic/telemetry/gnmiserver.pem",
+                    "server_key": "/etc/sonic/telemetry/gnmiserver.key"
+                },
+                "gnmi": {
+                    "client_auth": "true",
+                    "log_level": "2",
+                    "port": "8080"
+                }
+            }
+        }
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "gnmi": {
+                    "client_auth": "true",
+                    "port": "50052",
+                    "state_publish_interval": "1"
+                }
+            }
+        }
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_ZERO": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "gnmi": {
+                    "client_auth": "true",
+                    "port": "50052",
+                    "state_publish_interval": "0"
+                }
+            }
+        }
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_MAX": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "gnmi": {
+                    "client_auth": "true",
+                    "port": "50052",
+                    "state_publish_interval": "3600"
+                }
+            }
+        }
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_TOO_LARGE": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "gnmi": {
+                    "client_auth": "true",
+                    "port": "50052",
+                    "state_publish_interval": "3601"
+                }
+            }
+        }
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_NOT_A_NUMBER": {
+        "sonic-gnmi:sonic-gnmi": {
+            "sonic-gnmi:GNMI": {
+                "gnmi": {
+                    "client_auth": "true",
+                    "port": "50052",
+                    "state_publish_interval": "ten"
+                }
+            }
+        }
+>>>>>>> a5da1c886 (NOS-8352: [sonic-yang-models] add GNMI|gnmi state_publish_interval (#12462))
     }
 }

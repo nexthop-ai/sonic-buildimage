@@ -45,5 +45,32 @@
     },
     "GNMI_TABLE_WITH_DEFAULT_VRF_CORRECT": {
         "desc": "TABLE WITH DEFAULT VRF."
+<<<<<<< HEAD
+=======
+    },
+    "GNMI_TABLE_WITH_CRT_EXTENSION": {
+        "desc": "TABLE WITH .crt CERTIFICATE EXTENSION."
+    },
+    "GNMI_TABLE_WITH_PEM_EXTENSION": {
+        "desc": "TABLE WITH .pem CERTIFICATE EXTENSION."
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL": {
+        "desc": "TABLE WITH A VALID state_publish_interval."
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_ZERO": {
+        "desc": "TABLE WITH state_publish_interval 0 failure.",
+        "eStrKey": "Range"
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_MAX": {
+        "desc": "TABLE WITH state_publish_interval 3600, the largest value."
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_TOO_LARGE": {
+        "desc": "TABLE WITH state_publish_interval above 3600 failure.",
+        "eStrKey": "Range"
+    },
+    "GNMI_TABLE_WITH_STATE_PUBLISH_INTERVAL_NOT_A_NUMBER": {
+        "desc": "TABLE WITH state_publish_interval not a number failure.",
+        "eStrKey": "InvalidValue"
+>>>>>>> a5da1c886 (NOS-8352: [sonic-yang-models] add GNMI|gnmi state_publish_interval (#12462))
     }
 }

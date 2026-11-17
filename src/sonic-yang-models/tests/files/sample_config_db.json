@@ -1483,7 +1483,8 @@
                 "log_level": "2",
                 "port": "50052",
                 "enable_crl": "false",
-                "crl_expire_duration": "86400"
+                "crl_expire_duration": "86400",
+                "state_publish_interval": "10"
             }
         },
         "GNMI_CLIENT_CERT": {

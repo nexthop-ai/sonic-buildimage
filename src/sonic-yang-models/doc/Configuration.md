@@ -1642,7 +1642,8 @@ GNMI (gRPC Network Management Interface) related configuration is defined in the
             "enable_crl": "true",
             "crl_expire_duration": "86400",
             "user_auth": "password",
-            "vrf": "mgmt"
+            "vrf": "mgmt",
+            "state_publish_interval": "10"
         }
     },
     "GNMI_CLIENT_CERT": {
@@ -1652,6 +1653,11 @@ GNMI (gRPC Network Management Interface) related configuration is defined in the
     }
 }
 ```
+
+`state_publish_interval` is how often, in seconds, the gNMI server and the
+dial-out client refresh their subscription state rows in STATE_DB
+(`GNMI_SERVER_STATE`, `GNMI_SUBSCRIPTION`, `GNMI_SUBSCRIPTION_PATH`).
+Range 1 to 3600, default 10. Both pick up a change without a restart.
 
 ### Hash
 
