@@ -32,6 +32,23 @@ stderr_logfile=NONE
 stderr_syslog=true
 dependent_startup=true
 
+{# Logs what docker_init.sh recorded before rsyslogd was up. Taking the file first
+   keeps a second start of this one-shot from logging it twice. rsyslogd counts as
+   running before it opens /dev/log, so this waits for the socket, and keeps the
+   file if logger still fails. #}
+[program:docker_init_errors]
+command=/bin/sh -c "mv /run/docker_init.errors /run/docker_init.errors.logging 2>/dev/null || exit 0; i=0; while [ ! -S /dev/log ] && [ $i -lt 10 ]; do sleep 1; i=$((i+1)); done; logger --socket-errors=on -p error -t docker_init -f /run/docker_init.errors.logging && rm -f /run/docker_init.errors.logging"
+priority=2
+autostart=false
+autorestart=false
+startsecs=0
+stdout_logfile=NONE
+stdout_syslog=true
+stderr_logfile=NONE
+stderr_syslog=true
+dependent_startup=true
+dependent_startup_wait_for=rsyslogd:running
+
 {% set frr_priority_base = 4 %}
 {% set use_dependent_startup = true %}
 {% set frr_wait_for = "rsyslogd:running" %}

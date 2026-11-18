@@ -26,7 +26,35 @@ CFGGEN_PARAMS=" \
     -t /usr/share/sonic/templates/unisolate.j2,/usr/sbin/bgp-unisolate \
 "
 
+# No syslog socket exists until supervisord starts rsyslogd, so a line for syslog
+# waits in this file for the docker_init_errors program; stderr reaches
+# `docker logs bgp` at once.
+DOCKER_INIT_ERRORS=/run/docker_init.errors
+rm -f $DOCKER_INIT_ERRORS
+
+report_error()
+{
+    echo "docker_init: $1" >&2
+    echo "$1" >> $DOCKER_INIT_ERRORS
+}
+
+# A failed render leaves the previous files in /etc/frr, so FRR starts from
+# config that may not match CONFIG_DB. Say so where an operator will look, then
+# carry on: refusing to start would take BGP down on any template error.
+render()
+{
+    sonic-cfggen "$@"
+    local rc=$?
+    if [ $rc -ne 0 ]; then
+        report_error "sonic-cfggen exited $rc rendering FRR config; FRR starts from the files already in /etc/frr, which may not match CONFIG_DB"
+    fi
+}
+
 FRR_VARS=$(sonic-cfggen $CFGGEN_PARAMS)
+FRR_VARS_RC=$?
+if [ $FRR_VARS_RC -ne 0 ]; then
+    report_error "sonic-cfggen exited $FRR_VARS_RC rendering the FRR config mode; FRR starts from the files already in /etc/frr, which may not match CONFIG_DB"
+fi
 CONFIG_TYPE=$(echo $FRR_VARS | jq -r '.docker_routing_config_mode')
 
 update_default_gw()
@@ -69,7 +97,10 @@ if [[ ! -z "$NAMESPACE_ID" ]]; then
    update_default_gw 6
 fi
 
-if [ -z "$CONFIG_TYPE" ] || [ "$CONFIG_TYPE" == "separated" ]; then
+if [ $FRR_VARS_RC -ne 0 ]; then
+    # With no mode known, /etc/frr stays as the last start left it.
+    :
+elif [ -z "$CONFIG_TYPE" ] || [ "$CONFIG_TYPE" == "separated" ]; then
     CFGGEN_PARAMS=" \
         -d \
         -y /etc/sonic/constants.yml \
@@ -86,14 +117,14 @@ if [ -z "$CONFIG_TYPE" ] || [ "$CONFIG_TYPE" == "separated" ]; then
             -T /usr/local/sonic/frrcfgd \
             -t /usr/share/sonic/templates/gen_frr.conf.j2,/etc/frr/frr.conf \
         "
-        sonic-cfggen $CFGGEN_PARAMS
+        render $CFGGEN_PARAMS
         echo "service integrated-vtysh-config" > /etc/frr/vtysh.conf
         rm -f /etc/frr/bgpd.conf /etc/frr/zebra.conf /etc/frr/staticd.conf \
               /etc/frr/bfdd.conf /etc/frr/ospfd.conf /etc/frr/pimd.conf \
               /etc/frr/sharpd.conf
     else
         rm -f /etc/frr/bfdd.conf /etc/frr/ospfd.conf
-        sonic-cfggen $CFGGEN_PARAMS
+        render $CFGGEN_PARAMS
         echo "no service integrated-vtysh-config" > /etc/frr/vtysh.conf
         rm -f /etc/frr/frr.conf
     fi
@@ -113,7 +144,7 @@ elif [ "$CONFIG_TYPE" == "unified" ]; then
         -T /usr/local/sonic/frrcfgd \
         -t /usr/share/sonic/templates/gen_frr.conf.j2,/etc/frr/frr.conf \
     "
-    sonic-cfggen $CFGGEN_PARAMS
+    render $CFGGEN_PARAMS
     echo "service integrated-vtysh-config" > /etc/frr/vtysh.conf
     rm -f /etc/frr/bgpd.conf /etc/frr/zebra.conf /etc/frr/staticd.conf \
           /etc/frr/bfdd.conf /etc/frr/ospfd.conf /etc/frr/pimd.conf \

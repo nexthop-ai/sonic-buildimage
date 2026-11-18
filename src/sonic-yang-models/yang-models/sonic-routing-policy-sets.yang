@@ -58,7 +58,24 @@ module sonic-routing-policy-sets {
         }
 
         leaf masklength_range {
-            type string;
+            type string {
+                pattern 'exact|([0-9]|[1-9][0-9]|1[01][0-9]|12[0-8])\.\.'
+                +       '([0-9]|[1-9][0-9]|1[01][0-9]|12[0-8])' {
+                    error-message "masklength_range is 'exact' or <low>..<high>, each 0-128";
+                }
+            }
+            must "current() = 'exact' or
+                number(substring-before(current(), '..')) <= number(substring-after(current(), '..'))" {
+                error-message "masklength_range low bound must be <= high bound";
+            }
+            must "current() = 'exact' or
+                number(substring-after(../ip_prefix, '/')) <= number(substring-after(current(), '..'))" {
+                error-message "masklength_range high bound must be >= prefix length";
+            }
+            must "current() = 'exact' or contains(../ip_prefix, ':') or
+                number(substring-after(current(), '..')) <= 32" {
+                error-message "masklength_range high bound must be <= 32 for an IPv4 prefix";
+            }
             description
                 "Defines a range for the masklength, or 'exact' if
                 the prefix has an exact length.

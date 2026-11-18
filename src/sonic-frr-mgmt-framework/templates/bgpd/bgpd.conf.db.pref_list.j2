@@ -24,13 +24,34 @@
 {% if pf_len == 'exact' %}
 {{ip_str[md]}} prefix-list {{key}} {{seq}} {{pf_val['action']|default('permit')}} {{pf_prefix}}
 {% else %}
+<<<<<<< HEAD
 {% set len = pf_prefix.split('/')[1] %}
 {% set rb = pf_len.split('..')[0] %}
 {% set re = pf_len.split('..')[1] %}
 {% if rb > len %}
+=======
+{# A range that is not two numbers joined by '..' can never be valid. Skip it,
+   so one bad entry does not abort the whole render: |int raises on a missing
+   second bound and reads any other non-number as 0. #}
+{% set bounds = pf_len.split('..') %}
+{% if bounds|length == 2 and bounds[0].isdigit() and bounds[1].isdigit() %}
+{# The bounds are compared as numbers (as text, '32' < '8' dropped ge), and
+   ge/le are left out exactly where frrcfgd's MatchPrefix leaves them out, so
+   the boot render and the live push give FRR the same line. #}
+{% set len = pf_prefix.split('/')[1]|int %}
+{% set rb = bounds[0]|int %}
+{% set re = bounds[1]|int %}
+{% set af_max = 32 if md == 'IPv4' else 128 %}
+{% if len >= rb %}
+{{ip_str[md]}} prefix-list {{key}} {{seq}} {{pf_val['action']|default('permit')}} {{pf_prefix}} le {{re}}
+{% elif re == af_max %}
+{{ip_str[md]}} prefix-list {{key}} {{seq}} {{pf_val['action']|default('permit')}} {{pf_prefix}} ge {{rb}}
+{% else %}
+>>>>>>> f98442e78 (NOS-23302: [frrcfgd] Refuse a malformed prefix masklength range and keep it from aborting the frr.conf render (#13151))
 {{ip_str[md]}} prefix-list {{key}} {{seq}} {{pf_val['action']|default('permit')}} {{pf_prefix}} ge {{rb}} le {{re}}
 {% else %}
 {{ip_str[md]}} prefix-list {{key}} {{seq}} {{pf_val['action']|default('permit')}} {{pf_prefix}} le {{re}}
+{% endif %}
 {% endif %}
 {% endif %}
 {% endif %}

@@ -558,6 +558,235 @@
     },
 
 
+    "ROUTE_PREFIX_VALID_MASKLENGTH_RANGE_BOUNDS": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv6"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "2001:db8::/32",
+                    "masklength_range": "128..128",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_EMPTY": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "20.0.0.0/8",
+                    "masklength_range": "",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_NOSEQ_INVALID_MASKLENGTH_RANGE_EMPTY": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_NOSEQ_LIST": [
+                {
+                    "name": "prefix1",
+                    "ip_prefix": "20.0.0.0/8",
+                    "masklength_range": "",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_ONE_BOUND": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "20.0.0.0/8",
+                    "masklength_range": "24",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_OVER_128": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "20.0.0.0/8",
+                    "masklength_range": "24..129",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+
+    "ROUTE_PREFIX_VALID_MASKLENGTH_RANGE_IPV4_TO_32": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "10.0.0.0/8",
+                    "masklength_range": "8..32",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_LOW_ABOVE_HIGH": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "10.0.0.0/8",
+                    "masklength_range": "24..8",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_NOSEQ_INVALID_MASKLENGTH_RANGE_LOW_ABOVE_HIGH": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_NOSEQ_LIST": [
+                {
+                    "name": "prefix1",
+                    "ip_prefix": "10.0.0.0/8",
+                    "masklength_range": "24..8",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_BELOW_PREFIX_LENGTH": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "10.1.2.0/28",
+                    "masklength_range": "16..24",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_IPV4_OVER_32": {
+        "sonic-routing-policy-sets:sonic-routing-policy-sets":{
+            "sonic-routing-policy-sets:PREFIX_SET": {
+                "PREFIX_SET_LIST": [
+                {
+                    "name": "prefix1",
+                    "mode": "IPv4"
+                }
+                ]
+            },
+            "sonic-routing-policy-sets:PREFIX": {
+                "PREFIX_LIST": [
+                {
+                    "name": "prefix1",
+                    "sequence_number": "1",
+                    "ip_prefix": "10.0.0.0/8",
+                    "masklength_range": "8..64",
+                    "action": "permit"
+                }
+                ]
+            }
+        }
+    },
     "BGP_COMMUNITY_VALID": {
         "sonic-routing-policy-sets:sonic-routing-policy-sets":{
             "sonic-routing-policy-sets:COMMUNITY_SET": {

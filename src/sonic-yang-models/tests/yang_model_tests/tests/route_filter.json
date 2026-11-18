@@ -93,6 +93,44 @@
         "desc": "Invalid IP prefix",
         "eStrKey": "InvalidValue"
     },
+    "ROUTE_PREFIX_VALID_MASKLENGTH_RANGE_BOUNDS": {
+        "desc": "A masklength range at the bounds."
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_EMPTY": {
+        "desc": "An empty masklength range.",
+        "eStr": ["masklength_range is 'exact' or <low>..<high>, each 0-128"]
+    },
+    "ROUTE_PREFIX_NOSEQ_INVALID_MASKLENGTH_RANGE_EMPTY": {
+        "desc": "An empty masklength range on a prefix without a sequence number.",
+        "eStr": ["masklength_range is 'exact' or <low>..<high>, each 0-128"]
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_ONE_BOUND": {
+        "desc": "A masklength range with one bound.",
+        "eStr": ["masklength_range is 'exact' or <low>..<high>, each 0-128"]
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_OVER_128": {
+        "desc": "A masklength range past 128.",
+        "eStr": ["masklength_range is 'exact' or <low>..<high>, each 0-128"]
+    },
+    "ROUTE_PREFIX_VALID_MASKLENGTH_RANGE_IPV4_TO_32": {
+        "desc": "An IPv4 masklength range from the prefix length to 32."
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_LOW_ABOVE_HIGH": {
+        "desc": "A masklength range whose low bound is above its high bound.",
+        "eStr": ["masklength_range low bound must be <= high bound"]
+    },
+    "ROUTE_PREFIX_NOSEQ_INVALID_MASKLENGTH_RANGE_LOW_ABOVE_HIGH": {
+        "desc": "A masklength range whose low bound is above its high bound, on a prefix without a sequence number.",
+        "eStr": ["masklength_range low bound must be <= high bound"]
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_BELOW_PREFIX_LENGTH": {
+        "desc": "A masklength range whose high bound is below the prefix length.",
+        "eStr": ["masklength_range high bound must be >= prefix length"]
+    },
+    "ROUTE_PREFIX_INVALID_MASKLENGTH_RANGE_IPV4_OVER_32": {
+        "desc": "An IPv4 masklength range past 32.",
+        "eStr": ["masklength_range high bound must be <= 32 for an IPv4 prefix"]
+    },
     "BGP_COMMUNITY_VALID": {
         "desc": "Configure BGP community table."
     },
