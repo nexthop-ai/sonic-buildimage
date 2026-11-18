@@ -16,7 +16,38 @@ module sonic-telemetry_client {
         "SONiC";
 
     description
+<<<<<<< HEAD
         "TELEMETRY_CLIENT yang Module for SONiC OS";
+=======
+        "TELEMETRY_CLIENT configuration";
+
+    revision 2026-11-17 {
+        description
+            "Add OC_YANG to path_target. Require a report_interval of at least
+             1000 for a stream Subscription to OTHERS, which is sampled at
+             that interval.";
+    }
+
+    revision 2026-11-12 {
+        description
+            "Require a Subscription's dst_group to exactly name an existing
+             DestinationGroup entry. Before this revision dst_group was only
+             checked as a substring of the first TELEMETRY_CLIENT_LIST name, so
+             a Subscription whose dst_group named no DestinationGroup validated
+             before this revision and is now rejected.";
+    }
+
+    revision 2026-11-06 {
+        description
+            "Add vrf leaf to Global";
+    }
+
+    revision 2026-10-30 {
+        description
+            "Widen dst_addr from IPv4-only endpoints to host:port endpoints
+             whose host may be a bracketed IPv6 address.";
+    }
+>>>>>>> 8d8c32aeb (NOS-23425: [yang] Add OC_YANG to TELEMETRY_CLIENT path_target, bound a stream to OTHERS (#13616))
 
     revision 2023-01-12 {
         description
@@ -32,13 +63,20 @@ module sonic-telemetry_client {
         }
     }
     typedef path_target {
+<<<<<<< HEAD
         description "SONiC database target for telemetry subscriptions.";
+=======
+        description
+            "Where a subscription's paths are read from: a database, OC_YANG
+             for OpenConfig paths, or OTHERS for the non-database paths.";
+>>>>>>> 8d8c32aeb (NOS-23425: [yang] Add OC_YANG to TELEMETRY_CLIENT path_target, bound a stream to OTHERS (#13616))
         type enumeration {
             enum APPL_DB;
             enum CONFIG_DB;
             enum COUNTERS_DB;
             enum STATE_DB;
             enum OTHERS;
+            enum OC_YANG;
         }
     }
 
@@ -120,17 +158,23 @@ module sonic-telemetry_client {
 
                 leaf path_target {
                     type path_target;
-                    description "Target database to subscribe to.";
+                    description "Where the paths are read from.";
                 }
 
                 leaf paths {
                     type string;
-                    description "Comma-separated data paths to subscribe to within the target database.";
+                    description "Comma-separated data paths to subscribe to within path_target.";
                 }
 
                 leaf report_interval {
+                    must "not(../report_type = 'stream' and ../path_target = 'OTHERS') or current() >= 1000" {
+                        error-message "A stream to OTHERS is sampled every report_interval, which cannot be less than 1000";
+                    }
                     type uint64;
-                    description "report_interval unit ms";
+                    description
+                        "In milliseconds. How often a periodic subscription sends
+                         its paths, and how often a stream to OTHERS samples them.
+                         A stream to a database or to OC_YANG does not use it.";
                     default 5000;
                 }
 
