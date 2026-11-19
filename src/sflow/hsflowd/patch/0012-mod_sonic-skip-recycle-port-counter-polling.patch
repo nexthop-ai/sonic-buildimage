@@ -1,0 +1,20 @@
+mod_sonic: do not poll the recycle port for counters
+
+Ethernet-Rec* is an internal port, so it gets no counter poller.
+Its PORT_INDEX_TABLE row still maps the port in flow and drop samples.
+
+diff --git a/src/Linux/mod_sonic.c b/src/Linux/mod_sonic.c
+index b2f3df6..4f5954e 100644
+--- a/src/Linux/mod_sonic.c
++++ b/src/Linux/mod_sonic.c
+@@ -1268,7 +1268,9 @@ extern "C" {
+ 	HSPAdaptorNIO *nio = ADAPTOR_NIO(adaptor);
+ 	if(nio) {
+ 	  nio->up = prt->operUp;
+-	  if(!nio->switchPort) {
++	  // The recycle port is internal, so give it no counter poller.
++	  if(!nio->switchPort
++	     && strncmp(prt->portName, "Ethernet-Rec", 12) != 0) {
+ 	    nio->switchPort = YES;
+ 	    mdata->changedSwitchPorts = YES;
+ 	    myDebug(1, "sonic db_portStateCB: %s(%s) marked as switchPort", adaptor->deviceName, nio->deviceAlias);

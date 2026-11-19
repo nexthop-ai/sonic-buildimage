@@ -8,3 +8,8 @@
 0008-mod_sonic-batch-port-discovery.patch
 # 0009-mod_sonic-debug-sndbuf.patch  # forensic harness for PR #27739 / issue #27728; apply manually with HSP_SONIC_SNDBUF=<bytes> to reduce send-buffer for repro investigations. Not applied by default.
 0010-mod_sonic-fix-write-recursion-via-evbus.patch
+<<<<<<< HEAD
+=======
+0011-mod_sonic-write-sflow-telemetry-to-state-db.patch
+0012-mod_sonic-skip-recycle-port-counter-polling.patch
+>>>>>>> 010196977 (NOS-23610: [sflow][202605] Skip recycle port counter polling in hsflowd (#13779))
