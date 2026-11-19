@@ -30,5 +30,208 @@
 				]
 			}
 		}
+	},
+	"PVST_VLAN_MAX_AGE_ABOVE_FWD_DELAY": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"forward_delay": "15",
+						"max_age": "40"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_MAX_AGE_BELOW_HELLO": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"hello_time": "10",
+						"max_age": "20",
+						"forward_delay": "15"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_MAX_AGE_ABOVE_GLOBAL_FWD_DELAY": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"max_age": "30"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_HELLO_ABOVE_GLOBAL_MAX_AGE": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"hello_time": "10"
+					}
+				]
+			}
+		}
+	},
+	"PVST_GLOBAL_FWD_DELAY_BELOW_VLAN_MAX_AGE": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst",
+						"forward_delay": "10",
+						"max_age": "18"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"max_age": "28"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_MAX_AGE_WITH_GLOBAL_FWD_DELAY_VALID": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst",
+						"forward_delay": "30"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"max_age": "40"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_OWN_TIMERS_VALID": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst",
+						"hello_time": "10",
+						"max_age": "30",
+						"forward_delay": "20"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"hello_time": "2",
+						"max_age": "20",
+						"forward_delay": "15"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_TIMERS_BOUNDARY_VALID": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP": {
+				"STP_LIST": [
+					{
+						"keyleaf": "GLOBAL",
+						"mode": "pvst"
+					}
+				]
+			},
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"hello_time": "10",
+						"forward_delay": "12",
+						"max_age": "22"
+					}
+				]
+			}
+		}
+	},
+	"PVST_VLAN_TIMERS_WITH_STP_DISABLED_VALID": {
+		"sonic-spanning-tree:sonic-spanning-tree": {
+			"sonic-spanning-tree:STP_VLAN": {
+				"STP_VLAN_LIST": [
+					{
+						"name": "Vlan200",
+						"vlanid": "200",
+						"enabled": "true",
+						"max_age": "40"
+					}
+				]
+			}
+		}
 	}
 }

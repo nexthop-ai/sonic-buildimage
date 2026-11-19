@@ -17,7 +17,57 @@ module sonic-spanning-tree {
 		"SONiC";
 
 	description
+<<<<<<< HEAD
 		"YANG model for Spanning Tree Protocol (STP) in SONiC, supporting PVST and MSTP";
+=======
+		"Spanning Tree Protocol (STP) configuration, supporting PVST and MSTP";
+
+	revision 2026-11-19 {
+		description
+			"Apply 2 x (hello_time + 1) <= max_age <= 2 x (forward_delay - 1)
+			 to the per-VLAN PVST timers. A timer or priority an STP_VLAN row
+			 leaves out takes the global value, so those leaves carry no
+			 default of their own.";
+	}
+
+	revision 2026-11-17 {
+		description
+			"STP_VLAN enabled defaults to true; STP_VLAN_PORT needs neither an
+			 STP_PORT nor an STP_VLAN row, references VLAN, and is refused
+			 outside PVST and on a PortChannel member.";
+	}
+
+	revision 2026-11-16 {
+		description
+			"Allow an MST region name of up to 32 characters, the full
+			 802.1Q configuration name field.";
+	}
+
+	revision 2026-10-28 {
+		description
+			"Refuse configuration the daemons cannot use: an MST instance ID
+			 outside 0..4094; MST instances while the mode is PVST, PVST VLAN
+			 rows and uplink_fast while the mode is MST, and a non-default
+			 global PVST timer, priority or rootguard_timeout while the mode
+			 is MST; MST region values outside their 802.1Q ranges and a
+			 region name longer than the 31 characters stpd keeps; timers
+			 that break
+			 2 x (hello_time + 1) <= max_age <= 2 x (forward_delay - 1);
+			 malformed MST VLAN lists and a VLAN mapped to two instances; an
+			 STP_VLAN name that is not Vlan<1-4094> or disagrees with vlanid;
+			 STP on a PortChannel member; bpdu_guard_do_disable without
+			 bpdu_guard.";
+	}
+
+	revision 2026-10-22 {
+		description
+			"Add the bridge_priority and port_priority typedefs: a bridge
+			 priority is a multiple of 4096 from 0 to 61440 and a port priority
+			 a multiple of 16 from 0 to 240, which the daemon rounds down to
+			 anyway, so a value such as 4097, 100 or 17 is refused instead of
+			 silently truncated.";
+	}
+>>>>>>> afc4f42a7 (NOS-24027: [yang] apply the STP timer rule to the per-VLAN timers (#13653))
 
 	revision 2025-03-15 {
 		description
@@ -28,7 +78,8 @@ module sonic-spanning-tree {
 
 	grouping vlanModeAttr {
 		description
-			"Configuration parameters for VLAN-based STP settings";
+			"PVST timers and bridge priority. The global row gives each a
+			 default; a VLAN row that leaves one out takes the global value.";
 
 		leaf forward_delay {
 			type uint8 {
@@ -37,7 +88,6 @@ module sonic-spanning-tree {
 				}
 			}
 			units seconds;
-			default 15;
 			description
 				"Delay before transitioning to the forwarding state";
 		}
@@ -49,7 +99,6 @@ module sonic-spanning-tree {
 				}
 			}
 			units seconds;
-			default 2;
 			description
 				"Interval between configuration BPDUs";
 		}
@@ -61,18 +110,21 @@ module sonic-spanning-tree {
 				}
 			}
 			units seconds;
-			default 20;
 			description
 				"Maximum time bridge stores BPDU information";
 		}
 
 		leaf priority {
+<<<<<<< HEAD
 			type uint16 {
 				range "0..61440" {
 					error-message "Invalid Bridge Priority value";
 				}
 			}
 			default 32768;
+=======
+			type bridge_priority;
+>>>>>>> afc4f42a7 (NOS-24027: [yang] apply the STP timer rule to the per-VLAN timers (#13653))
 			description
 				"Bridge Identifier priority component";
 		}
@@ -162,7 +214,43 @@ module sonic-spanning-tree {
 					description
 						"Once superior BPDUs stop coming on the port, device will wait for a period until root guard timeout before moving the port to forwarding state";
 				}
+<<<<<<< HEAD
 				uses vlanModeAttr;
+=======
+
+				// These four drive PVST only. MST takes its timers from STP_MST
+				// and its priority from STP_MST_INST, so in MST mode they must
+				// stay at their defaults.
+				uses vlanModeAttr {
+					refine forward_delay {
+						default 15;
+						must "../mode != 'mst' or current() = 15" {
+							error-message "In MST mode the global forward_delay is not used; set forward_delay on the MST region instead";
+						}
+					}
+					refine hello_time {
+						default 2;
+						must "../mode != 'mst' or current() = 2" {
+							error-message "In MST mode the global hello_time is not used; set hello_time on the MST region instead";
+						}
+					}
+					refine max_age {
+						default 20;
+						must "../mode != 'mst' or current() = 20" {
+							error-message "In MST mode the global max_age is not used; set max_age on the MST region instead";
+						}
+						must "current() <= 2 * (../forward_delay - 1) and current() >= 2 * (../hello_time + 1)" {
+							error-message "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)";
+						}
+					}
+					refine priority {
+						default 32768;
+						must "../mode != 'mst' or current() = 32768" {
+							error-message "In MST mode the global priority is not used; set bridge_priority on the MST instance instead";
+						}
+					}
+				}
+>>>>>>> afc4f42a7 (NOS-24027: [yang] apply the STP timer rule to the per-VLAN timers (#13653))
 			}
 		}
 
@@ -172,6 +260,17 @@ module sonic-spanning-tree {
 
 			list STP_VLAN_LIST {
 				key "name";
+<<<<<<< HEAD
+=======
+				must "not(../../STP/STP_LIST[keyleaf='GLOBAL']) or ../../STP/STP_LIST[keyleaf='GLOBAL']/mode='pvst'" {
+					error-message "Per-VLAN spanning tree configuration is allowed in PVST mode only";
+				}
+				// Each sum() holds one node: the VLAN's own timer, or the global
+				// one when the VLAN leaves it out.
+				must "not(../../STP/STP_LIST[keyleaf='GLOBAL']) or (sum(max_age | ../../STP/STP_LIST[keyleaf='GLOBAL']/max_age[not(current()/max_age)]) <= 2 * (sum(forward_delay | ../../STP/STP_LIST[keyleaf='GLOBAL']/forward_delay[not(current()/forward_delay)]) - 1) and sum(max_age | ../../STP/STP_LIST[keyleaf='GLOBAL']/max_age[not(current()/max_age)]) >= 2 * (sum(hello_time | ../../STP/STP_LIST[keyleaf='GLOBAL']/hello_time[not(current()/hello_time)]) + 1))" {
+					error-message "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1); a timer the VLAN leaves out takes the global value";
+				}
+>>>>>>> afc4f42a7 (NOS-24027: [yang] apply the STP timer rule to the per-VLAN timers (#13653))
 				description
 					"List of VLAN STP configurations";
 
