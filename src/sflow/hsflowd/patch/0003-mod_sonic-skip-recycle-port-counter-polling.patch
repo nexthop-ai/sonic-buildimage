@@ -1,0 +1,20 @@
+mod_sonic: do not poll the recycle port for counters
+
+Ethernet-Rec* is an internal port, so it gets no counter poller.
+Its PORT_INDEX_TABLE row still maps the port in flow and drop samples.
+
+diff --git a/src/Linux/mod_sonic.c b/src/Linux/mod_sonic.c
+index 142d3c3..b0635b8 100644
+--- a/src/Linux/mod_sonic.c
++++ b/src/Linux/mod_sonic.c
+@@ -1267,7 +1267,9 @@ extern "C" {
+ 	  changed = YES;
+ 	if(setPortSelectionPriority(mod, idxm, sync))
+ 	  changed = YES;
+-	if(setSwitchPort(mod, idxm->osIndex, sync))
++	// The recycle port is internal, so give it no counter poller.
++	bool recycle = (strncmp(prt->portName, "Ethernet-Rec", 12) == 0);
++	if(setSwitchPort(mod, idxm->osIndex, sync && !recycle))
+ 	  changed = YES;
+ 	// It's OK to set ifSpeed because we turned off the other
+ 	// ways that readInterfaces() might use to discover it, and
