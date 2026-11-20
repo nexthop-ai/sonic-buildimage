@@ -9,13 +9,61 @@ module sonic-bmp {
         prefix stypes;
     }
 
+<<<<<<< HEAD
+=======
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    import sonic-port {
+        prefix port;
+    }
+
+    import sonic-portchannel {
+        prefix lag;
+    }
+
+    import sonic-vlan {
+        prefix vlan;
+    }
+
+    import sonic-vlan-sub-interface {
+        prefix subintf;
+    }
+
+    import sonic-loopback-interface {
+        prefix lointf;
+    }
+
+
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
     organization
         "SONiC";
 
     contact
         "SONiC";
 
+<<<<<<< HEAD
     description "BMP YANG Module for SONiC OS";
+=======
+    description "BMP configuration";
+
+    revision 2026-11-19 {
+        description
+            "BMP_TARGET_COLLECTOR source-interface names its interface by leafref to PORT,
+             PORTCHANNEL, VLAN, VLAN_SUB_INTERFACE or LOOPBACK_INTERFACE, so a collector cannot
+             name an interface that does not exist and the interface's removal finds the
+             collectors that use it. The management port remains a pattern.";
+    }
+
+    revision 2026-04-21 {
+        description "Add source-interface to BMP collector configuration";
+    }
+
+    revision 2025-12-24 {
+        description "Add BMP collector configuration parameters";
+    }
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
 
     revision 2024-03-20 {
         description "First Revision";
@@ -51,6 +99,160 @@ module sonic-bmp {
 
         }
 
+<<<<<<< HEAD
+=======
+        container BMP_TARGET {
+
+            description "BMP_TARGET part of config_db.json";
+
+            list BMP_TARGET_LIST {
+                key "name";
+
+                description "BMP target configuration";
+
+                leaf name {
+                    type string {
+                        length "1..64";
+                    }
+                    description "Target name identifier";
+                }
+
+                leaf mirror {
+                    type boolean;
+                    default false;
+                    description "Enable BMP route mirroring for this target";
+                }
+
+                leaf stats-interval {
+                    type uint32 {
+                        range "100..86400000";
+                    }
+                    units "milliseconds";
+                    description "Interval to send BMP statistics messages";
+                }
+            }
+        }
+
+        container BMP_TARGET_COLLECTOR {
+
+            description "BMP_TARGET_COLLECTOR part of config_db.json";
+
+            list BMP_TARGET_COLLECTOR_LIST {
+                key "target_name ip port";
+
+                description "BMP collector (outgoing session) configuration";
+
+                leaf target_name {
+                    type leafref {
+                        path "../../../BMP_TARGET/BMP_TARGET_LIST/name";
+                    }
+                    description "Reference to BMP target";
+                }
+
+                leaf ip {
+                    type inet:ip-address;
+                    description "BMP collector IP address or hostname";
+                }
+
+                leaf port {
+                    type inet:port-number;
+                    description "BMP collector TCP port number";
+                }
+
+                leaf min-retry {
+                    type uint32 {
+                        range "100..86400000";
+                    }
+                    units "milliseconds";
+                    default 30000;
+                    description "Minimum connection retry interval";
+                }
+
+                leaf max-retry {
+                    type uint32 {
+                        range "100..86400000";
+                    }
+                    units "milliseconds";
+                    default 720000;
+                    description "Maximum connection retry interval";
+                }
+
+                leaf source-interface {
+                    type union {
+                        type string {
+                            pattern "eth[0-9]+";
+                        }
+                        type leafref {
+                            path "/port:sonic-port/port:PORT/port:PORT_LIST/port:name";
+                        }
+                        type leafref {
+                            path "/lag:sonic-portchannel/lag:PORTCHANNEL/lag:PORTCHANNEL_LIST/lag:name";
+                        }
+                        type leafref {
+                            path "/vlan:sonic-vlan/vlan:VLAN/vlan:VLAN_LIST/vlan:name";
+                        }
+                        type leafref {
+                            path "/subintf:sonic-vlan-sub-interface/subintf:VLAN_SUB_INTERFACE/subintf:VLAN_SUB_INTERFACE_LIST/subintf:name";
+                        }
+                        type leafref {
+                            path "/lointf:sonic-loopback-interface/lointf:LOOPBACK_INTERFACE/lointf:LOOPBACK_INTERFACE_LIST/lointf:name";
+                        }
+                    }
+                    must "not(contains(., '-'))" {
+                        error-message "An internal port cannot source a BMP session.";
+                    }
+                    description
+                        "Interface whose address is used as the source for the outgoing BMP session:
+                         a port, port channel, VLAN, VLAN sub-interface or loopback, each of which
+                         must exist in its table, or a management port. 'eth[0-9]+' is a pattern
+                         because eth0 is up without a MGMT_PORT row when ZTP brings it up on DHCP.
+                         bgpd binds the session to an address of this interface. Internal port
+                         names (those with a '-') are refused.";
+                }
+            }
+        }
+
+        container BMP_TARGET_AFI_SAFI {
+
+            description "BMP_TARGET_AFI_SAFI part of config_db.json";
+
+            list BMP_TARGET_AFI_SAFI_LIST {
+                key "target_name afi_safi_name";
+
+                description "Address family specific BMP monitoring configuration";
+
+                leaf target_name {
+                    type leafref {
+                        path "../../../BMP_TARGET/BMP_TARGET_LIST/name";
+                    }
+                    description "Reference to BMP target";
+                }
+
+                leaf afi_safi_name {
+                    type afi-safi-type;
+                    description "Address family identifier";
+                }
+
+                leaf adj-rib-in-pre {
+                    type boolean;
+                    default false;
+                    description "Send state before policy and filter processing (Adj-RIB-In pre-policy)";
+                }
+
+                leaf adj-rib-in-post {
+                    type boolean;
+                    default false;
+                    description "Send state after policy and filter processing (Adj-RIB-In post-policy)";
+                }
+
+                leaf loc-rib {
+                    type boolean;
+                    default false;
+                    description "Send state from local RIB (Loc-RIB)";
+                }
+            }
+        }
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
     }
 
 }

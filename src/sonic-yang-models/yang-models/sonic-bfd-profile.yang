@@ -1,0 +1,382 @@
+module sonic-bfd-profile {
+    namespace "http://github.com/sonic-net/sonic-bfd-profile";
+    prefix bfdprofile;
+    yang-version 1.1;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    import sonic-device_metadata {
+        prefix sdm;
+    }
+
+    import sonic-port {
+        prefix port;
+    }
+
+    import sonic-portchannel {
+        prefix lag;
+    }
+
+    import sonic-vlan {
+        prefix vlan;
+    }
+
+    import sonic-system-defaults {
+        prefix sysdef;
+    }
+
+    organization
+        "SONiC";
+
+    contact
+        "SONiC";
+
+    description
+        "BFD profile and standalone BFD peer configuration for CONFIG_DB.
+         Leaf naming intentionally differs by table: BFD_PROFILE fields are
+         snake_case (receive_interval) while BFD_PEER_* fields are hyphenated
+         (desired-minimum-tx-interval) — each table's field names are the
+         CONFIG_DB contract of its consumers (bgpcfgd / frrcfgd key maps)
+         and must not be normalized to match each other.";
+
+    revision 2026-11-19 {
+        description
+            "BFD_PEER_SINGLE_HOP interface names a port, port channel or VLAN by
+             leafref to PORT, PORTCHANNEL or VLAN.";
+    }
+
+    revision 2026-08-14 {
+        description
+            "Add the standalone BFD peer tables BFD_PEER_SINGLE_HOP and
+             BFD_PEER_MULTI_HOP consumed by frrcfgd (NOS-14139), keyed
+             remote-address|interface|vrf|local-address with the literal
+             string 'null' filling key slots not applicable to the session
+             type.";
+    }
+
+    revision 2026-07-27 {
+        description
+            "Apply the 100/1000 ms timer restriction only when hardware BFD
+             offload is active: DEVICE_METADATA switch_type is voq and
+             SYSTEM_DEFAULTS hw_bfd_offload is enabled (and software_bfd is
+             not), so software BFD keeps the full timer range.";
+    }
+
+    revision 2026-07-23 {
+        description
+            "Restrict receive_interval and transmit_interval to 100 or 1000 ms
+             for ALL modes (classic bfd and sbfd_echo); hardware BFD offload
+             only supports these timer values. The 1000 ms default for an unset
+             timer is applied by bgpcfgd BfdProfileMgr / frrcfgd.";
+    }
+
+    revision 2026-06-24 {
+        description
+            "Add mode and source_ipv6 leaves for SBFD Echo over SRv6.";
+    }
+
+    revision 2026-04-21 {
+        description
+            "Initial revision.";
+    }
+
+    typedef bfd-vrf-name {
+        type string {
+            pattern "(Vrf[a-zA-Z0-9_-]+)|(default)|(mgmt)";
+        }
+        description
+            "VRF hosting the BFD session. frrcfgd always emits an explicit
+             'vrf <name>' token to FRR, so the default VRF is spelled
+             'default' rather than left as 'null'.";
+    }
+
+    grouping bfd-peer-session-fields {
+        description
+            "Session parameters shared by single-hop and multihop standalone
+             peers. Leaf names are the hyphenated frrcfgd key-map names
+             (bfd_peer_shop_key_map / bfd_peer_mhop_key_map) — the CONFIG_DB
+             contract.";
+
+        leaf enabled {
+            type boolean;
+            description
+                "Administrative state ('no shutdown' when true). Set it
+                 explicitly: when unset, the startup template renders
+                 'shutdown' while a runtime add through frrcfgd keeps FRR's
+                 default (enabled).";
+        }
+
+        leaf desired-minimum-tx-interval {
+            type uint32 {
+                range "10..60000";
+            }
+            must ". = 100 or . = 1000 or
+                  not(/sdm:sonic-device_metadata/sdm:DEVICE_METADATA/sdm:localhost/sdm:switch_type = 'voq') or
+                  not(/sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='hw_bfd_offload']/sysdef:status = 'enabled') or
+                  /sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='software_bfd']/sysdef:status = 'enabled'" {
+                error-message "desired-minimum-tx-interval must be 100 or 1000 ms when hardware BFD offload is enabled";
+            }
+            description
+                "BFD transmit interval in milliseconds (FRR transmit-interval,
+                 default 300). With hardware BFD offload (VOQ switch,
+                 SYSTEM_DEFAULTS hw_bfd_offload) only 100 or 1000 ms are
+                 supported.";
+        }
+
+        leaf required-minimum-receive {
+            type uint32 {
+                range "10..60000";
+            }
+            must ". = 100 or . = 1000 or
+                  not(/sdm:sonic-device_metadata/sdm:DEVICE_METADATA/sdm:localhost/sdm:switch_type = 'voq') or
+                  not(/sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='hw_bfd_offload']/sysdef:status = 'enabled') or
+                  /sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='software_bfd']/sysdef:status = 'enabled'" {
+                error-message "required-minimum-receive must be 100 or 1000 ms when hardware BFD offload is enabled";
+            }
+            description
+                "BFD receive interval in milliseconds (FRR receive-interval,
+                 default 300). With hardware BFD offload (VOQ switch,
+                 SYSTEM_DEFAULTS hw_bfd_offload) only 100 or 1000 ms are
+                 supported.";
+        }
+
+        leaf detection-multiplier {
+            type uint8 {
+                range "2..255";
+            }
+            description
+                "BFD detection multiplier (FRR detect-multiplier, default 3).";
+        }
+    }
+
+    container sonic-bfd-profile {
+        container BFD_PROFILE {
+            description "BFD_PROFILE part of config_db.json";
+
+            list BFD_PROFILE_LIST {
+                key "name";
+                description "BFD profile configuration entries";
+
+                leaf name {
+                    type string {
+                        length "1..64";
+                        pattern "[a-zA-Z0-9_-]+";
+                    }
+                    description "BFD profile name.";
+                }
+
+                leaf detect_multiplier {
+                    type uint8 {
+                        range "2..255";
+                    }
+                    description "BFD detection multiplier";
+                }
+
+                leaf receive_interval {
+                    type uint32 {
+                        range "10..60000";
+                    }
+                    must ". = 100 or . = 1000 or
+                          not(/sdm:sonic-device_metadata/sdm:DEVICE_METADATA/sdm:localhost/sdm:switch_type = 'voq') or
+                          not(/sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='hw_bfd_offload']/sysdef:status = 'enabled') or
+                          /sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='software_bfd']/sysdef:status = 'enabled'" {
+                        error-message "receive_interval must be 100 or 1000 ms when hardware BFD offload is enabled";
+                    }
+                    description "BFD minimum receive interval in milliseconds. When hardware BFD offload is enabled (VOQ switch, SYSTEM_DEFAULTS hw_bfd_offload) only 100 or 1000 ms are supported; other platforms keep the full range.";
+                }
+
+                leaf transmit_interval {
+                    type uint32 {
+                        range "10..60000";
+                    }
+                    must ". = 100 or . = 1000 or
+                          not(/sdm:sonic-device_metadata/sdm:DEVICE_METADATA/sdm:localhost/sdm:switch_type = 'voq') or
+                          not(/sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='hw_bfd_offload']/sysdef:status = 'enabled') or
+                          /sysdef:sonic-system-defaults/sysdef:SYSTEM_DEFAULTS/sysdef:SYSTEM_DEFAULTS_LIST[sysdef:name='software_bfd']/sysdef:status = 'enabled'" {
+                        error-message "transmit_interval must be 100 or 1000 ms when hardware BFD offload is enabled";
+                    }
+                    description "BFD minimum transmit interval in milliseconds. When hardware BFD offload is enabled (VOQ switch, SYSTEM_DEFAULTS hw_bfd_offload) only 100 or 1000 ms are supported; other platforms keep the full range.";
+                }
+
+                leaf echo_interval {
+                    type uint32 {
+                        range "10..60000";
+                    }
+                    description "BFD echo interval in milliseconds";
+                }
+
+                leaf echo_mode {
+                    type boolean;
+                    description "Enable or disable BFD echo mode";
+                }
+
+                leaf passive_mode {
+                    type boolean;
+                    description "Enable or disable BFD passive mode";
+                }
+
+                leaf minimum_ttl {
+                    type uint8 {
+                        range "1..254";
+                    }
+                    description "Minimum expected TTL on received multihop packets";
+                }
+
+                leaf mode {
+                    type enumeration {
+                        enum bfd;
+                        enum sbfd_echo;
+                    }
+                    default bfd;
+                    description "Session mode: classic BFD or Seamless BFD Echo over SRv6";
+                }
+
+                leaf source_ipv6 {
+                    when "../mode = 'sbfd_echo'";
+                    type inet:ipv6-address;
+                    mandatory true;
+                    description "SRv6 outer source IPv6 address used by SBFD Echo sessions";
+                }
+            }
+        }
+
+        container BFD_PEER_SINGLE_HOP {
+            description
+                "BFD_PEER_SINGLE_HOP part of config_db.json: standalone
+                 single-hop BFD peers, rendered by frrcfgd as
+                 'peer <remote> [local-address <local>] vrf <vrf>
+                 interface <interface>'.";
+
+            list BFD_PEER_SINGLE_HOP_LIST {
+                key "remote-address interface vrf local-address";
+                /* FRR keys single-hop sessions on dest-addr/interface/vrf only
+                   (frr-bfdd.yang); local-address is a non-key modify. Two rows
+                   sharing the triple would collapse onto one FRR session, so
+                   the triple must be unique even though local-address widens
+                   the CONFIG_DB key. */
+                unique "remote-address interface vrf";
+                description
+                    "Single-hop BFD peer entries. frrcfgd emits the vrf and
+                     interface tokens unconditionally, so both must be real
+                     names; only local-address may be 'null'. At most one entry
+                     per remote-address/interface/vrf: local-address is not part
+                     of FRR's single-hop session key, so a second entry would
+                     silently reuse (and its deletion would tear down) the same
+                     FRR session.";
+
+                leaf remote-address {
+                    type inet:ip-address;
+                    description "IP address of the BFD peer.";
+                }
+
+                leaf interface {
+                    type union {
+                        type leafref {
+                            path "/port:sonic-port/port:PORT/port:PORT_LIST/port:name";
+                        }
+                        type leafref {
+                            path "/lag:sonic-portchannel/lag:PORTCHANNEL/lag:PORTCHANNEL_LIST/lag:name";
+                        }
+                        type leafref {
+                            path "/vlan:sonic-vlan/vlan:VLAN/vlan:VLAN_LIST/vlan:name";
+                        }
+                    }
+                    must "not(contains(., '-'))" {
+                        error-message "An internal port cannot carry a BFD session.";
+                    }
+                    description
+                        "Interface the single-hop session is bound to: a port,
+                         port channel or VLAN that exists. 'null' is not
+                         accepted (frrcfgd always emits 'interface <name>').";
+                }
+
+                leaf vrf {
+                    type bfd-vrf-name;
+                    description
+                        "VRF of the session; 'default' for the default VRF.";
+                }
+
+                leaf local-address {
+                    type union {
+                        type inet:ip-address;
+                        type string {
+                            pattern "null";
+                        }
+                    }
+                    must ". = 'null' or contains(., ':') = contains(../remote-address, ':')" {
+                        error-message "local-address must be of the same address family as remote-address";
+                    }
+                    description
+                        "Source address of the session, or the literal 'null'
+                         to let FRR pick one.";
+                }
+
+                uses bfd-peer-session-fields;
+
+                leaf desired-minimum-echo-receive {
+                    type uint32 {
+                        range "10..60000";
+                    }
+                    description
+                        "BFD echo receive interval in milliseconds (FRR
+                         echo-interval, default 50).";
+                }
+
+                leaf echo-active {
+                    type boolean;
+                    description "Enable BFD echo mode for this peer.";
+                }
+            }
+        }
+
+        container BFD_PEER_MULTI_HOP {
+            description
+                "BFD_PEER_MULTI_HOP part of config_db.json: standalone
+                 multihop BFD peers, rendered by frrcfgd as
+                 'peer <remote> vrf <vrf> multihop local-address <local>'.";
+
+            list BFD_PEER_MULTI_HOP_LIST {
+                key "remote-address interface vrf local-address";
+                description
+                    "Multihop BFD peer entries. FRR requires a local address
+                     and prohibits an interface for multihop sessions: the
+                     interface key slot is fixed to the literal 'null'.";
+
+                leaf remote-address {
+                    type inet:ip-address;
+                    description "IP address of the BFD peer.";
+                }
+
+                leaf interface {
+                    type string {
+                        pattern "null";
+                    }
+                    description
+                        "Key placeholder, always the literal 'null': FRR
+                         rejects 'interface' together with 'multihop'.";
+                }
+
+                leaf vrf {
+                    type bfd-vrf-name;
+                    description
+                        "VRF of the session; 'default' for the default VRF.";
+                }
+
+                leaf local-address {
+                    type inet:ip-address;
+                    must "contains(., ':') = contains(../remote-address, ':')" {
+                        error-message "local-address must be of the same address family as remote-address";
+                    }
+                    description
+                        "Source address of the session; mandatory for multihop
+                         (FRR rejects multihop sessions without one, and
+                         frrcfgd always emits 'local-address <addr>').";
+                }
+
+                uses bfd-peer-session-fields;
+            }
+        }
+    }
+}

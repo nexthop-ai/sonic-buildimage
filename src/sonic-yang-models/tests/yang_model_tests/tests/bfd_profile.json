@@ -1,0 +1,142 @@
+{
+    "BFD_PROFILE_VALID": {
+        "desc": "Configure a valid BFD_PROFILE entry."
+    },
+    "BFD_PROFILE_SBFD_ECHO_VALID": {
+        "desc": "A BFD_PROFILE in sbfd_echo mode with an SRv6 source_ipv6 is accepted."
+    },
+    "BFD_PROFILE_MODE_INVALID": {
+        "desc": "An unknown mode enum value must be rejected.",
+        "eStrKey": "InvalidValue"
+    },
+    "BFD_PROFILE_SOURCE_IPV6_INVALID": {
+        "desc": "A malformed source_ipv6 must be rejected by the inet:ipv6-address type.",
+        "eStrKey": "Pattern"
+    },
+    "BFD_PROFILE_SOURCE_IPV6_WITHOUT_SBFD": {
+        "desc": "source_ipv6 is out of scope (when) unless mode is sbfd_echo.",
+        "eStrKey": "When"
+    },
+    "BFD_PROFILE_SBFD_ECHO_WITHOUT_SOURCE": {
+        "desc": "mode sbfd_echo requires source_ipv6 (mandatory true).",
+        "eStrKey": "Mandatory"
+    },
+    "BFD_PROFILE_NAME_WITH_QUOTE": {
+        "desc": "Profile name containing a single quote must be rejected by the name pattern; otherwise it would mis-parse in vtysh command construction.",
+        "eStrKey": "Pattern"
+    },
+    "BFD_PROFILE_NAME_WITH_SPACE": {
+        "desc": "Profile name containing whitespace must be rejected by the name pattern; FRR does not accept whitespace in profile names.",
+        "eStrKey": "Pattern"
+    },
+    "BFD_PROFILE_ASYNC_TIMERS_1000_VALID": {
+        "desc": "An async (mode bfd) profile with 1000ms receive/transmit intervals is accepted."
+    },
+    "BFD_PROFILE_ASYNC_RECEIVE_INTERVAL_NOT_SUPPORTED": {
+        "desc": "An async (mode bfd) profile receive_interval other than 100 or 1000 ms must be rejected; hardware BFD offload only supports these timer values.",
+        "eStr": [
+            "must be 100 or 1000 ms when hardware BFD offload"
+        ]
+    },
+    "BFD_PROFILE_ASYNC_TRANSMIT_INTERVAL_NOT_SUPPORTED": {
+        "desc": "An async profile (mode defaulted to bfd) transmit_interval other than 100 or 1000 ms must be rejected; the must guard sees the mode default.",
+        "eStr": [
+            "must be 100 or 1000 ms when hardware BFD offload"
+        ]
+    },
+    "BFD_PROFILE_SBFD_ECHO_TIMER_NOT_SUPPORTED": {
+        "desc": "An sbfd_echo profile timer other than 100 or 1000 ms must also be rejected; the 100/1000 restriction applies to all modes (hardware BFD offload).",
+        "eStr": [
+            "must be 100 or 1000 ms when hardware BFD offload"
+        ]
+    },
+    "BFD_PROFILE_RECEIVE_INTERVAL_TOO_LOW": {
+        "desc": "receive_interval below 10ms must be rejected (FRR floor is 10ms per frr-bfdd.yang range \"10000..max\" microseconds).",
+        "eStrKey": "Range"
+    },
+    "BFD_PROFILE_TRANSMIT_INTERVAL_TOO_HIGH": {
+        "desc": "transmit_interval above 60000ms must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BFD_PROFILE_DETECT_MULTIPLIER_TOO_LOW": {
+        "desc": "detect_multiplier below 2 must be rejected (BFD requires at least 2 to tolerate a single packet loss).",
+        "eStrKey": "Range"
+    },
+    "BFD_PROFILE_MINIMUM_TTL_TOO_HIGH": {
+        "desc": "minimum_ttl above 254 must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BFD_PROFILE_BIND_VALID": {
+        "desc": "BGP_NEIGHBOR.bfd_profile referencing an existing BFD_PROFILE entry is accepted by the leafref."
+    },
+    "BFD_PROFILE_BIND_GHOST_REJECTED": {
+        "desc": "BGP_NEIGHBOR.bfd_profile referencing a non-existent BFD_PROFILE entry must be rejected by the leafref. This is the symmetric protection for delete-while-bound: any final state in which a peer references a missing profile is invalid, regardless of how it was reached.",
+        "eStrKey": "LeafRef"
+    },
+    "BFD_PROFILE_BIND_VALID_PEER_GROUP": {
+        "desc": "BGP_PEER_GROUP.bfd_profile referencing an existing BFD_PROFILE entry is accepted by the leafref. The bfd_profile leaf lives in the shared sonic-bgp-cmn grouping; both BGP_NEIGHBOR_LIST and BGP_PEER_GROUP_LIST inherit it, so the leafref must work on either."
+    },
+    "BFD_PROFILE_BIND_GHOST_REJECTED_PEER_GROUP": {
+        "desc": "BGP_PEER_GROUP.bfd_profile referencing a non-existent BFD_PROFILE entry must be rejected by the leafref \u2014 the same symmetric protection as the BGP_NEIGHBOR case.",
+        "eStrKey": "LeafRef"
+    },
+    "BFD_PROFILE_BIND_VALID_TEMPLATE": {
+        "desc": "BGP_NEIGHBOR_TEMPLATE_LIST.bfd_profile referencing an existing BFD_PROFILE entry is accepted by the leafref. This is the bgpcfgd-mode (default) BGP neighbor table written by GCU and nhcli; the bgpd/templates/*/instance.conf.j2 templates already render bfd / bfd profile <name> from this table, so the YANG must surface the same leaves."
+    },
+    "BFD_PROFILE_BIND_GHOST_REJECTED_TEMPLATE": {
+        "desc": "BGP_NEIGHBOR_TEMPLATE_LIST.bfd_profile referencing a non-existent BFD_PROFILE entry must be rejected by the leafref \u2014 same symmetric protection as the BGP_NEIGHBOR / BGP_PEER_GROUP cases.",
+        "eStrKey": "LeafRef"
+    },
+    "BFD_PROFILE_NO_HW_OFFLOAD_TIMERS_UNRESTRICTED": {
+        "desc": "Without hardware BFD offload (NPU switch) the 100/1000 ms restriction does not apply; 300 ms is accepted (software BFD keeps the full range)."
+    },
+    "BFD_PROFILE_SOFTWARE_BFD_OVERRIDE_UNRESTRICTED": {
+        "desc": "On a VOQ switch with hw_bfd_offload enabled but software_bfd forced, sessions run in software and timers are unrestricted."
+    },
+
+    "BFD_PEER_SINGLE_HOP_VALID": {
+        "desc": "Load valid standalone single-hop BFD peers: one with 'null' local-address and full session fields, one on a PortChannel with an explicit local-address and echo fields"
+    },
+
+    "BFD_PEER_SINGLE_HOP_NULL_INTERFACE_REJECTED": {
+        "desc": "Single-hop peer with 'null' interface must be rejected (frrcfgd always emits 'interface <name>')",
+        "eStrKey": "LeafRef"
+    },
+
+    "BFD_PEER_SINGLE_HOP_DUPLICATE_TRIPLE_REJECTED": {
+        "desc": "Two single-hop peers sharing remote-address/interface/vrf and differing only in local-address must be rejected: FRR keys single-hop sessions on the triple, so both rows would drive one session",
+        "eStr": ["Unique data leaf", "not satisfied"]
+    },
+
+    "BFD_PEER_MULTI_HOP_VALID": {
+        "desc": "Load valid standalone multihop BFD peers: same remote/local across several VRFs plus the default VRF (NOS-14139 repro), and an IPv6 peer"
+    },
+
+    "BFD_PEER_MULTI_HOP_INTERFACE_REJECTED": {
+        "desc": "Multihop peer with a real interface must be rejected (FRR prohibits interface with multihop)",
+        "eStrKey": "Pattern"
+    },
+
+    "BFD_PEER_MULTI_HOP_FAMILY_MISMATCH_REJECTED": {
+        "desc": "Multihop peer with IPv4 remote-address and IPv6 local-address must be rejected",
+        "eStr": ["same address family"]
+    },
+
+    "BFD_PEER_VRF_WITHOUT_PREFIX_REJECTED": {
+        "desc": "Peer vrf without the Vrf prefix (and not default/mgmt) must be rejected — only coverage of the new bfd-vrf-name typedef",
+        "eStrKey": "Pattern"
+    },
+
+    "BFD_PEER_HW_OFFLOAD_TIMER_NOT_SUPPORTED": {
+        "desc": "With hardware BFD offload (VOQ switch) a 300 ms peer timer must be rejected",
+        "eStr": ["must be 100 or 1000 ms when hardware BFD offload"]
+    },
+
+    "BFD_PEER_NO_HW_OFFLOAD_TIMERS_UNRESTRICTED": {
+        "desc": "Without hardware BFD offload (NPU switch) the 100/1000 ms restriction does not apply; 300 ms is accepted"
+    },
+    "BFD_PEER_SINGLE_HOP_PORT_MISSING_REJECTED": {"desc": "Reject a single-hop peer on a port missing from PORT", "eStrKey": "LeafRef"},
+    "BFD_PEER_SINGLE_HOP_INTERNAL_PORT_REJECTED": {"desc": "Reject a single-hop peer on an internal port, even one in PORT", "eStr": ["An internal port cannot carry a BFD session"]},
+    "BFD_PEER_SINGLE_HOP_VLAN": {"desc": "Configure a single-hop peer on an existing VLAN"},
+    "BFD_PEER_SINGLE_HOP_VLAN_MISSING_REJECTED": {"desc": "Reject a single-hop peer on a VLAN missing from VLAN", "eStrKey": "LeafRef"}
+}

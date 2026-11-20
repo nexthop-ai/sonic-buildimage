@@ -20,5 +20,162 @@
                 }
             }
         }
+    },
+    "BMP_COLLECTOR_SOURCE_INTERFACE_LOOPBACK": {
+        "sonic-bmp:sonic-bmp": {
+            "sonic-bmp:BMP_TARGET": {
+                "BMP_TARGET_LIST": [
+                    {
+                        "name": "collector1"
+                    }
+                ]
+            },
+            "sonic-bmp:BMP_TARGET_COLLECTOR": {
+                "BMP_TARGET_COLLECTOR_LIST": [
+                    {
+                        "target_name": "collector1",
+                        "ip": "192.0.2.10",
+                        "port": 5000,
+                        "source-interface": "Loopback0"
+                    }
+                ]
+            }
+        },
+        "sonic-loopback-interface:sonic-loopback-interface": {
+            "sonic-loopback-interface:LOOPBACK_INTERFACE": {
+                "LOOPBACK_INTERFACE_LIST": [
+                    {
+                        "name": "Loopback0"
+                    }
+                ]
+            }
+        }
+    },
+    "BMP_COLLECTOR_SOURCE_INTERFACE_LOOPBACK_MISSING": {
+        "sonic-bmp:sonic-bmp": {
+            "sonic-bmp:BMP_TARGET": {
+                "BMP_TARGET_LIST": [
+                    {
+                        "name": "collector1"
+                    }
+                ]
+            },
+            "sonic-bmp:BMP_TARGET_COLLECTOR": {
+                "BMP_TARGET_COLLECTOR_LIST": [
+                    {
+                        "target_name": "collector1",
+                        "ip": "192.0.2.10",
+                        "port": 5000,
+                        "source-interface": "Loopback0"
+                    }
+                ]
+            }
+        }
+    },
+    "BMP_COLLECTOR_SOURCE_INTERFACE_PORT": {
+        "sonic-bmp:sonic-bmp": {
+            "sonic-bmp:BMP_TARGET": {
+                "BMP_TARGET_LIST": [
+                    {
+                        "name": "collector1"
+                    }
+                ]
+            },
+            "sonic-bmp:BMP_TARGET_COLLECTOR": {
+                "BMP_TARGET_COLLECTOR_LIST": [
+                    {
+                        "target_name": "collector1",
+                        "ip": "192.0.2.10",
+                        "port": 5000,
+                        "source-interface": "Ethernet0"
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "1",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "BMP_COLLECTOR_SOURCE_INTERFACE_PORT_MISSING": {
+        "sonic-bmp:sonic-bmp": {
+            "sonic-bmp:BMP_TARGET": {
+                "BMP_TARGET_LIST": [
+                    {
+                        "name": "collector1"
+                    }
+                ]
+            },
+            "sonic-bmp:BMP_TARGET_COLLECTOR": {
+                "BMP_TARGET_COLLECTOR_LIST": [
+                    {
+                        "target_name": "collector1",
+                        "ip": "192.0.2.10",
+                        "port": 5000,
+                        "source-interface": "Ethernet0"
+                    }
+                ]
+            }
+        }
+    },
+    "BMP_COLLECTOR_SOURCE_INTERFACE_INTERNAL_PORT": {
+        "sonic-bmp:sonic-bmp": {
+            "sonic-bmp:BMP_TARGET": {
+                "BMP_TARGET_LIST": [
+                    {
+                        "name": "collector1"
+                    }
+                ]
+            },
+            "sonic-bmp:BMP_TARGET_COLLECTOR": {
+                "BMP_TARGET_COLLECTOR_LIST": [
+                    {
+                        "target_name": "collector1",
+                        "ip": "192.0.2.10",
+                        "port": 5000,
+                        "source-interface": "Ethernet-BP0"
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet-BP0",
+                        "lanes": "200",
+                        "speed": 25000
+                    }
+                ]
+            }
+        }
+    },
+    "BMP_COLLECTOR_SOURCE_INTERFACE_MGMT_PORT_WITHOUT_ROW": {
+        "sonic-bmp:sonic-bmp": {
+            "sonic-bmp:BMP_TARGET": {
+                "BMP_TARGET_LIST": [
+                    {
+                        "name": "collector1"
+                    }
+                ]
+            },
+            "sonic-bmp:BMP_TARGET_COLLECTOR": {
+                "BMP_TARGET_COLLECTOR_LIST": [
+                    {
+                        "target_name": "collector1",
+                        "ip": "192.0.2.10",
+                        "port": 5000,
+                        "source-interface": "eth0"
+                    }
+                ]
+            }
+        }
     }
 }

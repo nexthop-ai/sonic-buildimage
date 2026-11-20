@@ -1,4 +1,263 @@
 {
+<<<<<<< HEAD
+=======
+    "SRV6_STATIC_ROUTE_IPV4_SINGLE_SID": {
+        "sonic-static-route:sonic-static-route": {
+            "sonic-static-route:STATIC_ROUTE": {
+                "STATIC_ROUTE_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24"
+                    }
+                ]
+            },
+            "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+                "STATIC_ROUTE_NEXTHOP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24",
+                        "gateway": "none",
+                        "ifname": "Ethernet0",
+                        "sidlist": [
+                            "FCBB:BBBB:2:3:FEDD::"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "SRV6_STATIC_ROUTE_IPV4_MULTIPLE_SIDS": {
+        "sonic-static-route:sonic-static-route": {
+            "sonic-static-route:STATIC_ROUTE": {
+                "STATIC_ROUTE_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24"
+                    }
+                ]
+            },
+            "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+                "STATIC_ROUTE_NEXTHOP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24",
+                        "gateway": "none",
+                        "ifname": "Ethernet0",
+                        "sidlist": [
+                            "FCBB:BBBB:2:3:4:5:6:7",
+                            "FCBB:BBBB:8:9:FEDD::"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "SRV6_STATIC_ROUTE_IPV4_ECMP": {
+        "sonic-static-route:sonic-static-route": {
+            "sonic-static-route:STATIC_ROUTE": {
+                "STATIC_ROUTE_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24"
+                    }
+                ]
+            },
+            "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+                "STATIC_ROUTE_NEXTHOP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24",
+                        "gateway": "none",
+                        "ifname": "Ethernet0",
+                        "sidlist": [
+                            "FCBB:BBBB:2:3:4:5:6:7",
+                            "FCBB:BBBB:8:9:FEDD::"
+                        ]
+                    },
+                    {
+                        "vrf_name": "default",
+                        "prefix": "10.1.0.0/24",
+                        "gateway": "none",
+                        "ifname": "Ethernet4",
+                        "sidlist": [
+                            "FCBB:BBBB:3:9:FEDD::"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    },
+                    {
+                        "name": "Ethernet4",
+                        "lanes": "4",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "SRV6_STATIC_ROUTE_IPV6_SINGLE_SID": {
+        "sonic-static-route:sonic-static-route": {
+            "sonic-static-route:STATIC_ROUTE": {
+                "STATIC_ROUTE_LIST": [
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64"
+                    }
+                ]
+            },
+            "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+                "STATIC_ROUTE_NEXTHOP_LIST": [
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64",
+                        "gateway": "none",
+                        "ifname": "Ethernet0",
+                        "sidlist": [
+                            "FCBB:BBBB:2:3:FEDD::"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "SRV6_STATIC_ROUTE_IPV6_MULTIPLE_SIDS": {
+        "sonic-static-route:sonic-static-route": {
+            "sonic-static-route:STATIC_ROUTE": {
+                "STATIC_ROUTE_LIST": [
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64"
+                    }
+                ]
+            },
+            "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+                "STATIC_ROUTE_NEXTHOP_LIST": [
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64",
+                        "gateway": "none",
+                        "ifname": "Ethernet0",
+                        "sidlist": [
+                            "FCBB:BBBB:2:3:4:5:6:7",
+                            "FCBB:BBBB:8:9:FEDD::"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "SRV6_STATIC_ROUTE_IPV6_ECMP": {
+        "sonic-static-route:sonic-static-route": {
+            "sonic-static-route:STATIC_ROUTE": {
+                "STATIC_ROUTE_LIST": [
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64"
+                    }
+                ]
+            },
+            "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+                "STATIC_ROUTE_NEXTHOP_LIST": [
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64",
+                        "gateway": "none",
+                        "ifname": "Ethernet0",
+                        "sidlist": [
+                            "FCBB:BBBB:2:3:4:5:6:7",
+                            "FCBB:BBBB:8:9:FEDD::"
+                        ]
+                    },
+                    {
+                        "vrf_name": "VrfA",
+                        "prefix": "2001:db8:10::/64",
+                        "gateway": "none",
+                        "ifname": "Ethernet4",
+                        "sidlist": [
+                            "FCBB:BBBB:3:9:FEDD::"
+                        ]
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    },
+                    {
+                        "name": "Ethernet4",
+                        "lanes": "4",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
     "SRV6_VALID": {
         "sonic-srv6:sonic-srv6": {
             "sonic-srv6:SRV6_MY_LOCATORS": {

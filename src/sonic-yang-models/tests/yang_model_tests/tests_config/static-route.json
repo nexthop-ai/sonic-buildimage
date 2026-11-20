@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "STATIC_ROUTE_TEST": {
         "sonic-interface:sonic-interface": {
             "sonic-interface:INTERFACE": {
@@ -93,6 +94,1446 @@
                 }]
             }
         }
+=======
+  "STATIC_ROUTE_TEST": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.100.1/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.100.1/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Ethernet8"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "8",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_GATEWAY_ONLY": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.101.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.101.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_ONLY": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.102.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.102.0/24",
+            "gateway": "none",
+            "ifname": "Ethernet8"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "8",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_BLACKHOLE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.103.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.103.0/24",
+            "gateway": "none",
+            "ifname": "none",
+            "blackhole": "true"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BLACKHOLE_WITH_GATEWAY": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.104.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.104.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "blackhole": "true"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_ADVERTISE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.105.0/24",
+            "advertise": "true"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.105.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_VRF": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "Vrf-test",
+            "prefix": "100.100.107.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "Vrf-test",
+            "prefix": "100.100.107.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_KEY_VRF_MGMT": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "mgmt",
+            "prefix": "100.100.108.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "mgmt",
+            "prefix": "100.100.108.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_NEXTHOP_VRF_MGMT": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.109.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.109.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "nexthop-vrf": "mgmt"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_VRF_LEAK": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "Vrf-A",
+            "prefix": "100.100.110.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "Vrf-A",
+            "prefix": "100.100.110.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "nexthop-vrf": "Vrf-B"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_ECMP": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "15.15.15.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "15.15.15.0/24",
+            "gateway": "1.0.0.2",
+            "ifname": "none"
+          },
+          {
+            "vrf_name": "default",
+            "prefix": "15.15.15.0/24",
+            "gateway": "2.0.0.2",
+            "ifname": "none"
+          },
+          {
+            "vrf_name": "default",
+            "prefix": "15.15.15.0/24",
+            "gateway": "3.0.0.2",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_ECMP_WITH_DISTANCE_COLOR": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "10.2.0.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "10.2.0.0/24",
+            "gateway": "192.168.1.1",
+            "ifname": "none",
+            "distance": "10",
+            "color": [
+              "00:100"
+            ]
+          },
+          {
+            "vrf_name": "default",
+            "prefix": "10.2.0.0/24",
+            "gateway": "192.168.1.2",
+            "ifname": "none",
+            "distance": "20",
+            "color": [
+              "00:200"
+            ]
+          },
+          {
+            "vrf_name": "default",
+            "prefix": "10.2.0.0/24",
+            "gateway": "192.168.1.3",
+            "ifname": "none",
+            "distance": "30"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_SAME_GATEWAY_DIFFERENT_IFNAME": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::3/128"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::3/128",
+            "gateway": "fe80::1",
+            "ifname": "Ethernet0"
+          },
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::3/128",
+            "gateway": "fe80::1",
+            "ifname": "Ethernet4"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet0",
+            "lanes": "0",
+            "speed": 25000,
+            "admin_status": "up"
+          },
+          {
+            "name": "Ethernet4",
+            "lanes": "4",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.100.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.100.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_WITH_DISTANCE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.111.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.111.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "distance": "5"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_WITH_BLACKHOLE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.112.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.112.0/24",
+            "gateway": "none",
+            "ifname": "none",
+            "blackhole": "true"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_WITH_NEXTHOP_VRF": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.113.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.113.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "nexthop-vrf": "default"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_WITH_SIDLIST": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "fc04::1/128"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "fc04::1/128",
+            "gateway": "2001:db8:1::1",
+            "ifname": "sr0",
+            "sidlist": [
+              "2016:100::2",
+              "2016:100::8:2"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_WITH_TAG": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.114.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.114.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "tag": "42"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_TAG": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.115.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.115.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "tag": "42"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_COLOR": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.116.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.116.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "00:7"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_SIDLIST_ECMP": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::2/128"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::2/128",
+            "gateway": "2001:db8:1::1",
+            "ifname": "sr0",
+            "sidlist": [
+              "2016:100::2",
+              "2016:100::8:2"
+            ]
+          },
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::2/128",
+            "gateway": "2001:db8:2::1",
+            "ifname": "sr0",
+            "sidlist": [
+              "2017:100::2",
+              "2017:100::9:2"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_SR": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::4/128"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::4/128",
+            "gateway": "2001:db8:1::1",
+            "ifname": "sr0"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_NULL": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.117.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.117.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "null"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_IFNAME_SHORT_SUBINTERFACE_VALID": {
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "45,46,47,48",
+            "speed": 100000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    },
+    "sonic-vlan-sub-interface:sonic-vlan-sub-interface": {
+      "sonic-vlan-sub-interface:VLAN_SUB_INTERFACE": {
+        "VLAN_SUB_INTERFACE_LIST": [
+          {
+            "name": "Eth8.100",
+            "vlan": 100
+          }
+        ]
+      }
+    },
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.119.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.119.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Eth8.100"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_MALFORMED": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.120.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.120.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Etharnet8"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_VLAN_OUT_OF_RANGE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.121.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.121.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Vlan4096"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BOTH_KEY_SHAPES_ONE_PREFIX": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.118.0/24"
+          }
+        ],
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.118.0/24"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BOTH_KEY_SHAPES_DIFFERENT_PREFIXES": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.122.0/24"
+          }
+        ],
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.123.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.122.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ],
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.123.0/24",
+            "gateway": "10.10.10.2",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_NEXTHOP_LEAFREF_ORPHAN": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.124.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_NEXTHOP_LEAFREF_ORPHAN": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.125.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_NEXTHOP_VRF_PREFIX_MISMATCH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "Vrf-A",
+            "prefix": "100.100.159.0/24"
+          },
+          {
+            "vrf_name": "Vrf-B",
+            "prefix": "100.100.160.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "Vrf-A",
+            "prefix": "100.100.160.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_NEXTHOP_VRF_PREFIX_MATCH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "Vrf-A",
+            "prefix": "100.100.161.0/24"
+          },
+          {
+            "vrf_name": "Vrf-B",
+            "prefix": "100.100.162.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "Vrf-A",
+            "prefix": "100.100.161.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_NO_FORWARDING_PATH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.126.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.126.0/24",
+            "gateway": "none",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_NO_FORWARDING_PATH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.127.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.127.0/24",
+            "gateway": "none",
+            "ifname": "none"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_SIDLIST_WITH_BLACKHOLE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::5/128"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::5/128",
+            "gateway": "none",
+            "ifname": "none",
+            "blackhole": "true",
+            "sidlist": [
+              "2016:100::2"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_SIDLIST_WITH_COLOR": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::6/128"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "fc04::6/128",
+            "gateway": "2016:100::1",
+            "ifname": "none",
+            "sidlist": [
+              "2016:100::2"
+            ],
+            "color": [
+              "00:100"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BLACKHOLE_INVALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.128.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.128.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "blackhole": "notabool"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_DISTANCE_INVALID_ZERO": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.129.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.129.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "distance": "0"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_DISTANCE_INVALID_TOO_HIGH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.130.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.130.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "distance": "256"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_DISTANCE_MIN_VALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.131.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.131.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "distance": "1"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_DISTANCE_MAX_VALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.132.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.132.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "distance": "255"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_DISTANCE_INVALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.133.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.133.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "distance": "0"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_TAG_INVALID_TOO_HIGH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.134.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.134.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "tag": "4294967296"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_TAG_MIN_VALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.135.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.135.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "tag": "0"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_TAG_MAX_VALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.136.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.136.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "tag": "4294967295"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEMPLATE_TEST_TAG_INVALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.137.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.137.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "tag": "4294967296"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_COLOR_INVALID_TOO_HIGH": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.138.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.138.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "00:4294967296"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_COLOR_MIN_VALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.139.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.139.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "00:1"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_COLOR_MAX_VALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.140.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.140.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "00:4294967295"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_COLOR_ZERO_INVALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.156.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.156.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "00:0"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_COLOR_MISSING_PREFIX": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.157.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.157.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "100"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_COLOR_TOO_MANY": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.158.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.158.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "color": [
+              "00:1",
+              "00:2"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_NEXTHOP_VRF_INVALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.153.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.153.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "nexthop-vrf": "NotAVrf!"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_WITH_ADVERTISE_INVALID": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.154.0/24",
+            "advertise": "notabool"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BFD_ENABLED": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.110.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.110.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "bfd": "true"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BFD_WITH_PROFILE": {
+    "sonic-bfd-profile:sonic-bfd-profile": {
+      "sonic-bfd-profile:BFD_PROFILE": {
+        "BFD_PROFILE_LIST": [
+          {
+            "name": "fast-failover",
+            "detect_multiplier": "3",
+            "receive_interval": "100",
+            "transmit_interval": "100"
+          }
+        ]
+      }
+    },
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.111.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.111.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Ethernet8",
+            "bfd": "true",
+            "bfd-profile": "fast-failover"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "8",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BFD_PROFILE_MISSING": {
+    "sonic-bfd-profile:sonic-bfd-profile": {
+      "sonic-bfd-profile:BFD_PROFILE": {
+        "BFD_PROFILE_LIST": [
+          {
+            "name": "fast-failover",
+            "detect_multiplier": "3",
+            "receive_interval": "100",
+            "transmit_interval": "100"
+          }
+        ]
+      }
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
     },
     "STATIC_ROUTE_TEST_WITH_BLACKHOLE": {
         "sonic-interface:sonic-interface": {
@@ -189,6 +1630,7 @@
             }
         }
     },
+<<<<<<< HEAD
 
     "STATIC_ROUTE_TEST_WITH_VRF": {
          "sonic-vrf:sonic-vrf": {
@@ -247,6 +1689,104 @@
                 }]
             }
         }
+=======
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.119.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.119.0/24",
+            "gateway": "192.168.50.1",
+            "ifname": "none",
+            "bfd": "true",
+            "bfd-multihop": "true",
+            "bfd-source": "10.10.10.254",
+            "bfd-profile": "fast-failover"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BFD_ON_INTERFACE_ONLY": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.120.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.120.0/24",
+            "gateway": "none",
+            "ifname": "Ethernet8",
+            "bfd": "true"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "8",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BFD_ON_BLACKHOLE": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.121.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.121.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "none",
+            "blackhole": "true",
+            "bfd": "true"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_BFD_IPV6_WITH_SOURCE": {
+    "sonic-bfd-profile:sonic-bfd-profile": {
+      "sonic-bfd-profile:BFD_PROFILE": {
+        "BFD_PROFILE_LIST": [
+          {
+            "name": "fast-failover",
+            "detect_multiplier": "3",
+            "receive_interval": "100",
+            "transmit_interval": "100"
+          }
+        ]
+      }
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
     },
     "STATIC_ROUTE_TEST_WITH_KEY_VRF_MGMT": {
         "sonic-interface:sonic-interface": {
@@ -1166,7 +2706,295 @@
             }
         }
     }
+<<<<<<< HEAD
 
+=======
+  },
+  "STATIC_ROUTE_TEST_BFD_TEMPLATE_LIST_ON_INTERFACE_ONLY": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_TEMPLATE_LIST": [
+          {
+            "prefix": "100.100.123.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_TEMPLATE_NEXTHOP_LIST": [
+          {
+            "prefix": "100.100.123.0/24",
+            "gateway": "none",
+            "ifname": "Ethernet8",
+            "bfd": "true"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "8",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_PORTCHANNEL": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.120.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.120.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "PortChannel10"
+          }
+        ]
+      }
+    },
+    "sonic-portchannel:sonic-portchannel": {
+      "sonic-portchannel:PORTCHANNEL": {
+        "PORTCHANNEL_LIST": [
+          {
+            "name": "PortChannel10",
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_PORT_MISSING": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.121.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.121.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Ethernet12"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_INTERNAL_PORT": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.122.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.122.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Ethernet-BP0"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet-BP0",
+            "lanes": "200",
+            "speed": 25000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_VLAN": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.123.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.123.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Vlan100"
+          }
+        ]
+      }
+    },
+    "sonic-vlan:sonic-vlan": {
+      "sonic-vlan:VLAN": {
+        "VLAN_LIST": [
+          {
+            "name": "Vlan100",
+            "vlanid": 100
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_VLAN_MISSING": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.124.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.124.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Vlan100"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_SUBINTERFACE_MISSING": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.125.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.125.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Ethernet8.100"
+          }
+        ]
+      }
+    },
+    "sonic-port:sonic-port": {
+      "sonic-port:PORT": {
+        "PORT_LIST": [
+          {
+            "name": "Ethernet8",
+            "lanes": "45,46,47,48",
+            "speed": 100000,
+            "admin_status": "up"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_LOOPBACK": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.126.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.126.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Loopback0"
+          }
+        ]
+      }
+    },
+    "sonic-loopback-interface:sonic-loopback-interface": {
+      "sonic-loopback-interface:LOOPBACK_INTERFACE": {
+        "LOOPBACK_INTERFACE_LIST": [
+          {
+            "name": "Loopback0"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_LOOPBACK_MISSING": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.127.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.127.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "Loopback0"
+          }
+        ]
+      }
+    }
+  },
+  "STATIC_ROUTE_TEST_IFNAME_MGMT_PORT_WITHOUT_ROW": {
+    "sonic-static-route:sonic-static-route": {
+      "sonic-static-route:STATIC_ROUTE": {
+        "STATIC_ROUTE_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.129.0/24"
+          }
+        ]
+      },
+      "sonic-static-route:STATIC_ROUTE_NEXTHOP": {
+        "STATIC_ROUTE_NEXTHOP_LIST": [
+          {
+            "vrf_name": "default",
+            "prefix": "100.100.129.0/24",
+            "gateway": "10.10.10.1",
+            "ifname": "eth0"
+          }
+        ]
+      }
+    }
+  }
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
 }
 
 

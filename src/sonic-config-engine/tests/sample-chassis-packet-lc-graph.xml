@@ -154,7 +154,7 @@
 	  <ElementType>IPNextHop</ElementType>
 	  <Name i:nil="true"/>
 	  <Address>8.0.0.1</Address>
-          <AttachTo>PortChannel40,192.168.1.2;PortChannel50,192.168.2.2</AttachTo>
+          <AttachTo>PortChannel32,192.168.1.2;PortChannel33,192.168.2.2</AttachTo>
           <Type>StaticRoute</Type>
         </IPNextHop>
       </IPNextHops>

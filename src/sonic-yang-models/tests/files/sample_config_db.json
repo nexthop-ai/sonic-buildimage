@@ -3362,6 +3362,31 @@
                 "serial-no" : "1234-5678-91A"
             }
         },
+<<<<<<< HEAD
+=======
+        "MONITOR_LINK_GROUP": {
+            "critical_links": {
+                "description": "Critical uplink and downlink monitoring group",
+                "uplinks": ["Ethernet0", "Ethernet4", "Ethernet8", "PortChannel0003"],
+                "downlinks": ["Ethernet12", "Ethernet16", "PortChannel0004"],
+                "min-uplinks": "3",
+                "startup-delay": "5"
+            },
+            "backup_links": {
+                "description": "Backup link monitoring group",
+                "uplinks": ["Ethernet20", "Ethernet24"],
+                "downlinks": ["Ethernet28", "Ethernet32"],
+                "min-uplinks": "2",
+                "startup-delay": "10"
+            },
+            "edge_links": {
+                "description": "Edge link monitoring group with minimal configuration",
+                "uplinks": ["Ethernet36"],
+                "downlinks": ["Ethernet112"],
+                "min-uplinks": "1"
+            }
+        },
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
         "SWITCH_FAST_LINKUP": {
             "GLOBAL": {
                 "polling_time": "10",

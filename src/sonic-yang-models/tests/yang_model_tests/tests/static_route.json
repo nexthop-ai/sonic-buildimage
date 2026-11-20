@@ -60,8 +60,80 @@
         "desc": "Configure with invalid vrf for ECMP",
         "eStrKey": "Pattern"
     },
+<<<<<<< HEAD
     "STATIC_ROUTE_TEST_NEXTHOP_EMPTY_VRF": {
         "desc": "Configure with null value for VRF"
     }
 
+=======
+    "STATIC_ROUTE_TEST_BFD_SOURCE_WITHOUT_BFD": {
+        "desc": "bfd-source on a nexthop whose bfd is explicitly false is rejected",
+        "eStr": [
+            "bfd-source applies only when bfd is enabled"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_SOURCE_AF_MISMATCH": {
+        "desc": "An IPv6 bfd-source on an IPv4 gateway is rejected: FRR keys the session on one address family",
+        "eStr": [
+            "same address family as gateway"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_SOURCE_SINGLE_HOP": {
+        "desc": "A single-hop session may name its local address"
+    },
+    "STATIC_ROUTE_TEST_BFD_MULTIHOP_WITHOUT_SOURCE": {
+        "desc": "bfd-multihop without bfd-source is rejected: a multihop session needs an explicit local address",
+        "eStr": [
+            "bfd-multihop requires bfd-source"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_MULTIHOP_WITHOUT_BFD": {
+        "desc": "bfd-multihop on a nexthop whose bfd is not enabled is rejected",
+        "eStr": [
+            "applies only when bfd is enabled"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_MULTIHOP_WITH_SOURCE": {
+        "desc": "A multihop session with its local address and a profile, for a recursive gateway"
+    },
+    "STATIC_ROUTE_TEST_BFD_ON_INTERFACE_ONLY": {
+        "desc": "bfd on an interface-only nexthop (gateway 'none') is rejected: there is no address to monitor",
+        "eStr": [
+            "bfd requires a gateway address"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_ON_BLACKHOLE": {
+        "desc": "bfd on a blackhole nexthop is rejected even when a gateway is written on the row",
+        "eStr": [
+            "bfd requires a gateway address"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_IPV6_WITH_SOURCE": {
+        "desc": "IPv6 nexthop with BFD, an IPv6 local address and a profile"
+    },
+    "STATIC_ROUTE_TEST_BFD_IPV6_SOURCE_AF_MISMATCH": {
+        "desc": "An IPv4 bfd-source on an IPv6 gateway is rejected",
+        "eStr": [
+            "same address family as gateway"
+        ]
+    },
+    "STATIC_ROUTE_TEST_BFD_TEMPLATE_LIST_WITH_PROFILE": {
+        "desc": "BFD with a profile on the template (vrf-less) nexthop list, which shares the same attribute grouping"
+    },
+    "STATIC_ROUTE_TEST_BFD_TEMPLATE_LIST_ON_INTERFACE_ONLY": {
+        "desc": "bfd on an interface-only nexthop is rejected on the template list too",
+        "eStr": [
+            "bfd requires a gateway address"
+        ]
+    },
+    "STATIC_ROUTE_TEST_IFNAME_PORTCHANNEL": {"desc": "Configure a nexthop whose egress interface is an existing port channel"},
+    "STATIC_ROUTE_TEST_IFNAME_PORT_MISSING": {"desc": "Reject a nexthop whose egress interface names a port missing from PORT", "eStrKey": "LeafRef"},
+    "STATIC_ROUTE_TEST_IFNAME_INTERNAL_PORT": {"desc": "Reject a nexthop whose egress interface is an internal port, even one in PORT", "eStr": ["An internal port is not a nexthop egress interface"]},
+    "STATIC_ROUTE_TEST_IFNAME_VLAN": {"desc": "Configure a nexthop whose egress interface is an existing VLAN"},
+    "STATIC_ROUTE_TEST_IFNAME_VLAN_MISSING": {"desc": "Reject a nexthop whose egress interface names a VLAN missing from VLAN", "eStrKey": "LeafRef"},
+    "STATIC_ROUTE_TEST_IFNAME_SUBINTERFACE_MISSING": {"desc": "Reject a nexthop whose egress interface names a sub-interface missing from VLAN_SUB_INTERFACE, even on an existing port", "eStrKey": "LeafRef"},
+    "STATIC_ROUTE_TEST_IFNAME_LOOPBACK": {"desc": "Configure a nexthop whose egress interface is an existing loopback"},
+    "STATIC_ROUTE_TEST_IFNAME_LOOPBACK_MISSING": {"desc": "Reject a nexthop whose egress interface names a loopback missing from LOOPBACK_INTERFACE", "eStrKey": "LeafRef"},
+    "STATIC_ROUTE_TEST_IFNAME_MGMT_PORT_WITHOUT_ROW": {"desc": "Configure a nexthop out eth0 with no MGMT_PORT row, as when ZTP brings eth0 up on DHCP"}
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
 }

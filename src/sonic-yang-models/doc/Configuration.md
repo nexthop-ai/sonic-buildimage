@@ -3596,6 +3596,398 @@ An example is as follows:
 }
 ```
 
+<<<<<<< HEAD
+=======
+### SR-Policy
+
+The **SR_TE_SEGMENT_LIST** and **SR_POLICY** tables introduce Segment Routing Traffic Engineering Policy configuration for SONiC. These tables enable configuration of SR policies that can be used for traffic steering using segment routing.
+
+**Note:** SR-Policy configuration requires the routing daemon's path computation component (`pathd`) to be running in the BGP container. This is automatically started when SONiC is configured with SR-Policy support.
+
+#### SR_TE_SEGMENT_LIST
+Defines individual segments that form segment lists. Segments are ordered by their index values.
+
+**Key:** name|index (e.g., "srv6_path|10")
+
+**Attributes:**
+- **name**: Segment list name
+- **index**: Segment index (uint32, 1-65535) - determines order in the path. Indices don't need to be consecutive, allowing insertion between existing segments (e.g., 10, 20, 30 allows inserting 15)
+- **ipv6_address**: SRv6 SID - IPv6 address (Type B segment as defined in RFC 9256). This is currently the only supported segment type.
+
+**Note:** Currently only SRv6 Type B segments (IPv6 addresses) are supported. Future releases will add support for additional segment types including SR-MPLS labels, NAI-based segments (prefix, adjacency, interface-based), and algorithm-based segments.
+
+#### SR_POLICY
+The SR_POLICY table uses variable-length keys to represent the hierarchical structure of SR policies in a flat ConfigDB table:
+
+- **2-part key** (color|endpoint): Defines the SR policy itself
+- **3-part key** (color|endpoint|preference): Defines a candidate path for the policy
+- **4-part key** (color|endpoint|preference|segment_list_name): Associates a segment list with a candidate path
+
+This design is idiomatic SONiC - using key length to distinguish between different configuration levels within a single table.
+
+##### SR Policy Entry (2-part key)
+Defines SR policies identified by color and endpoint.
+
+**Key:** color|endpoint (e.g., "100|2001:db8:3::1")
+
+**Attributes:**
+- **color**: Policy color/distinguisher (uint32, range 1-4294967295)
+- **endpoint**: Policy endpoint IPv4 or IPv6 address
+- **name**: Policy name (optional, but must be unique across all policies if specified)
+
+**Note:** Once a policy name is set, it cannot be modified due to backend limitations.
+
+##### Candidate Path Entry (3-part key)
+Defines candidate paths for SR policies. Multiple candidate paths can be configured for a single policy with different preferences.
+
+**Key:** color|endpoint|preference (e.g., "100|2001:db8:3::1|100")
+
+**Attributes:**
+- **color**: Policy color (must match an existing 2-part SR_POLICY entry)
+- **endpoint**: Policy endpoint (must match an existing 2-part SR_POLICY entry)
+- **preference**: Candidate path preference (uint32, range 1-4294967295, higher value = higher preference)
+- **name**: Candidate path name (required)
+- **type**: Path type - currently only "explicit" is supported (default value)
+
+**Note:** Currently only explicit candidate paths are supported. Dynamic paths (computed by PCE or local computation) will be added in future releases.
+
+##### Segment List Association Entry (4-part key)
+Associates a segment list with a candidate path. Multiple segment lists can be associated with a single candidate path, each with its own weight, to enable weighted ECMP across the segment lists.
+
+**Key:** color|endpoint|preference|segment_list_name (e.g., "100|2001:db8:3::1|100|srv6_path")
+
+**Attributes:**
+- **color**: Policy color (must match parent candidate path)
+- **endpoint**: Policy endpoint (must match parent candidate path)
+- **preference**: Candidate path preference (must match parent candidate path)
+- **name**: Segment list name (must reference an existing SR_TE_SEGMENT_LIST entry)
+- **weight**: Optional weight for weighted ECMP when multiple segment lists are configured (uint32, range 1-4294967295, default: 1)
+
+The key components establish the relationship between the candidate path and the segment list.
+
+**Note:** Multiple segment lists may be associated with the same candidate path (color|endpoint|preference) by adding multiple 4-part entries that differ only in the segment list name. Each association can carry its own `weight` for weighted ECMP load balancing across the segment lists.
+
+**Note:** A segment list may be associated with only one candidate path across all SR policies. To move a segment list to another candidate path, delete the old association and add the new association in a single atomic configuration transaction. Management tools that apply individual writes must delete the old association before adding the new one.
+
+**Basic Example - SRv6 Policy:**
+```json
+{
+    "SR_TE_SEGMENT_LIST": {
+        "srv6_path|10": {
+            "ipv6_address": "2001:db8:2::100"
+        },
+        "srv6_path|20": {
+            "ipv6_address": "2001:db8:3::1"
+        }
+    },
+    "SR_POLICY": {
+        "100|2001:db8:3::1": {
+            "name": "static_srv6_policy"
+        },
+        "100|2001:db8:3::1|100": {
+            "name": "cp1",
+            "type": "explicit"
+        },
+        "100|2001:db8:3::1|100|srv6_path": {
+        }
+    }
+}
+```
+
+In this example:
+- `"100|2001:db8:3::1"` - 2-part key defines the policy with name "static_srv6_policy"
+- `"100|2001:db8:3::1|100"` - 3-part key defines candidate path with preference 100 and name "cp1"
+- `"100|2001:db8:3::1|100|srv6_path"` - 4-part key associates the segment list "srv6_path" with the candidate path
+
+This configuration generates the following routing configuration:
+```
+segment-routing
+ traffic-eng
+  segment-list srv6_path
+   index 10 ipv6-address 2001:db8:2::100
+   index 20 ipv6-address 2001:db8:3::1
+  exit
+  policy color 100 endpoint 2001:db8:3::1
+   name static_srv6_policy
+   candidate-path preference 100 name cp1 explicit
+    segment-list srv6_path weight 1
+```
+
+**Multiple Segment Lists Example (Weighted ECMP):**
+
+A candidate path can reference more than one segment list, each with its own weight, to load balance traffic across the segment lists:
+```json
+{
+    "SR_TE_SEGMENT_LIST": {
+        "sl1|10": {
+            "ipv6_address": "2001:db8:1::1"
+        },
+        "sl2|10": {
+            "ipv6_address": "2001:db8:2::1"
+        }
+    },
+    "SR_POLICY": {
+        "100|2001:db8:3::1": {
+            "name": "weighted_ecmp_policy"
+        },
+        "100|2001:db8:3::1|100": {
+            "name": "cp1",
+            "type": "explicit"
+        },
+        "100|2001:db8:3::1|100|sl1": {
+            "weight": "10"
+        },
+        "100|2001:db8:3::1|100|sl2": {
+            "weight": "20"
+        }
+    }
+}
+```
+
+This configuration generates the following routing configuration:
+```
+segment-routing
+ traffic-eng
+  segment-list sl1
+   index 10 ipv6-address 2001:db8:1::1
+  exit
+  segment-list sl2
+   index 10 ipv6-address 2001:db8:2::1
+  exit
+  policy color 100 endpoint 2001:db8:3::1
+   name weighted_ecmp_policy
+   candidate-path preference 100 name cp1 explicit
+    segment-list sl1 weight 10
+    segment-list sl2 weight 20
+```
+
+**Inserting Segments Example:**
+
+Initial configuration with segments at index 10 and 30:
+```json
+{
+    "SR_TE_SEGMENT_LIST": {
+        "path1|10": {
+            "ipv6_address": "2001:db8:1::1"
+        },
+        "path1|30": {
+            "ipv6_address": "2001:db8:3::3"
+        }
+    }
+}
+```
+
+To insert a segment between index 10 and 30, simply add:
+```json
+{
+    "SR_TE_SEGMENT_LIST": {
+        "path1|20": {
+            "ipv6_address": "2001:db8:2::2"
+        }
+    }
+}
+```
+
+The resulting segment list will have segments in order: 10, 20, 30.
+
+**Configuration Order:**
+1. Configure individual segments (SR_TE_SEGMENT_LIST entries with name|index keys)
+2. Configure SR_POLICY entries in order:
+   - First, 2-part keys (policies)
+   - Then, 3-part keys (candidate paths)
+   - Finally, 4-part keys (segment list associations)
+
+**Multiple Candidate Paths Example:**
+```json
+{
+    "SR_TE_SEGMENT_LIST": {
+        "primary_path|10": {
+            "ipv6_address": "2001:db8:1::1"
+        },
+        "primary_path|20": {
+            "ipv6_address": "2001:db8:2::2"
+        },
+        "backup_path|10": {
+            "ipv6_address": "2001:db8:4::4"
+        },
+        "backup_path|20": {
+            "ipv6_address": "2001:db8:5::5"
+        }
+    },
+    "SR_POLICY": {
+        "200|2001:db8:10::1": {
+            "name": "multi_path_policy"
+        },
+        "200|2001:db8:10::1|200": {
+            "name": "primary_cp",
+            "type": "explicit"
+        },
+        "200|2001:db8:10::1|100": {
+            "name": "backup_cp",
+            "type": "explicit"
+        },
+        "200|2001:db8:10::1|200|primary_path": {
+        },
+        "200|2001:db8:10::1|100|backup_path": {
+        }
+    }
+}
+```
+
+In this example, the policy has two candidate paths with different preferences:
+- Primary path (preference 200) uses segment list "primary_path"
+- Backup path (preference 100) uses segment list "backup_path"
+- Higher preference (200) will be selected when both paths are available
+
+### Static Route
+
+Static routes are stored in two tables. `STATIC_ROUTE` holds the attributes that
+apply to the route as a whole, and `STATIC_ROUTE_NEXTHOP` holds one entry per
+forwarding path. A route with several nexthops has one `STATIC_ROUTE` row and one
+`STATIC_ROUTE_NEXTHOP` row per nexthop.
+
+Both tables come in two key shapes, told apart by key-component count: a
+default-VRF form that omits `vrf_name`, and a VRF-qualified form that carries it.
+
+**STATIC_ROUTE key:** `ip_prefix` or `vrf_name|ip_prefix` (e.g. `"default|10.1.0.0/24"`)
+
+| Attribute | Description |
+|-----------|-------------|
+| advertise | Advertise this route to BGP. Applies to the whole route. Default `false`. |
+
+**STATIC_ROUTE_NEXTHOP key:** `ip_prefix|gateway|ifname` or `vrf_name|ip_prefix|gateway|ifname`
+(e.g. `"default|10.1.0.0/24|192.168.1.1|Ethernet0"`)
+
+A nexthop is identified by its gateway address together with its egress interface,
+which is what allows one gateway to be reached over more than one interface. Both
+key components take the literal `none` when the nexthop does not have that
+component. A nexthop must have a gateway, an egress interface, or be a blackhole.
+
+| Attribute | Description |
+|-----------|-------------|
+| gateway | Gateway address of this nexthop, or `none` (key). |
+| ifname | Egress interface of this nexthop, or `none` (key). A port, port channel, VLAN, VLAN sub-interface or loopback must exist in `PORT`, `PORTCHANNEL`, `VLAN`, `VLAN_SUB_INTERFACE` or `LOOPBACK_INTERFACE`. A management port (`eth<n>`) and the SRv6 encapsulation interface (`sr<n>`) are checked by their form. Internal ports are refused. |
+| sidlist | SRv6 segment list in traversal order: first entry is the next segment after this node, last entry is the final segment nearest the destination (e.g. `["2001:db8:aaaa::7", "2002::4", "2002::3", "2002::2"]` renders as FRR's `segments 2001:db8:aaaa::7/2002::4/2002::3/2002::2`). Stored as `sidlist@`. Cannot be combined with `blackhole` or `color`. |
+| distance | Administrative distance (1-255) of this nexthop. |
+| nexthop-vrf | VRF of this nexthop, for VRF leaking. |
+| blackhole | This nexthop discards matching traffic silently. Default `false`. |
+| tag | Route tag (0-4294967295); 0 means no tag. |
+| color | SR-Policy color extended community, `type:value` format (e.g. `00:100`); at most one, stored as `color@`. Absent means no SR-Policy. Only type `00` is supported for now. When present, the route uses the SR-Policy matching that color with the nexthop as endpoint. |
+| bfd | Monitor this nexthop with a BFD session to its gateway; the nexthop is withheld from the routing table while the session is down. Requires a gateway (not interface-only or blackhole). Default `false`. |
+| bfd-profile | `BFD_PROFILE` entry supplying the session's timers and other parameters. Requires `bfd`. Absent means FRR defaults. A BGP peer with `bfd` to the same gateway shares the session; use the same profile on both, otherwise the last registration decides. |
+| bfd-source | Local address of the BFD session, same address family as `gateway`. Requires `bfd`. Absent on a single-hop session means FRR uses the egress interface address in the gateway's subnet. |
+| bfd-multihop | Run the session multihop, for a gateway that is not directly connected. Requires `bfd` and `bfd-source`. Default `false`. |
+
+**Example - ECMP route with per-nexthop distance and SR-Policy color:**
+```json
+{
+    "STATIC_ROUTE": {
+        "default|10.2.0.0/24": {}
+    },
+    "STATIC_ROUTE_NEXTHOP": {
+        "default|10.2.0.0/24|192.168.1.1|none": {
+            "distance": "10",
+            "color": ["00:100"]
+        },
+        "default|10.2.0.0/24|192.168.1.2|none": {
+            "distance": "20",
+            "color": ["00:200"]
+        },
+        "default|10.2.0.0/24|192.168.1.3|none": {
+            "distance": "30"
+        }
+    }
+}
+```
+
+**Routing Configuration Generated:**
+```
+ip route 10.2.0.0/24 192.168.1.1 10 color 100
+ip route 10.2.0.0/24 192.168.1.2 20 color 200
+ip route 10.2.0.0/24 192.168.1.3 30
+```
+
+**Example - SRv6 route, one segment list per nexthop:**
+```json
+{
+    "STATIC_ROUTE": {
+        "fc04::2/128": {}
+    },
+    "STATIC_ROUTE_NEXTHOP": {
+        "fc04::2/128|2001:db8:1::1|sr0": {
+            "sidlist": [
+                "2016:100::2",
+                "2016:100::8:2"
+            ]
+        },
+        "fc04::2/128|2001:db8:2::1|sr0": {
+            "sidlist": [
+                "2017:100::2",
+                "2017:100::9:2"
+            ]
+        }
+    }
+}
+```
+
+**Routing Configuration Generated:**
+```
+ipv6 route fc04::2/128 2001:db8:1::1 sr0 segments 2016:100::2/2016:100::8:2
+ipv6 route fc04::2/128 2001:db8:2::1 sr0 segments 2017:100::2/2017:100::9:2
+```
+
+**Example - one gateway reached over two interfaces:**
+```json
+{
+    "STATIC_ROUTE": {
+        "default|fc04::3/128": {}
+    },
+    "STATIC_ROUTE_NEXTHOP": {
+        "default|fc04::3/128|fe80::1|Ethernet0": {},
+        "default|fc04::3/128|fe80::1|Ethernet4": {}
+    }
+}
+```
+
+**Example - BFD-monitored nexthops, one single-hop and one multihop:**
+```json
+{
+    "BFD_PROFILE": {
+        "fast-failover": {
+            "receive_interval": "100",
+            "transmit_interval": "100",
+            "detect_multiplier": "3"
+        }
+    },
+    "STATIC_ROUTE": {
+        "default|10.1.0.0/24": {}
+    },
+    "STATIC_ROUTE_NEXTHOP": {
+        "default|10.1.0.0/24|192.168.1.1|Ethernet0": {
+            "bfd": "true",
+            "bfd-profile": "fast-failover"
+        },
+        "default|10.1.0.0/24|172.16.0.1|none": {
+            "bfd": "true",
+            "bfd-multihop": "true",
+            "bfd-source": "172.16.5.1",
+            "bfd-profile": "fast-failover"
+        }
+    }
+}
+```
+
+**Routing Configuration Generated:**
+```
+ip route 10.1.0.0/24 192.168.1.1 Ethernet0 bfd profile fast-failover
+ip route 10.1.0.0/24 172.16.0.1 bfd multi-hop source 172.16.5.1 profile fast-failover
+```
+staticd owns the sessions: while a session is down only that nexthop is withdrawn,
+the route stays reachable over the others.
+
+---
+
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
 ### Prefix List
 Prefix list table stores a list of prefixes with type and prefix separated by `|`. PrefixListMgr renders configuration for supported prefix types (e.g., `ANCHOR_PREFIX` for RADIAN); other prefix list entries may be consumed by BGP and can use the optional fields below.
 

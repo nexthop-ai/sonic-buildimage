@@ -1,0 +1,875 @@
+{
+    "BFD_PROFILE_VALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "fast-failover",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100",
+                        "echo_interval": "100",
+                        "echo_mode": true,
+                        "passive_mode": false,
+                        "minimum_ttl": "253"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_SBFD_ECHO_VALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "sbfd-fast",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8::a",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_MODE_INVALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "bad-mode",
+                        "mode": "sbfd_reflector",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_SOURCE_IPV6_INVALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "bad-source",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "not-an-ipv6",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_SOURCE_IPV6_WITHOUT_SBFD": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "src-no-sbfd",
+                        "mode": "bfd",
+                        "source_ipv6": "2001:db8::a"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_SBFD_ECHO_WITHOUT_SOURCE": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "echo-no-src",
+                        "mode": "sbfd_echo",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_NAME_WITH_QUOTE": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "fast'failover",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_NAME_WITH_SPACE": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "fast failover",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_ASYNC_TIMERS_1000_VALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "slow-async",
+                        "mode": "bfd",
+                        "detect_multiplier": "3",
+                        "receive_interval": "1000",
+                        "transmit_interval": "1000"
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "hw-bfd-dut",
+                    "switch_type": "voq"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_ASYNC_RECEIVE_INTERVAL_NOT_SUPPORTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "async-rx-300",
+                        "mode": "bfd",
+                        "detect_multiplier": "3",
+                        "receive_interval": "300",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "hw-bfd-dut",
+                    "switch_type": "voq"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_ASYNC_TRANSMIT_INTERVAL_NOT_SUPPORTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "async-tx-300",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "300"
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "hw-bfd-dut",
+                    "switch_type": "voq"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_SBFD_ECHO_TIMER_NOT_SUPPORTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "sbfd-custom",
+                        "mode": "sbfd_echo",
+                        "source_ipv6": "2001:db8::a",
+                        "detect_multiplier": "3",
+                        "receive_interval": "300",
+                        "transmit_interval": "300"
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "hw-bfd-dut",
+                    "switch_type": "voq"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_RECEIVE_INTERVAL_TOO_LOW": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "too-fast",
+                        "detect_multiplier": "3",
+                        "receive_interval": "5",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_TRANSMIT_INTERVAL_TOO_HIGH": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "too-slow",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "70000"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_DETECT_MULTIPLIER_TOO_LOW": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "single-loss",
+                        "detect_multiplier": "1",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_MINIMUM_TTL_TOO_HIGH": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "ttl-overflow",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100",
+                        "minimum_ttl": "255"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_BIND_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "fast-failover",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "10.0.0.1",
+                        "asn": 65002,
+                        "bfd_profile": "fast-failover"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_BIND_GHOST_REJECTED": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "10.0.0.1",
+                        "asn": 65002,
+                        "bfd_profile": "ghost-profile"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_BIND_VALID_PEER_GROUP": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "fast-failover",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG_FAST_BFD",
+                        "asn": 65002,
+                        "bfd_profile": "fast-failover"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_BIND_GHOST_REJECTED_PEER_GROUP": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG_FAST_BFD",
+                        "asn": 65002,
+                        "bfd_profile": "ghost-profile"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_BIND_VALID_TEMPLATE": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "fast-failover",
+                        "detect_multiplier": "3",
+                        "receive_interval": "100",
+                        "transmit_interval": "100"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "10.0.0.1",
+                        "asn": 65002,
+                        "bfd": true,
+                        "bfd_profile": "fast-failover"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_BIND_GHOST_REJECTED_TEMPLATE": {
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "10.0.0.1",
+                        "asn": 65002,
+                        "bfd_profile": "ghost-profile"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_NO_HW_OFFLOAD_TIMERS_UNRESTRICTED": {
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "npu-dut",
+                    "switch_type": "npu"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "soft-bfd",
+                        "mode": "bfd",
+                        "detect_multiplier": "3",
+                        "receive_interval": "300",
+                        "transmit_interval": "300"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PROFILE_SOFTWARE_BFD_OVERRIDE_UNRESTRICTED": {
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "soft-bfd-dut",
+                    "switch_type": "voq"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    },
+                    {
+                        "name": "software_bfd",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        },
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PROFILE": {
+                "BFD_PROFILE_LIST": [
+                    {
+                        "name": "soft-override",
+                        "mode": "bfd",
+                        "detect_multiplier": "3",
+                        "receive_interval": "300",
+                        "transmit_interval": "300"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_SINGLE_HOP_VALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.10",
+                        "interface": "Ethernet0",
+                        "vrf": "default",
+                        "local-address": "null",
+                        "enabled": "true",
+                        "desired-minimum-tx-interval": "300",
+                        "required-minimum-receive": "300",
+                        "detection-multiplier": "3",
+                        "echo-active": "false"
+                    },
+                    {
+                        "remote-address": "192.0.2.20",
+                        "interface": "PortChannel100",
+                        "vrf": "Vrf_red",
+                        "local-address": "192.0.2.21",
+                        "enabled": "true",
+                        "echo-active": "true",
+                        "desired-minimum-echo-receive": "50"
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        },
+        "sonic-portchannel:sonic-portchannel": {
+            "sonic-portchannel:PORTCHANNEL": {
+                "PORTCHANNEL_LIST": [
+                    {
+                        "name": "PortChannel100",
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_SINGLE_HOP_NULL_INTERFACE_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.10",
+                        "interface": "null",
+                        "vrf": "default",
+                        "local-address": "null",
+                        "enabled": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_SINGLE_HOP_DUPLICATE_TRIPLE_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.10",
+                        "interface": "Ethernet0",
+                        "vrf": "default",
+                        "local-address": "null",
+                        "enabled": "true"
+                    },
+                    {
+                        "remote-address": "192.0.2.10",
+                        "interface": "Ethernet0",
+                        "vrf": "default",
+                        "local-address": "192.0.2.5",
+                        "enabled": "true"
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_MULTI_HOP_VALID": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_MULTI_HOP": {
+                "BFD_PEER_MULTI_HOP_LIST": [
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "Vrf1",
+                        "local-address": "170.1.1.1",
+                        "enabled": "true",
+                        "desired-minimum-tx-interval": "300",
+                        "required-minimum-receive": "300",
+                        "detection-multiplier": "3"
+                    },
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "Vrf2",
+                        "local-address": "170.1.1.1",
+                        "enabled": "true"
+                    },
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "default",
+                        "local-address": "170.1.1.1",
+                        "enabled": "false"
+                    },
+                    {
+                        "remote-address": "2001:db8::10",
+                        "interface": "null",
+                        "vrf": "default",
+                        "local-address": "2001:db8::1",
+                        "enabled": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_MULTI_HOP_INTERFACE_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_MULTI_HOP": {
+                "BFD_PEER_MULTI_HOP_LIST": [
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "Ethernet0",
+                        "vrf": "default",
+                        "local-address": "170.1.1.1",
+                        "enabled": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_MULTI_HOP_FAMILY_MISMATCH_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_MULTI_HOP": {
+                "BFD_PEER_MULTI_HOP_LIST": [
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "default",
+                        "local-address": "2001:db8::1",
+                        "enabled": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_VRF_WITHOUT_PREFIX_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_MULTI_HOP": {
+                "BFD_PEER_MULTI_HOP_LIST": [
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "blue",
+                        "local-address": "170.1.1.1",
+                        "enabled": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_HW_OFFLOAD_TIMER_NOT_SUPPORTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_MULTI_HOP": {
+                "BFD_PEER_MULTI_HOP_LIST": [
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "default",
+                        "local-address": "170.1.1.1",
+                        "enabled": "true",
+                        "desired-minimum-tx-interval": "300",
+                        "required-minimum-receive": "1000"
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "hw-bfd-dut",
+                    "switch_type": "voq"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BFD_PEER_NO_HW_OFFLOAD_TIMERS_UNRESTRICTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_MULTI_HOP": {
+                "BFD_PEER_MULTI_HOP_LIST": [
+                    {
+                        "remote-address": "210.1.1.1",
+                        "interface": "null",
+                        "vrf": "default",
+                        "local-address": "170.1.1.1",
+                        "enabled": "true",
+                        "desired-minimum-tx-interval": "300",
+                        "required-minimum-receive": "300"
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "npu-bfd-dut",
+                    "switch_type": "npu"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PEER_SINGLE_HOP_PORT_MISSING_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.30",
+                        "interface": "Ethernet12",
+                        "vrf": "default",
+                        "local-address": "null"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PEER_SINGLE_HOP_INTERNAL_PORT_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.31",
+                        "interface": "Ethernet-BP0",
+                        "vrf": "default",
+                        "local-address": "null"
+                    }
+                ]
+            }
+        },
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet-BP0",
+                        "lanes": "200",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PEER_SINGLE_HOP_VLAN": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.31",
+                        "interface": "Vlan100",
+                        "vrf": "default",
+                        "local-address": "null"
+                    }
+                ]
+            }
+        },
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan100",
+                        "vlanid": 100
+                    }
+                ]
+            }
+        }
+    },
+    "BFD_PEER_SINGLE_HOP_VLAN_MISSING_REJECTED": {
+        "sonic-bfd-profile:sonic-bfd-profile": {
+            "sonic-bfd-profile:BFD_PEER_SINGLE_HOP": {
+                "BFD_PEER_SINGLE_HOP_LIST": [
+                    {
+                        "remote-address": "192.0.2.32",
+                        "interface": "Vlan100",
+                        "vrf": "default",
+                        "local-address": "null"
+                    }
+                ]
+            }
+        }
+    }
+}

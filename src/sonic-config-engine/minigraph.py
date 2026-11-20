@@ -3,6 +3,7 @@ from __future__ import print_function
 import ipaddress
 import math
 import os
+import re
 import sys
 import json
 import jinja2
@@ -2638,10 +2639,36 @@ def parse_xml(filename, platform=None, port_config_file=None, asic_name=None, hw
             port['mux_cable'] = "true"
 
     if static_routes:
+<<<<<<< HEAD
         # Enable static Route BFD by default for static route in chassis-packet
         if switch_type == "chassis-packet" or chassis_type == "chassis-packet":
             for pfx, data in static_routes.items():
                 data.update({"bfd":"true"})
+=======
+        # Keep only the nexthops whose ifname the static-route-ifname union accepts: a row of
+        # one of these tables, or the eth, sr and 'none' forms. Internal ports are in PORT, but
+        # the model refuses them. A route whose every nexthop is dropped goes with them.
+        interfaces = set()
+        for table in ('PORT', 'PORTCHANNEL', 'VLAN', 'VLAN_SUB_INTERFACE', 'LOOPBACK_INTERFACE'):
+            interfaces.update(key for key in results.get(table, {}) if isinstance(key, str))
+        routed = {nh_key.rsplit('|', 2)[0] for nh_key in static_route_nexthops}
+        for nh_key in list(static_route_nexthops.keys()):
+            nh_ifname = nh_key.rsplit('|', 1)[-1]
+            if '-' in nh_ifname:
+                reason = "is an internal port"
+            elif nh_ifname not in interfaces and not re.match(r'(eth|sr)[0-9]+$|none$', nh_ifname):
+                reason = "is not configured"
+            else:
+                continue
+            print("Warning: ignore static route nexthop '%s' as '%s' %s" % (nh_key, nh_ifname, reason),
+                  file=sys.stderr)
+            del static_route_nexthops[nh_key]
+        remaining = {nh_key.rsplit('|', 2)[0] for nh_key in static_route_nexthops}
+        for route_key in list(static_routes.keys()):
+            if route_key in routed and route_key not in remaining:
+                print("Warning: ignore static route '%s' as it has no nexthop left" % route_key, file=sys.stderr)
+                del static_routes[route_key]
+>>>>>>> 5565c2323 (NOS-23414: [yang] Static route and BFD peer interfaces reference their interface tables (#13837))
         results['STATIC_ROUTE'] = static_routes
 
     for nghbr in list(neighbors.keys()):

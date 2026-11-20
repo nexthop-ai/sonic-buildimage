@@ -1,0 +1,119 @@
+module sonic-monitor-link-group {
+
+    yang-version 1.1;
+
+    namespace "http://github.com/sonic-net/sonic-monitor-link-group";
+    prefix mlg;
+
+    import sonic-port {
+        prefix port;
+    }
+
+    import sonic-portchannel {
+        prefix lag;
+    }
+
+    organization
+        "SONiC";
+
+    contact
+        "SONiC";
+
+    description
+        "Monitor link group configuration";
+
+    revision 2026-11-19 {
+        description
+            "uplinks and downlinks name each member by leafref to PORT or PORTCHANNEL, so a
+             group cannot name an interface that does not exist and the interface's removal
+             finds the groups that use it.";
+    }
+
+    revision 2025-12-02 {
+        description
+            "Initial revision for Monitor link Groups";
+    }
+
+    container sonic-monitor-link-group {
+
+        container MONITOR_LINK_GROUP {
+
+            description "Link State Tracking Group configuration";
+
+            list MONITOR_LINK_GROUP_LIST {
+
+                key "group_name";
+
+                leaf group_name {
+                    type string {
+                        length "1..128";
+                        pattern "[a-zA-Z0-9_-]+";
+                    }
+                    description "Name of the link state tracking group";
+                }
+
+                leaf-list uplinks {
+                    type union {
+                        type leafref {
+                            path "/port:sonic-port/port:PORT/port:PORT_LIST/port:name";
+                        }
+                        type leafref {
+                            path "/lag:sonic-portchannel/lag:PORTCHANNEL/lag:PORTCHANNEL_LIST/lag:name";
+                        }
+                    }
+                    must "not(contains(., '-'))" {
+                        error-message "An internal port cannot be a monitor link group member.";
+                    }
+                    description
+                        "The uplink interfaces of this monitor link group: ports and port channels, each
+                         of which must exist in its table. Internal port names (those with a '-')
+                         are refused.";
+                }
+
+                leaf-list downlinks {
+                    type union {
+                        type leafref {
+                            path "/port:sonic-port/port:PORT/port:PORT_LIST/port:name";
+                        }
+                        type leafref {
+                            path "/lag:sonic-portchannel/lag:PORTCHANNEL/lag:PORTCHANNEL_LIST/lag:name";
+                        }
+                    }
+                    must "not(contains(., '-'))" {
+                        error-message "An internal port cannot be a monitor link group member.";
+                    }
+                    description
+                        "The downlink interfaces of this monitor link group: ports and port channels, each
+                         of which must exist in its table. Internal port names (those with a '-')
+                         are refused.";
+                }
+
+                leaf description {
+                    type string {
+                        length "1..255";
+                    }
+                    description "Description of the link state tracking group";
+                }
+
+                leaf startup-delay {
+                    type uint32 {
+                        range 0..6000;
+                    }
+                    default "0";
+                    description "Time in seconds to elapse before bringing up the downlink (max 6000)";
+                }
+
+                leaf min-uplinks {
+                    type uint32 {
+                        range 0..512;
+                    }
+                    default "1";
+                    description "Minimum number of uplinks that must be operational for the group to be considered up (max 512)";
+                }
+            }
+            /* end of list MONITOR_LINK_GROUP_LIST */
+        }
+        /* end of container MONITOR_LINK_GROUP */
+    }
+    /* end of container sonic-monitor-link-group */
+}
