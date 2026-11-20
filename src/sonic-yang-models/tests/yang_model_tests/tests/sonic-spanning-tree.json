@@ -2,5 +2,721 @@
     "PVST_GLOBAL_VALID": {
         "desc": "Configure valid global PVST settings",
         "eStr": []
+<<<<<<< HEAD
+=======
+    },
+    "MSTP_GLOBAL_VALID": {
+        "desc": "Configure valid global MST settings (rootguard_timeout omitted/pruned in mst mode)."
+    },
+    "MSTP_REGION_VALID": {
+        "desc": "Configure valid STP_MST region globals (name/revision/timers) in mst mode."
+    },
+    "MSTP_INSTANCE_VALID": {
+        "desc": "Configure a valid STP_MST_INST instance with vlan list and bridge_priority."
+    },
+    "MSTP_PORT_VALID": {
+        "desc": "Configure a valid STP_MST_PORT (per-instance per-port path_cost/priority)."
+    },
+    "MSTP_STP_PORT_MST_ATTRS_VALID": {
+        "desc": "Configure STP_PORT MST attributes (edge_port, link_type, guards) in mst mode."
+    },
+    "MSTP_ROOTGUARD_TIMEOUT_IN_MST_VALID": {
+        "desc": "The default rootguard_timeout is accepted in mst mode."
+    },
+    "MSTP_REGION_IN_PVST": {
+        "desc": "STP_MST region config is allowed only in mst mode; in pvst it must fail.",
+        "eStr": [
+            "Configuration allowed in MST mode"
+        ]
+    },
+    "MSTP_EDGE_PORT_IN_PVST": {
+        "desc": "edge_port=true is allowed only in mst mode; in pvst it must fail.",
+        "eStr": [
+            "Mode must be MST, and EdgePort must be enabled for this configuration to be valid."
+        ]
+    },
+    "MSTP_LINK_TYPE_IN_PVST": {
+        "desc": "link_type is allowed only in mst mode; in pvst it must fail.",
+        "eStr": [
+            "Configuration allowed in MST mode only"
+        ]
+    },
+    "MSTP_PORTFAST_IN_MST": {
+        "desc": "portfast=true is allowed only in pvst mode; in mst it must fail.",
+        "eStr": [
+            "Mode must be PVST, and PortFast must be enabled for this configuration to be valid."
+        ]
+    },
+    "PVST_GLOBAL_PRIORITY_NOT_MULTIPLE": {
+        "desc": "STP global priority that is not a multiple of 4096 is rejected.",
+        "eStr": [
+            "must be a multiple of 4096"
+        ]
+    },
+    "PVST_VLAN_PRIORITY_NOT_MULTIPLE": {
+        "desc": "STP_VLAN priority that is not a multiple of 4096 is rejected.",
+        "eStr": [
+            "must be a multiple of 4096"
+        ]
+    },
+    "PVST_VLAN_PRIORITY_MAX_VALID": {
+        "desc": "STP_VLAN priority 61440, the largest multiple of 4096, is accepted."
+    },
+    "PVST_GLOBAL_PRIORITY_MULTIPLE_VALID": {
+        "desc": "STP global priority 4096, a multiple of 4096, is accepted."
+    },
+    "MSTP_INSTANCE_BRIDGE_PRIORITY_MAX_VALID": {
+        "desc": "STP_MST_INST bridge_priority 61440, the largest multiple of 4096, is accepted."
+    },
+    "MSTP_INSTANCE_BRIDGE_PRIORITY_NOT_MULTIPLE": {
+        "desc": "STP_MST_INST bridge_priority that is not a multiple of 4096 is rejected.",
+        "eStr": [
+            "must be a multiple of 4096"
+        ]
+    },
+    "MSTP_INSTANCE_BRIDGE_PRIORITY_RANGE": {
+        "desc": "STP_MST_INST bridge_priority above 61440 is out of range.",
+        "eStr": [
+            "Invalid Bridge Priority value"
+        ]
+    },
+    "MSTP_GLOBAL_FWD_DELAY_RANGE": {
+        "desc": "STP global forward_delay above 30 is out of range.",
+        "eStr": [
+            "Invalid Forwarding Delay Value"
+        ]
+    },
+    "MSTP_PORT_PRIORITY_RANGE": {
+        "desc": "STP_MST_PORT priority above 240 is out of range.",
+        "eStr": [
+            "Invalid Port Priority value"
+        ]
+    },
+    "PVST_PORT_PRIORITY_NOT_MULTIPLE": {
+        "desc": "STP_PORT priority that is not a multiple of 16 is rejected.",
+        "eStr": [
+            "must be a multiple of 16"
+        ]
+    },
+    "PVST_PORT_PRIORITY_MAX_VALID": {
+        "desc": "STP_PORT priority 240, the largest multiple of 16, is accepted."
+    },
+    "PVST_VLAN_PORT_PRIORITY_NOT_MULTIPLE": {
+        "desc": "STP_VLAN_PORT priority that is not a multiple of 16 is rejected.",
+        "eStr": [
+            "must be a multiple of 16"
+        ]
+    },
+    "MSTP_PORT_PRIORITY_NOT_MULTIPLE": {
+        "desc": "STP_MST_PORT priority that is not a multiple of 16 is rejected.",
+        "eStr": [
+            "must be a multiple of 16"
+        ]
+    },
+    "MSTP_PORT_PRIORITY_MULTIPLE_VALID": {
+        "desc": "STP_MST_PORT priority 16, a multiple of 16, is accepted."
+    },
+    "MSTP_PORT_INVALID_IFNAME": {
+        "desc": "STP_MST_PORT ifname must be an existing port or port channel.",
+        "eStrKey": "InvalidValue"
+    },
+    "MSTP_PORT_INVALID_INSTANCE": {
+        "desc": "STP_MST_PORT inst_id must reference an existing STP_MST_INST (leafref).",
+        "eStrKey": "InvalidValue"
+    },
+    "MSTP_STP_PORT_MISSING_ENABLED": {
+        "desc": "STP_PORT requires the mandatory 'enabled' leaf.",
+        "eStrKey": "Mandatory"
+    },
+    "MSTP_GLOBAL_MISSING_MODE": {
+        "desc": "STP global requires the mandatory 'mode' leaf.",
+        "eStrKey": "Mandatory"
+    },
+    "STP_PORT_IFNAME_NOT_A_PORT": {
+        "desc": "STP_PORT ifname must be an existing port or port channel.",
+        "eStrKey": "InvalidValue"
+    },
+    "STP_PORT_ON_PORTCHANNEL_VALID": {
+        "desc": "STP_PORT accepts a port channel."
+    },
+    "STP_VLAN_PORT_WITHOUT_STP_PORT_VALID": {
+        "desc": "STP_VLAN_PORT is accepted without an STP_PORT row: under PVST the port runs with the defaults."
+    },
+    "PVST_VLAN_WITHOUT_ENABLED_VALID": {
+        "desc": "STP_VLAN without enabled is accepted and defaults to enabled."
+    },
+    "STP_VLAN_PORT_WITHOUT_STP_VLAN_VALID": {
+        "desc": "STP_VLAN_PORT is accepted for a VLAN without an STP_VLAN row: under PVST the VLAN runs by default."
+    },
+    "STP_VLAN_PORT_UNKNOWN_VLAN": {
+        "desc": "STP_VLAN_PORT for a VLAN that does not exist is refused.",
+        "eStrKey": "LeafRef"
+    },
+    "STP_VLAN_PORT_ON_PORTCHANNEL_MEMBER": {
+        "desc": "STP_VLAN_PORT on a PortChannel member is refused.",
+        "eStr": [
+            "Spanning tree cannot run on a PortChannel member"
+        ]
+    },
+    "STP_VLAN_PORT_VALID": {
+        "desc": "STP_VLAN_PORT is accepted when the interface has an STP_PORT row."
+    },
+    "STP_MST_PORT_WITHOUT_STP_PORT": {
+        "desc": "STP_MST_PORT needs an STP_PORT row for the same interface.",
+        "eStr": [
+            "Configure spanning tree on the interface first"
+        ]
+    },
+    "MSTP_REGION_WITH_STP_DISABLED": {
+        "desc": "STP_MST region config is kept while spanning tree is disabled (no STP GLOBAL row)."
+    },
+    "MSTP_DISABLED_KEEPS_INSTANCE_AND_PORT_ROWS": {
+        "desc": "What a disable leaves behind validates with no STP GLOBAL row: region, instance, per-instance port and a stripped STP_PORT."
+    },
+    "MSTP_LINK_TYPE_WITH_STP_DISABLED": {
+        "desc": "link_type is mode-only and is rejected while spanning tree is disabled (no STP GLOBAL row).",
+        "eStr": [
+            "Configuration allowed in MST mode only"
+        ]
+    },
+
+    "MSTP_INSTANCE_ID_4098": {
+        "desc": "MST instance ID 4098 is out of range.",
+        "eStr": [
+            "Invalid MST instance ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_ID_4095": {
+        "desc": "MST instance ID 4095 is out of range.",
+        "eStr": [
+            "Invalid MST instance ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_ID_65535": {
+        "desc": "MST instance ID 65535 is out of range.",
+        "eStr": [
+            "Invalid MST instance ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_ID_ABOVE_UINT16": {
+        "desc": "MST instance ID 65536 does not fit the type.",
+        "eStrKey": "Bounds"
+    },
+
+    "MSTP_INSTANCE_ID_NEGATIVE": {
+        "desc": "A negative MST instance ID does not fit the type.",
+        "eStrKey": "Bounds"
+    },
+
+    "MSTP_INSTANCE_ID_MAX_VALID": {
+        "desc": "MST instance ID 4094 is accepted."
+    },
+
+    "MSTP_INSTANCE_ID_CIST_VALID": {
+        "desc": "MST instance 0, the CIST, is accepted."
+    },
+
+    "MSTP_INSTANCE_IN_PVST": {
+        "desc": "An MST instance is refused while the mode is pvst.",
+        "eStr": [
+            "MST instances are allowed in MST mode only"
+        ]
+    },
+
+    "MSTP_CIST_IN_PVST": {
+        "desc": "The CIST row is refused while the mode is pvst.",
+        "eStr": [
+            "MST instances are allowed in MST mode only"
+        ]
+    },
+
+    "MSTP_INSTANCE_PORT_IN_PVST": {
+        "desc": "An MST instance port row is refused while the mode is pvst.",
+        "eStr": [
+            "MST instances are allowed in MST mode only"
+        ]
+    },
+
+    "PVST_VLAN_IN_MST": {
+        "desc": "An STP_VLAN row is refused while the mode is mst.",
+        "eStr": [
+            "Per-VLAN spanning tree configuration is allowed in PVST mode only"
+        ]
+    },
+
+    "PVST_VLAN_TIMERS_IN_MST": {
+        "desc": "STP_VLAN priority and timers are refused while the mode is mst.",
+        "eStr": [
+            "Per-VLAN spanning tree configuration is allowed in PVST mode only"
+        ]
+    },
+
+    "PVST_VLAN_PORT_IN_MST": {
+        "desc": "An STP_VLAN_PORT row is refused while the mode is mst.",
+        "eStr": [
+            "Per-VLAN spanning tree configuration is allowed in PVST mode only"
+        ]
+    },
+
+    "PVST_VLAN_WITH_STP_DISABLED_VALID": {
+        "desc": "STP_VLAN rows a PVST disable leaves behind validate with no STP GLOBAL row."
+    },
+
+    "PVST_UPLINK_FAST_IN_MST": {
+        "desc": "uplink_fast=true is refused while the mode is mst.",
+        "eStr": [
+            "UplinkFast is allowed in PVST mode only"
+        ]
+    },
+
+    "PVST_UPLINK_FAST_WITH_STP_DISABLED": {
+        "desc": "uplink_fast=true is refused with no STP GLOBAL row.",
+        "eStr": [
+            "UplinkFast is allowed in PVST mode only"
+        ]
+    },
+
+    "PVST_UPLINK_FAST_FALSE_IN_MST_VALID": {
+        "desc": "uplink_fast=false is accepted in mst mode."
+    },
+
+    "PVST_UPLINK_FAST_IN_PVST_VALID": {
+        "desc": "uplink_fast=true is accepted in pvst mode."
+    },
+
+    "PVST_GLOBAL_PRIORITY_IN_MST": {
+        "desc": "A non-default global priority is refused in mst mode.",
+        "eStr": [
+            "global priority is not used"
+        ]
+    },
+
+    "PVST_GLOBAL_HELLO_TIME_IN_MST": {
+        "desc": "A non-default global hello_time is refused in mst mode.",
+        "eStr": [
+            "global hello_time is not used"
+        ]
+    },
+
+    "PVST_GLOBAL_FWD_DELAY_IN_MST": {
+        "desc": "A non-default global forward_delay is refused in mst mode.",
+        "eStr": [
+            "global forward_delay is not used"
+        ]
+    },
+
+    "PVST_GLOBAL_MAX_AGE_IN_MST": {
+        "desc": "A non-default global max_age is refused in mst mode.",
+        "eStr": [
+            "global max_age is not used"
+        ]
+    },
+
+    "PVST_GLOBAL_ROOTGUARD_TIMEOUT_IN_MST": {
+        "desc": "A non-default global rootguard_timeout is refused in mst mode.",
+        "eStr": [
+            "global rootguard_timeout is not used"
+        ]
+    },
+
+    "PVST_GLOBAL_DEFAULTS_IN_MST_VALID": {
+        "desc": "The global timers and priority at their defaults are accepted in mst mode."
+    },
+
+    "MSTP_REGION_NAME_TOO_LONG": {
+        "desc": "An MST region name over 32 characters is refused.",
+        "eStr": [
+            "Invalid MST region name"
+        ]
+    },
+
+    "MSTP_REGION_NAME_EMPTY": {
+        "desc": "An empty MST region name is refused.",
+        "eStr": [
+            "Invalid MST region name"
+        ]
+    },
+
+    "MSTP_REGION_NAME_32_VALID": {
+        "desc": "A 32-character MST region name, the full width of the field, is accepted."
+    },
+
+    "MSTP_REGION_NAME_31_VALID": {
+        "desc": "A 31-character MST region name is accepted."
+    },
+
+    "MSTP_REGION_REVISION_RANGE": {
+        "desc": "An MST revision above 65535 is refused.",
+        "eStr": [
+            "Invalid MST revision value"
+        ]
+    },
+
+    "MSTP_REGION_REVISION_MAX_VALID": {
+        "desc": "MST revision 65535 is accepted."
+    },
+
+    "MSTP_REGION_MAX_HOPS_ZERO": {
+        "desc": "MST max_hops 0 is refused.",
+        "eStr": [
+            "Invalid MST max hops value"
+        ]
+    },
+
+    "MSTP_REGION_MAX_HOPS_41": {
+        "desc": "MST max_hops 41 is refused.",
+        "eStr": [
+            "Invalid MST max hops value"
+        ]
+    },
+
+    "MSTP_REGION_HELLO_TIME_RANGE": {
+        "desc": "MST hello_time 11 is refused.",
+        "eStr": [
+            "Invalid Hello Time value"
+        ]
+    },
+
+    "MSTP_REGION_HELLO_TIME_ZERO": {
+        "desc": "MST hello_time 0 is refused.",
+        "eStr": [
+            "Invalid Hello Time value"
+        ]
+    },
+
+    "MSTP_REGION_MAX_AGE_RANGE": {
+        "desc": "MST max_age 41 is refused.",
+        "eStr": [
+            "Invalid Maximum Age Time value"
+        ]
+    },
+
+    "MSTP_REGION_FWD_DELAY_RANGE": {
+        "desc": "MST forward_delay 3 is refused.",
+        "eStr": [
+            "Invalid Forwarding Delay Value"
+        ]
+    },
+
+    "MSTP_REGION_HOLD_COUNT_ZERO": {
+        "desc": "MST hold_count 0 is refused.",
+        "eStr": [
+            "Invalid MST hold count value"
+        ]
+    },
+
+    "MSTP_REGION_HOLD_COUNT_11": {
+        "desc": "MST hold_count 11 is refused.",
+        "eStr": [
+            "Invalid MST hold count value"
+        ]
+    },
+
+    "MSTP_REGION_HOLD_COUNT_1_VALID": {
+        "desc": "MST hold_count 1, the smallest allowed, is accepted."
+    },
+
+    "MSTP_REGION_HOLD_COUNT_10_VALID": {
+        "desc": "MST hold_count 10, the largest allowed, is accepted."
+    },
+
+    "MSTP_REGION_MAX_AGE_ABOVE_FWD_DELAY": {
+        "desc": "MST max_age above 2 x (forward_delay - 1) is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "MSTP_REGION_MAX_AGE_BELOW_HELLO": {
+        "desc": "MST max_age below 2 x (hello_time + 1) is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "MSTP_REGION_DEFAULT_FWD_DELAY_LIMITS_MAX_AGE": {
+        "desc": "MST max_age 40 with the default forward_delay 15 is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "MSTP_REGION_DEFAULT_MAX_AGE_BELOW_HELLO": {
+        "desc": "MST hello_time 10 with the default max_age 20 is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "MSTP_REGION_TIMERS_BOUNDARY_VALID": {
+        "desc": "MST timers on the relationship bounds are accepted."
+    },
+
+    "PVST_GLOBAL_DEFAULT_MAX_AGE_ABOVE_FWD_DELAY": {
+        "desc": "Global forward_delay 4 with the default max_age 20 is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "PVST_GLOBAL_MAX_AGE_ABOVE_FWD_DELAY": {
+        "desc": "Global max_age above 2 x (forward_delay - 1) is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "PVST_GLOBAL_MAX_AGE_BELOW_HELLO": {
+        "desc": "Global max_age below 2 x (hello_time + 1) is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1)"
+        ]
+    },
+
+    "PVST_GLOBAL_TIMERS_BOUNDARY_VALID": {
+        "desc": "Global timers on the relationship bounds are accepted."
+    },
+
+    "PVST_VLAN_MAX_AGE_ABOVE_FWD_DELAY": {
+        "desc": "VLAN max_age above 2 x (forward_delay - 1) is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1); a timer the VLAN leaves out takes the global value"
+        ]
+    },
+
+    "PVST_VLAN_MAX_AGE_BELOW_HELLO": {
+        "desc": "VLAN max_age below 2 x (hello_time + 1) is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1); a timer the VLAN leaves out takes the global value"
+        ]
+    },
+
+    "PVST_VLAN_MAX_AGE_ABOVE_GLOBAL_FWD_DELAY": {
+        "desc": "VLAN max_age 30 with the global forward_delay 15 is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1); a timer the VLAN leaves out takes the global value"
+        ]
+    },
+
+    "PVST_VLAN_HELLO_ABOVE_GLOBAL_MAX_AGE": {
+        "desc": "VLAN hello_time 10 with the global max_age 20 is refused.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1); a timer the VLAN leaves out takes the global value"
+        ]
+    },
+
+    "PVST_GLOBAL_FWD_DELAY_BELOW_VLAN_MAX_AGE": {
+        "desc": "Global forward_delay 10 is refused while a VLAN that takes it sets max_age 28.",
+        "eStr": [
+            "max_age must be between 2 x (hello_time + 1) and 2 x (forward_delay - 1); a timer the VLAN leaves out takes the global value"
+        ]
+    },
+
+    "PVST_VLAN_MAX_AGE_WITH_GLOBAL_FWD_DELAY_VALID": {
+        "desc": "VLAN max_age 40 with the global forward_delay 30 is accepted."
+    },
+
+    "PVST_VLAN_OWN_TIMERS_VALID": {
+        "desc": "A VLAN that sets all three timers is checked against its own values, not the global ones."
+    },
+
+    "PVST_VLAN_TIMERS_BOUNDARY_VALID": {
+        "desc": "VLAN timers on the relationship bounds are accepted."
+    },
+
+    "PVST_VLAN_TIMERS_WITH_STP_DISABLED_VALID": {
+        "desc": "VLAN timers are not checked while there is no STP GLOBAL row."
+    },
+
+    "MSTP_INSTANCE_VLAN_NAME": {
+        "desc": "An MST VLAN given as a VLAN name is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_ZERO": {
+        "desc": "MST VLAN 0 is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_4095": {
+        "desc": "MST VLAN 4095 is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_LEADING_ZERO": {
+        "desc": "MST VLAN with a leading zero is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_TEXT": {
+        "desc": "A non-numeric MST VLAN is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_SPACE": {
+        "desc": "An MST VLAN with whitespace is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_COMMA": {
+        "desc": "A comma-joined MST VLAN entry is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_OPEN": {
+        "desc": "An open-ended MST VLAN range is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_HIGH_4095": {
+        "desc": "An MST VLAN range ending at 4095 is refused.",
+        "eStr": [
+            "Invalid MST VLAN, must be a VLAN ID"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_REVERSED": {
+        "desc": "An MST VLAN range with its ends swapped is refused.",
+        "eStr": [
+            "Invalid MST VLAN range"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_VALID": {
+        "desc": "MST VLAN IDs and ranges, including 1-4094, are accepted."
+    },
+
+    "MSTP_INSTANCE_VLAN_IN_TWO_INSTANCES": {
+        "desc": "A VLAN mapped to two MST instances is refused.",
+        "eStr": [
+            "VLAN is already mapped to another MST instance"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_COVERS_OTHER_INSTANCE": {
+        "desc": "A VLAN range that covers a VLAN of another MST instance is refused.",
+        "eStr": [
+            "VLAN is already mapped to another MST instance"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_INSIDE_OTHER_RANGE": {
+        "desc": "A VLAN inside the range of another MST instance is refused.",
+        "eStr": [
+            "VLAN is already mapped to another MST instance"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGES_OVERLAP": {
+        "desc": "Two MST instances with overlapping VLAN ranges are refused.",
+        "eStr": [
+            "VLAN is already mapped to another MST instance"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_END_SHARED": {
+        "desc": "A VLAN range ending on a VLAN of another MST instance is refused.",
+        "eStr": [
+            "VLAN is already mapped to another MST instance"
+        ]
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGES_ADJACENT_VALID": {
+        "desc": "Adjacent VLAN ranges on two MST instances are accepted."
+    },
+
+    "MSTP_INSTANCE_VLAN_RANGE_OVERLAPS_ITSELF_VALID": {
+        "desc": "Overlapping entries inside one MST instance are accepted."
+    },
+
+    "MSTP_INSTANCE_VLANS_DISJOINT_VALID": {
+        "desc": "Different VLANs on two MST instances are accepted."
+    },
+
+    "PVST_VLAN_NAME_NOT_VLAN": {
+        "desc": "An STP_VLAN name that is not Vlan<id> is refused.",
+        "eStrKey": "Pattern"
+    },
+
+    "PVST_VLAN_NAME_ZERO": {
+        "desc": "STP_VLAN name Vlan0 is refused.",
+        "eStrKey": "Pattern"
+    },
+
+    "PVST_VLAN_NAME_4095": {
+        "desc": "STP_VLAN name Vlan4095 is refused while a Vlan4095 VLAN row exists.",
+        "eStr": [
+            "Vlan4095 is reserved"
+        ]
+    },
+
+    "PVST_VLAN_NAME_LOWERCASE": {
+        "desc": "STP_VLAN name vlan100 is refused.",
+        "eStrKey": "Pattern"
+    },
+
+    "PVST_VLAN_VLANID_MISMATCH": {
+        "desc": "An STP_VLAN vlanid that differs from the name is refused.",
+        "eStr": [
+            "vlanid must match the VLAN name"
+        ]
+    },
+
+    "PVST_VLAN_VLANID_4095": {
+        "desc": "STP_VLAN vlanid 4095 is refused.",
+        "eStr": [
+            "Vlan ID out of range"
+        ]
+    },
+
+    "PVST_VLAN_WITHOUT_VLANID_VALID": {
+        "desc": "An STP_VLAN row without vlanid is accepted."
+    },
+
+    "STP_PORT_ON_PORTCHANNEL_MEMBER": {
+        "desc": "STP_PORT on a PortChannel member is refused.",
+        "eStr": [
+            "Spanning tree cannot run on a PortChannel member"
+        ]
+    },
+
+    "STP_PORT_ON_PORTCHANNEL_WITH_MEMBER_VALID": {
+        "desc": "STP_PORT on the PortChannel of that member is accepted."
+    },
+
+    "STP_PORT_BPDU_GUARD_DO_DISABLE_WITHOUT_GUARD": {
+        "desc": "bpdu_guard_do_disable without bpdu_guard is refused.",
+        "eStr": [
+            "bpdu_guard_do_disable needs bpdu_guard enabled"
+        ]
+    },
+
+    "STP_PORT_BPDU_GUARD_SHUTDOWN_VALID": {
+        "desc": "bpdu_guard with bpdu_guard_do_disable is accepted."
+    },
+
+    "PVST_VLAN_MISSING_VLAN": {
+        "desc": "An STP_VLAN row naming a VLAN that does not exist is refused.",
+        "eStrKey": "LeafRef"
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
     }
 }

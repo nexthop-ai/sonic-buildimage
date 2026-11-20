@@ -17,7 +17,60 @@ module sonic-spanning-tree {
 		"SONiC";
 
 	description
+<<<<<<< HEAD
 		"YANG model for Spanning Tree Protocol (STP) in SONiC, supporting PVST and MSTP";
+=======
+		"Spanning Tree Protocol (STP) configuration, supporting PVST and MSTP";
+
+	revision 2026-11-19 {
+		description
+			"Apply 2 x (hello_time + 1) <= max_age <= 2 x (forward_delay - 1)
+			 to the per-VLAN PVST timers. A timer or priority an STP_VLAN row
+			 leaves out takes the global value, so those leaves carry no
+			 default of their own. STP_VLAN name names its VLAN by leafref to
+			 VLAN, so a row cannot name a VLAN that does not exist and the
+			 VLAN's removal finds the row that uses it.
+			 Vlan4095, which the VLAN name pattern admits, stays refused.";
+	}
+
+	revision 2026-11-17 {
+		description
+			"STP_VLAN enabled defaults to true; STP_VLAN_PORT needs neither an
+			 STP_PORT nor an STP_VLAN row, references VLAN, and is refused
+			 outside PVST and on a PortChannel member.";
+	}
+
+	revision 2026-11-16 {
+		description
+			"Allow an MST region name of up to 32 characters, the full
+			 802.1Q configuration name field.";
+	}
+
+	revision 2026-10-28 {
+		description
+			"Refuse configuration the daemons cannot use: an MST instance ID
+			 outside 0..4094; MST instances while the mode is PVST, PVST VLAN
+			 rows and uplink_fast while the mode is MST, and a non-default
+			 global PVST timer, priority or rootguard_timeout while the mode
+			 is MST; MST region values outside their 802.1Q ranges and a
+			 region name longer than the 31 characters stpd keeps; timers
+			 that break
+			 2 x (hello_time + 1) <= max_age <= 2 x (forward_delay - 1);
+			 malformed MST VLAN lists and a VLAN mapped to two instances; an
+			 STP_VLAN name that is not Vlan<1-4094> or disagrees with vlanid;
+			 STP on a PortChannel member; bpdu_guard_do_disable without
+			 bpdu_guard.";
+	}
+
+	revision 2026-10-22 {
+		description
+			"Add the bridge_priority and port_priority typedefs: a bridge
+			 priority is a multiple of 4096 from 0 to 61440 and a port priority
+			 a multiple of 16 from 0 to 240, which the daemon rounds down to
+			 anyway, so a value such as 4097, 100 or 17 is refused instead of
+			 silently truncated.";
+	}
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
 
 	revision 2025-03-15 {
 		description
@@ -176,9 +229,19 @@ module sonic-spanning-tree {
 					"List of VLAN STP configurations";
 
 				leaf name {
+<<<<<<< HEAD
 					type string;
+=======
+					must "current() != 'Vlan4095'" {
+						error-message "Vlan4095 is reserved; a VLAN ID runs up to 4094.";
+					}
+					type leafref {
+						path "/vlan:sonic-vlan/vlan:VLAN/vlan:VLAN_LIST/vlan:name";
+					}
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
 					description
-						"Vlan identifier in format 'Vlan<id>'";
+						"The VLAN this row configures, in format 'Vlan<id>'; it must exist
+						 in VLAN.";
 				}
 
 				leaf vlanid {

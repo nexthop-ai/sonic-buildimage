@@ -321,5 +321,336 @@
     "BGP_SENTINEL_INVALID_RANGE_IPV6": {
         "desc": "does not satisfy.",
         "eStr": "Invalid value \"fc00:f0::/129\" in \"ip_range\" element."
+<<<<<<< HEAD
+=======
+    },
+    "BGP_NEIGHBOR_V6ONLY_ETHERNET_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on Ethernet interface."
+    },
+    "BGP_NEIGHBOR_V6ONLY_PORTCHANNEL_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on PortChannel interface."
+    },
+    "BGP_NEIGHBOR_V6ONLY_VLAN_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on Vlan interface."
+    },
+    "BGP_NEIGHBOR_V6ONLY_IP_INVALID": {
+        "desc": "v6only cannot be configured for IP-based BGP neighbors.",
+        "eStr": "v6only can only be configured for interface-based BGP neighbors"
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_ETHERNET_VALID": {
+        "desc": "Configure BGP interface neighbor on Ethernet interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_PORTCHANNEL_VALID": {
+        "desc": "Configure BGP interface neighbor on PortChannel interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_VLAN_VALID": {
+        "desc": "Configure BGP interface neighbor on Vlan interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_V6ONLY_ETHERNET_VALID": {
+        "desc": "Configure BGP interface neighbor with v6only on Ethernet interface using BGP_NEIGHBOR_TEMPLATE_LIST."
+    },
+    "BGP_NEIGHBOR_TEMPLATE_V6ONLY_IP_INVALID": {
+        "desc": "v6only cannot be configured for IP-based BGP neighbors in BGP_NEIGHBOR_TEMPLATE_LIST.",
+        "eStr": "v6only can only be configured for interface-based BGP neighbors"
+    },
+    "BGP_NEIGHBOR_NO_HW_OFFLOAD_BFD_UNRESTRICTED": {
+        "desc": "Without hardware BFD offload (NPU switch) bfd can be enabled without profile/full timer set and with any FRR-legal interval; the offload-only musts do not apply."
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_RT_VALID": {
+        "desc": "BGP Address Family l2vpn_evpn with a route-distinguisher, import/export route targets and advertise-ipv4-unicast."
+    },
+    "BGP_GLOBALS_AF_EVPN_LEAVES_VALID": {
+        "desc": "The EVPN leaves frrcfgd renders: advertise-default-gw (address-family and per-VNI), default-originate, flooding and duplicate-address detection."
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_SECONDS_VALID": {
+        "desc": "dad-freeze takes a number of seconds as well as 'permanent'."
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_ALONE_VALID": {
+        "desc": "dad-max-moves is valid without dad-time."
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_TIME_WITHOUT_MAX_MOVES_INVALID": {
+        "desc": "dad-time without dad-max-moves is rejected.",
+        "eStr": [
+            "dad-time requires dad-max-moves"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_DISABLED_WITH_MAX_MOVES_INVALID": {
+        "desc": "dad-max-moves and dad-time are rejected while dad-enabled is false: the command re-enables detection.",
+        "eStr": [
+            "dad-max-moves cannot be set while dad-enabled is false"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_DISABLED_WITH_FREEZE_INVALID": {
+        "desc": "dad-freeze is rejected while dad-enabled is false.",
+        "eStr": [
+            "dad-freeze cannot be set while dad-enabled is false"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_OUT_OF_RANGE_INVALID": {
+        "desc": "dad-max-moves below FRR's minimum of 2 is rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_TIME_OUT_OF_RANGE_INVALID": {
+        "desc": "dad-time above FRR's maximum of 1800 is rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_OUT_OF_RANGE_INVALID": {
+        "desc": "A dad-freeze below FRR's minimum of 30 seconds is rejected.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_AF_EVPN_FLOODING_UNKNOWN_VALUE_INVALID": {
+        "desc": "flooding accepts head-end-replication and disable only.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_AF_EVPN_DEFAULT_ORIGINATE_ON_IPV4_UNICAST_INVALID": {
+        "desc": "The EVPN leaves are rejected outside l2vpn_evpn.",
+        "eStr": [
+            "default-originate-ipv4 is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_DEFAULT_GW_ON_IPV4_UNICAST_INVALID": {
+        "desc": "advertise-default-gw is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "advertise-default-gw is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DEFAULT_ORIGINATE_IPV6_ON_IPV4_UNICAST_INVALID": {
+        "desc": "default-originate-ipv6 is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "default-originate-ipv6 is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_FLOODING_ON_IPV4_UNICAST_INVALID": {
+        "desc": "flooding is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "flooding is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_ENABLED_ON_IPV4_UNICAST_INVALID": {
+        "desc": "dad-enabled is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "dad-enabled is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_ON_IPV4_UNICAST_INVALID": {
+        "desc": "dad-max-moves is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "dad-max-moves is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_TIME_ON_IPV4_UNICAST_INVALID": {
+        "desc": "dad-time is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "dad-time is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_ON_IPV4_UNICAST_INVALID": {
+        "desc": "dad-freeze is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "dad-freeze is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_BOUNDS_VALID": {
+        "desc": "dad-max-moves at FRR's maximum of 1000 and dad-time at its minimum of 2."
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_ABOVE_MAX_INVALID": {
+        "desc": "dad-max-moves above FRR's maximum of 1000 is rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_MAX_VALID": {
+        "desc": "dad-freeze at FRR's maximum of 3600 seconds."
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_ABOVE_MAX_INVALID": {
+        "desc": "A dad-freeze above FRR's maximum of 3600 seconds is rejected.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_AF_EVPN_FLOODING_HEAD_END_REPLICATION_VALID": {
+        "desc": "flooding accepts head-end-replication, FRR's default."
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_IPV4_FORM_VALID": {
+        "desc": "BGP Address Family l2vpn_evpn route-distinguisher in the <IPv4>:<number> form."
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_ON_IPV4_UNICAST_INVALID": {
+        "desc": "route-distinguisher is rejected on the ipv4_unicast address family.",
+        "eStr": ["route-distinguisher is supported only for the l2vpn_evpn address family"]
+    },
+    "BGP_GLOBALS_AF_EVPN_IMPORT_RTS_ON_IPV4_UNICAST_INVALID": {
+        "desc": "import-rts is rejected on the ipv4_unicast address family.",
+        "eStr": ["import-rts is supported only for the l2vpn_evpn address family"]
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_IPV4_UNICAST_ON_IPV4_UNICAST_INVALID": {
+        "desc": "advertise-ipv4-unicast is rejected on the ipv4_unicast address family; it only means anything inside l2vpn_evpn.",
+        "eStr": ["advertise-ipv4-unicast is supported only for the l2vpn_evpn address family"]
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_MALFORMED_INVALID": {
+        "desc": "A route-distinguisher that is not in <AS|IPv4>:<number> form is rejected.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_EVPN_VNI_VALID": {
+        "desc": "Per-VNI EVPN configuration with a route-distinguisher and import/export route targets."
+    },
+    "BGP_GLOBALS_EVPN_VNI_ADVERTISE_SVI_IP_VALID": {
+        "desc": "Per-VNI advertise-svi-ip. FRR scopes this to one VNI, distinct from the address-family-wide advertise-svi-ip on BGP_GLOBALS_AF."
+    },
+    "BGP_GLOBALS_EVPN_VNI_BARE_VALID": {
+        "desc": "A per-VNI row with no optional fields; frrcfgd emits a bare 'vni <id>' block for it."
+    },
+    "BGP_GLOBALS_EVPN_VNI_AFI_SAFI_LOWERCASE_INVALID": {
+        "desc": "The EVPN tables key on the uppercase L2VPN_EVPN spelling, matching upstream PR 28089 and the literal frrcfgd hardcodes for its route-target cache key; the lowercase form used by BGP_GLOBALS_AF is rejected here.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_EVPN_RT_VALID": {
+        "desc": "VRF-level EVPN route target with route-target-type both."
+    },
+    "BGP_GLOBALS_EVPN_RT_TYPE_INVALID": {
+        "desc": "route-target-type outside import/export/both is rejected.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_EVPN_RT_TYPE_MISSING_INVALID": {
+        "desc": "A route target row without route-target-type is rejected; frrcfgd dereferences the field unconditionally.",
+        "eStrKey": "Mandatory"
+    },
+    "BGP_GLOBALS_EVPN_RT_16BIT_OVERFLOW_INVALID": {
+        "desc": "A route target whose 2-octet component exceeds 65535 is rejected. rd-rt-format carried a [1-9][0-9]{1,4} alternative that subsumed the three range-checked branches above it, so the whole span 65536-99999 validated here and FRR then rejected it.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_EVPN_RT_32BIT_OVERFLOW_INVALID": {
+        "desc": "A route target whose 4-octet component exceeds 4294967295 is rejected; the previous digit-class spelling accepted 4294967296.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_EVPN_RT_BOUNDARY_VALID": {
+        "desc": "The maxima stay valid on both sides of rd-rt-format: 65535 for a 2-octet component and 4294967295 for a 4-octet one."
+    },
+    "BGP_GLOBALS_EVPN_RT_ZERO_VALID": {
+        "desc": "Zero is valid in the assigned-number position of every rd-rt-format union member. Each member carries its own |[0-9] alternative, so there is one row per form: a 2-octet ASN, an IPv4 address and a 4-octet ASN. Without these the alternation can lose |[0-9] again and the suite stays green, which is what happened between review rounds 2 and 3."
+    },
+    "BGP_GLOBALS_EVPN_VNI_RT_VALID": {
+        "desc": "Per-VNI EVPN route target attached to a VNI that exists in BGP_GLOBALS_EVPN_VNI."
+    },
+    "BGP_GLOBALS_EVPN_VNI_RT_UNKNOWN_VNI_INVALID": {
+        "desc": "A per-VNI route target for a VNI with no BGP_GLOBALS_EVPN_VNI row is rejected; the boot-time template nests the RT loop inside the VNI loop, so such a row would render nothing.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_GLOBALS_EVPN_VNI_RT_CROSS_VRF_INVALID": {
+        "desc": "A per-VNI route target naming a VNI that exists only under a different VRF is rejected. The leafref predicate matches vrf_name and afi_safi, not just the VNI value, because the template matches the whole parent key and a cross-VRF row would render nothing.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_NEIGHBOR_NEG_NO_ASN_NO_PEER_GROUP": {
+        "desc": "Configure an address-based BGP neighbor carrying neither an asn nor a peer group.",
+        "eStr": ["A BGP neighbor must carry an asn"]
+    },
+    "BGP_NEIGHBOR_NEG_ASN_AND_PEER_TYPE": {
+        "desc": "asn and peer_type are alternate ways of supplying FRR's single remote-as value and are mutually exclusive; configuring both on the same neighbor must be rejected.",
+        "eStr": ["asn and peer_type are mutually exclusive"]
+    },
+    "BGP_PEER_GROUP_NEG_ASN_AND_PEER_TYPE": {
+        "desc": "The must lives in the shared sonic-bgp-cmn grouping, so it applies to BGP_PEER_GROUP_LIST too; configuring both asn and peer_type on the same peer group must be rejected.",
+        "eStr": ["asn and peer_type are mutually exclusive"]
+    },
+    "BGP_NEIGHBOR_PEER_TYPE_ONLY_FRR_VALID": {
+        "desc": "Under frrcfgd, a plain address-based BGP neighbor carrying only peer_type (no asn) is valid -- FRR supports 'neighbor <ip> remote-as external/internal' standalone, with the actual AS learned dynamically on session establishment."
+    },
+    "BGP_NEIGHBOR_PEER_TYPE_ONLY_BGPCFGD_NEG": {
+        "desc": "Under bgpcfgd, a plain address-based BGP neighbor carrying only peer_type (no asn) is rejected; bgpcfgd renders remote-as from asn alone and has no rendering path for peer_type.",
+        "eStr": ["A BGP neighbor must carry an asn"]
+    },
+    "BGP_NEIGHBOR_PEER_GROUP_ONLY_VALID": {
+        "desc": "With no DEVICE_METADATA to name the routing mode, an address-based BGP neighbor carrying a peer group and no asn stays valid, so subset validation still works."
+    },
+    "BGP_NEIGHBOR_INTERFACE_NO_ASN_VALID": {
+        "desc": "With no DEVICE_METADATA to name the routing mode, an interface-attached BGP neighbor carrying no asn stays valid, so subset validation still works."
+    },
+    "BGP_NEIGHBOR_INTF_NO_ASN_BGPCFGD_NEG": {
+        "desc": "Under bgpcfgd an interface-attached BGP neighbor carrying no asn is rejected; bgpcfgd renders its remote-as from asn alone.",
+        "eStr": ["A BGP neighbor must carry an asn"]
+    },
+    "BGP_NEIGHBOR_INTF_NO_ASN_FRR_VALID": {
+        "desc": "Under frrcfgd an interface-attached BGP neighbor carrying no asn stays valid."
+    },
+    "BGP_NEIGHBOR_PEER_GROUP_ONLY_BGPCFGD_NEG": {
+        "desc": "Under bgpcfgd a BGP neighbor carrying only a peer group is rejected; bgpcfgd never reads peer_group_name.",
+        "eStr": ["A BGP neighbor must carry an asn"]
+    },
+    "BGP_NEIGHBOR_TEMPLATE_NEG_NO_ASN": {
+        "desc": "Configure a template-based BGP neighbor carrying no asn.",
+        "eStr": ["A template based BGP neighbor must carry an asn."]
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_RT_4BYTE_ASN_VALID": {
+        "desc": "A route-distinguisher and route targets using a 32-bit ASN. FRR accepts 4200000000:100 and keeps it; upstream PR 28089's patterns cannot express it, so rd-rt-format carries an extra union member for the RFC 4364 type 2 encoding."
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_4BYTE_ASN_MAX_VALID": {
+        "desc": "The upper bound of the 32-bit ASN form, 4294967295:65535."
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_ASN_OVERFLOW_INVALID": {
+        "desc": "An ASN above 2^32-1 is rejected; 4294967296 does not fit the 32-bit AS field.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_VALID": {
+        "desc": "The EVPN type-5 advertisement with a route-map, for both IPv4 and IPv6."
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_WITHOUT_BOOLEAN_INVALID": {
+        "desc": "A route-map without advertise-ipv4-unicast is rejected: FRR has no route-map without the advertisement.",
+        "eStr": [
+            "advertise-ipv4-unicast-route-map requires advertise-ipv4-unicast to be true"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_ON_IPV4_UNICAST_INVALID": {
+        "desc": "The route-map leaf is rejected outside l2vpn_evpn.",
+        "eStr": [
+            "advertise-ipv4-unicast-route-map is supported only for the l2vpn_evpn address family"
+        ]
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_UNDEFINED_INVALID": {
+        "desc": "A route-map that is not in ROUTE_MAP_SET is rejected.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_GLOBALS_AF_VPN_LEAK_VALID": {
+        "desc": "Route-target VRF leaking on the unicast address families: rd/rt vpn, import/export vpn and the vpn route-maps, with rt_vpn_both on IPv6."
+    },
+    "BGP_GLOBALS_AF_VPN_LEAK_SINGLE_LEAF_VALID": {
+        "desc": "export_vpn alone is accepted. nhcli validates after each set line, so the sender's leaves must not require each other."
+    },
+    "BGP_GLOBALS_AF_RD_VPN_EXPORT_ON_L2VPN_EVPN_INVALID": {
+        "desc": "rd_vpn_export is rejected on l2vpn_evpn; FRR has the command only under the unicast address families.",
+        "eStr": ["rd_vpn_export is supported only for the ipv4_unicast and ipv6_unicast address families"]
+    },
+    "BGP_GLOBALS_AF_RT_VPN_BOTH_WITH_IMPORT_INVALID": {
+        "desc": "rt_vpn_both sets both of FRR's per-direction lists, so it cannot be combined with rt_vpn_import.",
+        "eStr": ["rt_vpn_both cannot be combined with rt_vpn_import or rt_vpn_export"]
+    },
+    "BGP_GLOBALS_AF_IMPORT_VPN_WITH_IMPORT_VRF_INVALID": {
+        "desc": "FRR refuses import vpn while import vrf is configured on the same address family.",
+        "eStr": ["import_vpn cannot be combined with import_vrf or import_vrf_route_map"]
+    },
+    "BGP_NEIGHBOR_VLAN_MISSING": {
+        "desc": "A BGP neighbor naming a VLAN that does not exist is refused.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_NEIGHBOR_SUBINTF_VALID": {
+        "desc": "A BGP neighbor on an existing VLAN sub-interface is accepted."
+    },
+    "BGP_NEIGHBOR_SUBINTF_MISSING": {
+        "desc": "A BGP neighbor naming a VLAN sub-interface that does not exist is refused.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_VLAN_VALID": {
+        "desc": "A BGP neighbor local_addr naming an existing VLAN is accepted."
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_VLAN_MISSING": {
+        "desc": "A BGP neighbor local_addr naming a VLAN that does not exist is refused.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_NEIGHBOR_VLAN_4095": {
+        "desc": "A BGP neighbor on Vlan4095 is refused.",
+        "eStr": [
+            "Vlan4095 is reserved"
+        ]
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_VLAN_4095": {
+        "desc": "A BGP neighbor local_addr of Vlan4095 is refused.",
+        "eStr": [
+            "Vlan4095 is reserved"
+        ]
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
     }
 }

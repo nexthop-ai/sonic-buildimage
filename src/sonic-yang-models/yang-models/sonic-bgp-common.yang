@@ -19,10 +19,9 @@ module sonic-bgp-common {
         prefix lag;
     }
 
-  // Comment sonic-vlan import here until libyang back-links issue is resolved for VLAN leaf reference.
-  //  import sonic-vlan {
-  //      prefix vlan;
-  //  }
+    import sonic-vlan {
+        prefix vlan;
+    }
 
     import sonic-loopback-interface {
         prefix lointf;
@@ -47,7 +46,87 @@ module sonic-bgp-common {
         "SONiC";
 
     description
+<<<<<<< HEAD
         "SONIC BGP common YANG attributes for Neighbors and Peer group";
+=======
+        "BGP common attributes for neighbors and peer groups";
+
+    revision 2026-11-19 {
+        description
+            "local_addr names a VLAN by leafref to VLAN, so it cannot name a VLAN that does not
+             exist and the VLAN's removal finds the neighbors and peer groups that use it.
+             Vlan4095, which the VLAN name pattern admits, stays refused.";
+    }
+
+    revision 2026-11-06 {
+        description
+            "Refuse an empty auth_password; remove the field to clear the password.";
+    }
+
+    revision 2026-10-01 {
+        description
+            "Add per-peer bfd_strict and bfd_strict_hold_time leaves to sonic-bgp-cmn so
+             BGP_NEIGHBOR_LIST and BGP_PEER_GROUP_LIST can drive FRR 'neighbor X bfd strict
+             [hold-time N]', keeping the BGP session down while its BFD session is not Up.";
+    }
+
+    revision 2026-09-20 {
+        description
+            "asn and peer_type are now mutually exclusive. A row carrying
+             both, which validated before this revision, may now be rejected.";
+    }
+
+    revision 2026-08-10 {
+        description
+            "Extend the per-peer graceful_shutdown / graceful_restart / graceful_restart_disable / graceful_restart_helper leaves to bgpcfgd (separated) mode for BGP_NEIGHBOR, so the same CONFIG_DB drives FRR under either mode. No schema change; description text only. BGP_PEER_GROUP remains frrcfgd-only because bgpcfgd has no BGP_PEER_GROUP consumer.";
+    }
+
+    revision 2026-07-28 {
+        description
+            "Add per-peer graceful_shutdown, graceful_restart, graceful_restart_disable and graceful_restart_helper leaves to sonic-bgp-cmn so BGP_NEIGHBOR_LIST and BGP_PEER_GROUP_LIST (frrcfgd mode) can drive per-neighbor / per-peer-group BGP graceful-shutdown and graceful-restart, overriding the global BGP_GLOBALS settings. The three graceful-restart mode leaves are mutually exclusive, matching FRR's single per-peer graceful-restart mode.";
+    }
+
+    revision 2026-07-23 {
+        description
+            "Restrict per-peer bfd_min_rx and bfd_min_tx to 100 or 1000 ms for async BFD-for-BGP; hardware BFD offload only supports these timer values. Also require a bfd_profile, or all of bfd_detect_multiplier / bfd_min_rx / bfd_min_tx, whenever bfd is enabled (FRR's inline BFD needs all three; no session left at an unset default). Aligns with sonic-bfd-profile async timer restriction.";
+    }
+
+    revision 2026-07-22 {
+        description
+            "Add bgp_afi_safi typedef (and the bgp_afi_safi_global / bgp_afi_safi_device_global
+             restrictions) and use it for the afi_safi list keys, which were previously an
+             unconstrained 'type string'. Constraining the key rejects non-canonical
+             spellings such as 'ipv4-unicast' at validation time and lets YANG-derived
+             CLIs offer the valid values as completion candidates.";
+    }
+
+    revision 2026-06-02 {
+        description
+            "Extract BFD leaves into sonic-bgp-cmn-bfd grouping and use it from sonic-bgp-cmn-neigh so BGP_NEIGHBOR_TEMPLATE_LIST (bgpcfgd mode), BGP_INTERNAL_NEIGHBOR_LIST, BGP_VOQ_CHASSIS_NEIGHBOR_LIST and BGP_MONITORS_LIST expose the same BFD config the bgpcfgd templates already render.";
+    }
+
+    revision 2026-04-29 {
+        description
+            "Add bfd_profile leafref into sonic-bfd-profile/BFD_PROFILE/name; align bfd_min_rx and bfd_min_tx ranges with BFD_PROFILE timer ranges.";
+    }
+
+    revision 2026-04-23 {
+        description
+            "Add bgp_origin_type typedef for BGP origin attribute in aggregate addresses.";
+    }
+
+    revision 2026-04-22 {
+        description
+            "Add BGP address-family level add-path configuration parameters supported by FRR to
+             sonic-bgp-cmn-af grouping: add tx_best_selected enum to bgp_tx_addpaths_type,
+             add bgp_tx_add_paths_max_best_selected (uint8, 1..6, default 1).";
+    }
+
+    revision 2025-12-09 {
+        description
+            "Add BFD custom timer parameters: bfd_detect_multiplier, bfd_min_rx, bfd_min_tx";
+    }
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
 
     revision 2026-09-08 {
         description
@@ -219,6 +298,9 @@ module sonic-bgp-common {
         }
 
         leaf local_addr {
+            must "current() != 'Vlan4095'" {
+                error-message "Vlan4095 is reserved; a VLAN ID runs up to 4094.";
+            }
             type union {
                 type inet:ip-address;
                 type leafref {
@@ -227,18 +309,16 @@ module sonic-bgp-common {
                 type leafref {
                     path "/lag:sonic-portchannel/lag:PORTCHANNEL/lag:PORTCHANNEL_LIST/lag:name";
                 }
-                // Comment VLAN leaf reference here until libyang back-links issue is resolved and use VLAN string pattern
-                //type leafref {
-                //    path "/vlan:sonic-vlan/vlan:VLAN/vlan:VLAN_LIST/vlan:name";
-                //}
                 type leafref {
                     path "/lointf:sonic-loopback-interface/lointf:LOOPBACK_INTERFACE/lointf:LOOPBACK_INTERFACE_LIST/lointf:name";
                 }
-                type string {
-                    pattern 'Vlan([0-9]{1,3}|[1-3][0-9]{3}|[4][0][0-8][0-9]|[4][0][9][0-4])';
+                type leafref {
+                    path "/vlan:sonic-vlan/vlan:VLAN/vlan:VLAN_LIST/vlan:name";
                 }
             }
-            description "Local source address or interface name to use for connection.";
+            description
+                "Local source address, or the port, port channel, loopback or VLAN to source the
+                 connection from; the interface must exist in its table.";
         }
 
         leaf passive_mode {

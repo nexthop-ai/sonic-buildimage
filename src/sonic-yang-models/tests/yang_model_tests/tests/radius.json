@@ -32,5 +32,26 @@
     "RADIUS_SERVER_INVALID_VRF_TEST" : {
         "desc": "Radius server configuration with invalid VRF in RADIUS_SERVER table.",
         "eStr": "Invalid VRF name"
+<<<<<<< HEAD
+=======
+    },
+    "RADIUS_SERVER_INVALID_SKIP_MSG_AUTH_TEST" : {
+        "desc": "Radius server configuration with invalid skip_msg_auth value in RADIUS_SERVER table.",
+        "eStrKey": "Pattern",
+        "eStr": ["false|true|False|True"]
+    },
+    "RADIUS_SERVER_SRC_INTF_VLAN_TEST": {
+        "desc": "RADIUS server src_intf on an existing VLAN is accepted."
+    },
+    "RADIUS_SERVER_SRC_INTF_VLAN_MISSING_TEST": {
+        "desc": "RADIUS server src_intf naming a VLAN that does not exist is refused.",
+        "eStrKey": "LeafRef"
+    },
+    "RADIUS_SERVER_SRC_INTF_VLAN_4095_TEST": {
+        "desc": "RADIUS server src_intf of Vlan4095 is refused.",
+        "eStr": [
+            "Vlan4095 is reserved"
+        ]
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
     }
 }

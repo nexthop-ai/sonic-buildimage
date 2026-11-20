@@ -19,10 +19,13 @@ module sonic-bgp-neighbor {
         prefix lag;
     }
 
-    // Comment sonic-vlan import here until libyang back-links issue is resolved for VLAN leaf reference.
-    //import sonic-vlan {
-    //    prefix vlan;
-    //}
+    import sonic-vlan {
+        prefix vlan;
+    }
+
+    import sonic-vlan-sub-interface {
+        prefix subintf;
+    }
 
     import sonic-bgp-global {
         prefix bgpg;
@@ -43,7 +46,53 @@ module sonic-bgp-neighbor {
         "SONiC";
 
     description
+<<<<<<< HEAD
         "SONIC BGP Neighbor";
+=======
+        "BGP Neighbor configuration";
+
+    revision 2026-11-19 {
+        description
+            "neighbor names a VLAN by leafref to VLAN and a sub-interface by leafref to
+             VLAN_SUB_INTERFACE, so an unnumbered neighbor cannot name an interface that does
+             not exist and the interface's removal finds the neighbors that use it.
+             Vlan4095, which the VLAN name pattern admits, stays refused.";
+    }
+
+    revision 2026-09-20 {
+        description
+            "BGP_NEIGHBOR_LIST's asn requirement now also accepts peer_type
+             alone under frrcfgd. peer_type also gets asn's ext:create-only
+             refine.";
+    }
+
+    revision 2026-08-31 {
+        description
+            "Require an asn on both BGP neighbor lists, since a neighbor without one establishes no
+             session. On BGP_NEIGHBOR_LIST it may be omitted only when frr_mgmt_framework_config is
+             true and the neighbor has a peer_group_name or is attached to an interface. A neighbor
+             that validated before this revision may now be rejected.";
+    }
+
+    revision 2026-06-02 {
+        description
+            "Expose BFD-for-BGP per-peer leaves (bfd, bfd_detect_multiplier, bfd_min_rx, bfd_min_tx,
+             bfd_check_ctrl_plane_failure, bfd_profile) on BGP_NEIGHBOR_TEMPLATE_LIST via the updated
+             sonic-bgp-cmn-neigh grouping, so bgpcfgd-mode BGP neighbors can be configured through
+             CONFIG_DB/GCU/nhcli — matching what bgpd/templates/*/instance.conf.j2 already render.";
+    }
+
+    revision 2026-01-14 {
+        description
+            "Add v6only leaf and interface neighbor support for BGP_NEIGHBOR_TEMPLATE_LIST (bgpcfgd mode).
+             Refactor neighbor and v6only into sonic-bgp-neigh-attrs grouping.";
+    }
+
+    revision 2026-01-10 {
+        description
+            "Add v6only leaf for interface-based BGP neighbors.";
+    }
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
 
     revision 2026-07-22 {
         description
@@ -55,6 +104,46 @@ module sonic-bgp-neighbor {
             "Initial revision.";
     }
 
+<<<<<<< HEAD
+=======
+    grouping sonic-bgp-neigh-attrs {
+        description "Common neighbor and v6only attributes for BGP neighbors";
+
+        leaf neighbor {
+            must "current() != 'Vlan4095'" {
+                error-message "Vlan4095 is reserved; a VLAN ID runs up to 4094.";
+            }
+            type union {
+                type inet:ip-address;
+                type leafref {
+                    path "/port:sonic-port/port:PORT/port:PORT_LIST/port:name";
+                }
+                type leafref {
+                    path "/lag:sonic-portchannel/lag:PORTCHANNEL/lag:PORTCHANNEL_LIST/lag:name";
+                }
+                type leafref {
+                    path "/vlan:sonic-vlan/vlan:VLAN/vlan:VLAN_LIST/vlan:name";
+                }
+                type leafref {
+                    path "/subintf:sonic-vlan-sub-interface/subintf:VLAN_SUB_INTERFACE/subintf:VLAN_SUB_INTERFACE_LIST/subintf:name";
+                }
+            }
+            description
+                "BGP neighbor address, or the port, port channel, VLAN or VLAN sub-interface of an
+                 unnumbered neighbor; the interface must exist in its table.";
+        }
+
+        leaf v6only {
+            type boolean;
+            default false;
+            description "When set to 'true' it will create a neighbor with v6 link local only.";
+            must "current() = 'false' or starts-with(../neighbor, 'Eth') or starts-with(../neighbor, 'Po') or starts-with(../neighbor, 'Vlan')" {
+                error-message "v6only can only be configured for interface-based BGP neighbors";
+            }
+        }
+    }
+
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
     container sonic-bgp-neighbor {
         container BGP_NEIGHBOR {
             list BGP_NEIGHBOR_TEMPLATE_LIST {

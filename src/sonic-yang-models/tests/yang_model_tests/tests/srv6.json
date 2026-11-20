@@ -38,7 +38,73 @@
         "eStr": ["interface is mandatory when action is 'uA'"]
     },
     "SRV6_MY_SID_ADJ_INVALID_ACTION": {
+<<<<<<< HEAD
         "desc": "A SID with adj set but action is not uA",
         "eStr": ["adj is only applicable when action is 'uA'"]
+=======
+        "desc": "A SID with adj set but an action that is neither uA nor End.X related",
+        "eStr": ["adj is applicable only for 'uA', 'End.X' related actions"]
+    },
+    "SRV6_MY_LOCATOR_FUNC_LEN_ABOVE_20": {
+        "desc": "Locator whose lengths sum to 128 but func_len is 32, above the FRR ceiling of 20",
+        "eStr": ["func_len exceeds the supported maximum of 20"]
+    },
+    "SRV6_MY_LOCATOR_FUNC_LEN_AT_MAXIMUM": {
+        "desc": "Locator with func_len 20 and the remaining bits in arg_len, summing to exactly 128"
+    },
+    "SRV6_MY_LOCATOR_BLOCK_NODE_PREFIX_MISMATCH": {
+        "desc": "Locator whose block_len + node_len does not equal the prefix length, and whose four lengths still sum to <= 128",
+        "eStr": ["locator prefix length must equal block_len + node_len"]
+    },
+    "SRV6_MY_LOCATOR_DEFAULT_LENGTHS_PREFIX_MISMATCH": {
+        "desc": "Locator with only a /64 prefix, so the block_len 32 and node_len 16 defaults do not cover the prefix",
+        "eStr": ["locator prefix length must equal block_len + node_len"]
+    },
+    "SRV6_MY_SID_SAME_ACTION_SAME_LOCATOR_INVALID": {
+        "desc": "Invalid: two End SIDs in one locator share an FRR SID context, so FRR keeps only one",
+        "eStr": [
+            "Another SID in this locator already uses the same action"
+        ]
+    },
+    "SRV6_MY_SID_SAME_ACTION_EXPLICIT_DEFAULT_VRF_INVALID": {
+        "desc": "Invalid: an explicit decap_vrf 'default' collides with the defaulted one",
+        "eStr": [
+            "Another SID in this locator already uses the same action"
+        ]
+    },
+    "SRV6_MY_SID_SAME_ACTION_DIFFERENT_LOCATORS_VALID": {
+        "desc": "Valid: the same action in two locators with different blocks"
+    },
+    "SRV6_MY_SID_DIFFERENT_ACTIONS_SAME_LOCATOR_VALID": {
+        "desc": "Valid: End and End.PSP in one locator have different FRR SID contexts"
+    },
+    "SRV6_MY_SID_SAME_ACTION_NON_DT_DIFFERENT_VRF_INVALID": {
+        "desc": "Invalid: two End SIDs in one locator collide even with different decap_vrf, since FRR ignores the VRF for non-DT actions",
+        "eStr": [
+            "Another SID in this locator already uses the same action"
+        ]
+    },
+    "SRV6_MY_SID_SAME_DT_ACTION_DIFFERENT_VRFS_VALID": {
+        "desc": "Valid: two uDT46 SIDs in one locator decap into different VRFs, so their FRR SID contexts differ"
+    },
+    "SRV6_MY_SID_SAME_END_X_SAME_ADJ_INVALID": {
+        "desc": "Invalid: two End.X SIDs in one locator with the same interface and adj share an FRR SID context",
+        "eStr": [
+            "Another SID in this locator already uses the same action"
+        ]
+    },
+    "SRV6_MY_SID_SAME_END_X_DIFFERENT_ADJ_VALID": {
+        "desc": "Valid: two End.X SIDs in one locator on the same interface with different adj have different FRR SID contexts"
+    },
+    "SRV6_END_X_VLAN_MISSING": {
+        "desc": "An End.X SID naming a VLAN that does not exist is refused.",
+        "eStrKey": "LeafRef"
+    },
+    "SRV6_END_X_VLAN_4095": {
+        "desc": "An End.X SID on Vlan4095 is refused.",
+        "eStr": [
+            "Vlan4095 is reserved"
+        ]
+>>>>>>> e6740472e (NOS-24411: [yang] VLAN and sub-interface references become leafrefs (#13889))
     }
 }

@@ -298,5 +298,67 @@
                 ]
             }
         }
+    },
+    "SRV6_END_X_VLAN_MISSING": {
+        "sonic-srv6:sonic-srv6": {
+            "sonic-srv6:SRV6_MY_LOCATORS": {
+                "SRV6_MY_LOCATORS_LIST": [
+                    {
+                        "locator_name": "MAIN",
+                        "prefix": "FCBB:BBBB:20::/48",
+                        "full_sid": true
+                    }
+                ]
+            },
+            "sonic-srv6:SRV6_MY_SIDS": {
+                "SRV6_MY_SIDS_LIST": [
+                    {
+                        "ip_prefix": "FCBB:BBBB:20:E::/128",
+                        "locator": "MAIN",
+                        "action": "End.X",
+                        "interface": "Vlan100"
+                    }
+                ]
+            }
+        }
+    },
+    "SRV6_END_X_VLAN_4095": {
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan4095"
+                    }
+                ]
+            },
+            "sonic-vlan:VLAN_INTERFACE": {
+                "VLAN_INTERFACE_LIST": [
+                    {
+                        "name": "Vlan4095"
+                    }
+                ]
+            }
+        },
+        "sonic-srv6:sonic-srv6": {
+            "sonic-srv6:SRV6_MY_LOCATORS": {
+                "SRV6_MY_LOCATORS_LIST": [
+                    {
+                        "locator_name": "MAIN",
+                        "prefix": "FCBB:BBBB:20::/48",
+                        "full_sid": true
+                    }
+                ]
+            },
+            "sonic-srv6:SRV6_MY_SIDS": {
+                "SRV6_MY_SIDS_LIST": [
+                    {
+                        "ip_prefix": "FCBB:BBBB:20:E::/128",
+                        "locator": "MAIN",
+                        "action": "End.X",
+                        "interface": "Vlan4095"
+                    }
+                ]
+            }
+        }
     }
 }
