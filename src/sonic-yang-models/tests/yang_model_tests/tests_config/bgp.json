@@ -2434,5 +2434,3191 @@
                 ]
             }
         }
+<<<<<<< HEAD
+=======
+    },
+    "BGP_NEIGHBOR_V6ONLY_ETHERNET_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth0",
+                        "description": "Ethernet0",
+                        "lanes": "1",
+                        "mtu": 9000,
+                        "name": "Ethernet0",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Ethernet0",
+                        "asn": 65200,
+                        "v6only": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_V6ONLY_PORTCHANNEL_VALID": {
+        "sonic-portchannel:sonic-portchannel": {
+            "sonic-portchannel:PORTCHANNEL": {
+                "PORTCHANNEL_LIST": [
+                    {
+                        "admin_status": "up",
+                        "name": "PortChannel10",
+                        "mtu": 9000
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "PortChannel10",
+                        "asn": 65200,
+                        "v6only": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_V6ONLY_VLAN_VALID": {
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan100",
+                        "vlanid": 100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Vlan100",
+                        "asn": 65200,
+                        "v6only": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_V6ONLY_IP_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "10.0.0.1",
+                        "asn": 65200,
+                        "v6only": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_ETHERNET_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth0",
+                        "description": "Ethernet0",
+                        "lanes": "1",
+                        "mtu": 9000,
+                        "name": "Ethernet0",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "Ethernet0",
+                        "asn": "65200",
+                        "name": "IntfNeighbor"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_PORTCHANNEL_VALID": {
+        "sonic-portchannel:sonic-portchannel": {
+            "sonic-portchannel:PORTCHANNEL": {
+                "PORTCHANNEL_LIST": [
+                    {
+                        "admin_status": "up",
+                        "name": "PortChannel10",
+                        "mtu": 9000
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "PortChannel10",
+                        "asn": "65200",
+                        "name": "IntfNeighbor"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_TEMPLATE_INTF_VLAN_VALID": {
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan100",
+                        "vlanid": 100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "Vlan100",
+                        "asn": "65200",
+                        "name": "IntfNeighbor"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_TEMPLATE_V6ONLY_ETHERNET_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth0",
+                        "description": "Ethernet0",
+                        "lanes": "1",
+                        "mtu": 9000,
+                        "name": "Ethernet0",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "Ethernet0",
+                        "asn": "65200",
+                        "name": "IntfNeighbor",
+                        "v6only": "true"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_TEMPLATE_V6ONLY_IP_INVALID": {
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "10.0.0.1",
+                        "asn": "65200",
+                        "name": "IPNeighbor",
+                        "v6only": "true"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_GLOBALS_AF_AFI_SAFI_HYPHENATED_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4-unicast"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_AGGREGATE_ADDR_SRPOLICY_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF_AGGREGATE_ADDR": {
+                "BGP_GLOBALS_AF_AGGREGATE_ADDR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_srpolicy",
+                        "ip_prefix": "192.168.0.0/24"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_NETWORK_SRPOLICY_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF_NETWORK": {
+                "BGP_GLOBALS_AF_NETWORK_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_srpolicy",
+                        "ip_prefix": "192.168.0.0/24"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_LINK_STATE_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "distribute_bgp_fabric_link_state": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_LINK_STATE_INSTANCE_ID_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "distribute_bgp_fabric_link_state": true,
+                        "distribute_bgp_fabric_link_state_instance_id": "1000"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_INSTANCE_ID_LINK_STATE_WRONG_AF_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "distribute_bgp_fabric_link_state_instance_id": "1000"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_LINK_STATE_DISTRIBUTION_POLICY_VALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "ALLOW"
+                    }
+                ]
+            },
+            "sonic-route-map:ROUTE_MAP": {
+                "ROUTE_MAP_LIST": [
+                    {
+                        "name": "ALLOW",
+                        "stmt_name": 1,
+                        "route_operation": "permit"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "distribution_policy": "ALLOW"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_DISTRIBUTION_POLICY_LINK_STATE_WRONG_AF_INVALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "ALLOW"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "distribution_policy": "ALLOW"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_ROUTE_DISTANCE_LINK_STATE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "ebgp_route_distance": 20
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_IMPORT_VRF_LINK_STATE_INVALID": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf1"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    },
+                    {
+                        "vrf_name": "Vrf1",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "import_vrf": "Vrf1"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_IMPORT_VRF_ROUTE_MAP_LINK_STATE_INVALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "RM1"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "import_vrf_route_map": "RM1"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_AUTORT_LINK_STATE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "autort": "rfc8365-compatible"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_ADVERTISE_ALL_VNI_LINK_STATE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "advertise-all-vni": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_ADVERTISE_SVI_IP_LINK_STATE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "advertise-svi-ip": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_DISTRIBUTE_LINK_STATE_WRONG_AF_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "distribute_bgp_fabric_link_state": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_AGGREGATE_ADDR_LINK_STATE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF_AGGREGATE_ADDR": {
+                "BGP_GLOBALS_AF_AGGREGATE_ADDR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "ip_prefix": "192.168.0.0/24"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_NETWORK_LINK_STATE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF_NETWORK": {
+                "BGP_GLOBALS_AF_NETWORK_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "link_state_link_state",
+                        "ip_prefix": "192.168.0.0/24"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_AF_L2VPN_EVPN_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "local_asn": 1,
+                        "name": "BGP nbr 1",
+                        "asn": 65003
+                    }
+                ]
+            },
+            "sonic-bgp-neighbor:BGP_NEIGHBOR_AF": {
+                "BGP_NEIGHBOR_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "afi_safi": "l2vpn_evpn",
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_EMPTY_AUTH_PASSWORD_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "asn": 65003,
+                        "auth_password": ""
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_PEER_GROUP_EMPTY_AUTH_PASSWORD_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "auth_password": ""
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_SUB_INTERFACE_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet64",
+                        "admin_status": "up",
+                        "alias": "eth64",
+                        "description": "Ethernet64",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-portchannel:sonic-portchannel": {
+            "sonic-portchannel:PORTCHANNEL": {
+                "PORTCHANNEL_LIST": [
+                    {
+                        "admin_status": "up",
+                        "min_links": "1",
+                        "mtu": "9100",
+                        "lacp_key": "auto",
+                        "name": "PortChannel1"
+                    }
+                ]
+            }
+        },
+        "sonic-vlan-sub-interface:sonic-vlan-sub-interface": {
+            "sonic-vlan-sub-interface:VLAN_SUB_INTERFACE": {
+                "VLAN_SUB_INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet64.145"
+                    },
+                    {
+                        "name": "Eth64.146",
+                        "vlan": 146
+                    },
+                    {
+                        "name": "PortChannel1.10"
+                    },
+                    {
+                        "name": "Po1.20",
+                        "vlan": 20
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "2000:172:16::5f",
+                        "asn": 65003,
+                        "local_addr": "Ethernet64.145"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "2000:172:16::61",
+                        "asn": 65003,
+                        "local_addr": "Eth64.146"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "2000:172:16::63",
+                        "asn": 65003,
+                        "local_addr": "PortChannel1.10"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "2000:172:16::65",
+                        "asn": 65003,
+                        "local_addr": "Po1.20"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "asn": 65003,
+                        "local_addr": "Ethernet64.145"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_SUB_INTERFACE_NON_EXISTING_INVALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet64",
+                        "admin_status": "up",
+                        "alias": "eth64",
+                        "description": "Ethernet64",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-vlan-sub-interface:sonic-vlan-sub-interface": {
+            "sonic-vlan-sub-interface:VLAN_SUB_INTERFACE": {
+                "VLAN_SUB_INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet64.145"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "2000:172:16::5f",
+                        "asn": 65003,
+                        "local_addr": "Ethernet64.146"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_SUB_INTERFACE_OTHER_NAME_FORM_INVALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet64",
+                        "admin_status": "up",
+                        "alias": "eth64",
+                        "description": "Ethernet64",
+                        "lanes": "65",
+                        "mtu": 9000,
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-vlan-sub-interface:sonic-vlan-sub-interface": {
+            "sonic-vlan-sub-interface:VLAN_SUB_INTERFACE": {
+                "VLAN_SUB_INTERFACE_LIST": [
+                    {
+                        "name": "Eth64.145",
+                        "vlan": 145
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "2000:172:16::5f",
+                        "asn": 65003,
+                        "local_addr": "Ethernet64.145"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_AF_AFI_SAFI_HYPHENATED_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "local_asn": 1,
+                        "name": "BGP nbr 1",
+                        "asn": 65003
+                    }
+                ]
+            },
+            "sonic-bgp-neighbor:BGP_NEIGHBOR_AF": {
+                "BGP_NEIGHBOR_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "afi_safi": "ipv4-unicast",
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_PEER_GROUP_AF_AFI_SAFI_HYPHENATED_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1"
+                    }
+                ]
+            },
+            "sonic-bgp-peergroup:BGP_PEER_GROUP_AF": {
+                "BGP_PEER_GROUP_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "afi_safi": "ipv4-unicast",
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_PEER_GROUP_AF_SRPOLICY_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1"
+                    }
+                ]
+            },
+            "sonic-bgp-peergroup:BGP_PEER_GROUP_AF": {
+                "BGP_PEER_GROUP_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "afi_safi": "ipv4_srpolicy",
+                        "admin_status": "up"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "afi_safi": "ipv6_srpolicy",
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_PEER_GROUP_AF_LINK_STATE_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1"
+                    }
+                ]
+            },
+            "sonic-bgp-peergroup:BGP_PEER_GROUP_AF": {
+                "BGP_PEER_GROUP_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "afi_safi": "link_state_link_state",
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_RR_CLUSTER_ID_DOTTED_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001,
+                        "rr_cluster_id": "1.1.1.1"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_RR_CLUSTER_ID_INTEGER_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001,
+                        "rr_cluster_id": "4294967295"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_RR_CLUSTER_ID_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001,
+                        "rr_cluster_id": "cluster-one"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_NO_HW_OFFLOAD_BFD_UNRESTRICTED": {
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "npu-dut",
+                    "switch_type": "npu"
+                }
+            }
+        },
+        "sonic-system-defaults:sonic-system-defaults": {
+            "sonic-system-defaults:SYSTEM_DEFAULTS": {
+                "SYSTEM_DEFAULTS_LIST": [
+                    {
+                        "name": "hw_bfd_offload",
+                        "status": "enabled"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "11.12.13.14",
+                        "asn": 65003,
+                        "bfd": true,
+                        "bfd_min_rx": 300
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_NEG_NO_ASN_NO_PEER_GROUP": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "name": "fragment-row"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_PEER_GROUP_ONLY_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "asn": 65003
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "peer_group_name": "PG1"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_INTF_NO_ASN_BGPCFGD_NEG": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth0",
+                        "description": "Ethernet0",
+                        "lanes": "1",
+                        "mtu": 9000,
+                        "name": "Ethernet0",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "dut"
+                }
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Ethernet0",
+                        "name": "unnumbered-peer"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_INTF_NO_ASN_FRR_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth0",
+                        "description": "Ethernet0",
+                        "lanes": "1",
+                        "mtu": 9000,
+                        "name": "Ethernet0",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "dut",
+                    "frr_mgmt_framework_config": true
+                }
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Ethernet0",
+                        "name": "unnumbered-peer"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_PEER_GROUP_ONLY_BGPCFGD_NEG": {
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "dut"
+                }
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "asn": 65003
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "peer_group_name": "PG1"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_TEMPLATE_NEG_NO_ASN": {
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_TEMPLATE_LIST": [
+                    {
+                        "neighbor": "10.0.0.1",
+                        "name": "fragment-template-row"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_NEG_ASN_AND_PEER_TYPE": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "asn": 65001,
+                        "peer_type": "external"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_PEER_GROUP_NEG_ASN_AND_PEER_TYPE": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-peergroup:sonic-bgp-peergroup": {
+            "sonic-bgp-peergroup:BGP_PEER_GROUP": {
+                "BGP_PEER_GROUP_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "peer_group_name": "PG1",
+                        "asn": 65001,
+                        "peer_type": "external"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_PEER_TYPE_ONLY_FRR_VALID": {
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "dut",
+                    "frr_mgmt_framework_config": true
+                }
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "peer_type": "external"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_PEER_TYPE_ONLY_BGPCFGD_NEG": {
+        "sonic-device_metadata:sonic-device_metadata": {
+            "sonic-device_metadata:DEVICE_METADATA": {
+                "localhost": {
+                    "hostname": "dut"
+                }
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "20.0.0.1",
+                        "peer_type": "external"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_NEIGHBOR_INTERFACE_NO_ASN_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "admin_status": "up",
+                        "alias": "eth0",
+                        "description": "Ethernet0",
+                        "lanes": "1",
+                        "mtu": 9000,
+                        "name": "Ethernet0",
+                        "speed": 25000
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65100
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Ethernet0",
+                        "name": "unnumbered-peer"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_VALID_TRUE": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001,
+                    "ebgp_requires_policy": true
+                }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_VALID_FALSE": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001,
+                    "ebgp_requires_policy": false
+                }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_INVALID_INT_ZERO": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001,
+                    "ebgp_requires_policy": 0
+                }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_INVALID_INT_NON_ZERO": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                {
+                    "vrf_name": "default",
+                    "local_asn": 65001,
+                    "ebgp_requires_policy": 10
+                }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_RT_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "route-distinguisher": "65001:27001",
+                        "import-rts": ["511:27001", "503:10025"],
+                        "export-rts": ["511:27001"],
+                        "advertise-ipv4-unicast": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_LEAVES_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "advertise-default-gw": true,
+                        "default-originate-ipv4": true,
+                        "default-originate-ipv6": true,
+                        "flooding": "disable",
+                        "dad-enabled": true,
+                        "dad-max-moves": 10,
+                        "dad-time": 120,
+                        "dad-freeze": "permanent"
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 10100,
+                        "advertise-default-gw": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_SECONDS_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-freeze": 600
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_ALONE_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-max-moves": 10
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_TIME_WITHOUT_MAX_MOVES_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-time": 120
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_DISABLED_WITH_MAX_MOVES_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-enabled": false,
+                        "dad-max-moves": 10,
+                        "dad-time": 120
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_DISABLED_WITH_FREEZE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-enabled": false,
+                        "dad-freeze": "permanent"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_OUT_OF_RANGE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-max-moves": 1,
+                        "dad-time": 120
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_TIME_OUT_OF_RANGE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-max-moves": 10,
+                        "dad-time": 1801
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_OUT_OF_RANGE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-freeze": 29
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_FLOODING_UNKNOWN_VALUE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "flooding": "ingress-replication"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DEFAULT_ORIGINATE_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "default-originate-ipv4": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_DEFAULT_GW_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "advertise-default-gw": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DEFAULT_ORIGINATE_IPV6_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "default-originate-ipv6": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_FLOODING_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "flooding": "disable"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_ENABLED_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "dad-enabled": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "dad-max-moves": 10
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_TIME_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "dad-time": 120
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "dad-freeze": "permanent"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_BOUNDS_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-max-moves": 1000,
+                        "dad-time": 2
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_MAX_MOVES_ABOVE_MAX_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-max-moves": 1001,
+                        "dad-time": 120
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_MAX_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-freeze": 3600
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_DAD_FREEZE_ABOVE_MAX_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "dad-freeze": 3601
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_FLOODING_HEAD_END_REPLICATION_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 64496
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "flooding": "head-end-replication"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_IPV4_FORM_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "route-distinguisher": "10.145.11.202:27001"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "route-distinguisher": "65001:27001"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_IMPORT_RTS_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "import-rts": ["511:27001"]
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_IPV4_UNICAST_ON_IPV4_UNICAST_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "advertise-ipv4-unicast": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_RD_MALFORMED_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "route-distinguisher": "not-an-rd"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5032010,
+                        "route-distinguisher": "10.145.11.202:12010",
+                        "import-rts": ["503:12010"],
+                        "export-rts": ["503:12010"]
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_BARE_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030035
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_AFI_SAFI_LOWERCASE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "vni": 5032010
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "65001:27001",
+                        "route-target-type": "both"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_TYPE_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "65001:27001",
+                        "route-target-type": "bidirectional"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_TYPE_MISSING_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "65001:27001"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_16BIT_OVERFLOW_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "5.5.5.5:99999",
+                        "route-target-type": "both"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_32BIT_OVERFLOW_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "65001:4294967296",
+                        "route-target-type": "both"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_BOUNDARY_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "65535:4294967295",
+                        "route-target-type": "both"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_RT_ZERO_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_RT": {
+                "BGP_GLOBALS_EVPN_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "65001:0",
+                        "route-target-type": "import"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "1.1.1.1:0",
+                        "route-target-type": "export"
+                    },
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "rt": "4200000000:0",
+                        "route-target-type": "both"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_RT_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030025
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI_RT": {
+                "BGP_GLOBALS_EVPN_VNI_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030025,
+                        "rt": "503:10025",
+                        "route-target-type": "import"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_RT_UNKNOWN_VNI_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI_RT": {
+                "BGP_GLOBALS_EVPN_VNI_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030025,
+                        "rt": "503:10025",
+                        "route-target-type": "import"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_RT_CROSS_VRF_INVALID": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf_RED"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    },
+                    {
+                        "vrf_name": "Vrf_RED",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "Vrf_RED",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030025
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI_RT": {
+                "BGP_GLOBALS_EVPN_VNI_RT_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030025,
+                        "rt": "503:10025",
+                        "route-target-type": "import"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_EVPN_VNI_ADVERTISE_SVI_IP_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_EVPN_VNI": {
+                "BGP_GLOBALS_EVPN_VNI_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "L2VPN_EVPN",
+                        "vni": 5030025,
+                        "advertise-svi-ip": true
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_GLOBALS_AF_EVPN_RD_RT_4BYTE_ASN_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "route-distinguisher": "4200000000:100",
+                        "import-rts": [
+                            "4200000000:100"
+                        ],
+                        "export-rts": [
+                            "4200000000:100"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_GLOBALS_AF_EVPN_RD_4BYTE_ASN_MAX_VALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "route-distinguisher": "4294967295:65535"
+                    }
+                ]
+            }
+        }
+    },
+
+    "BGP_GLOBALS_AF_EVPN_RD_ASN_OVERFLOW_INVALID": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "route-distinguisher": "4294967296:100"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_VALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "RM_TYPE5"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "advertise-ipv4-unicast": true,
+                        "advertise-ipv4-unicast-route-map": "RM_TYPE5",
+                        "advertise-ipv6-unicast": true,
+                        "advertise-ipv6-unicast-route-map": "RM_TYPE5"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_WITHOUT_BOOLEAN_INVALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "RM_TYPE5"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "advertise-ipv4-unicast-route-map": "RM_TYPE5"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_ON_IPV4_UNICAST_INVALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "RM_TYPE5"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "ipv4_unicast",
+                        "advertise-ipv4-unicast-route-map": "RM_TYPE5"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_EVPN_ADVERTISE_ROUTE_MAP_UNDEFINED_INVALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "RM_TYPE5"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "afi_safi": "l2vpn_evpn",
+                        "advertise-ipv6-unicast": true,
+                        "advertise-ipv6-unicast-route-map": "RM_NOT_DEFINED"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_VPN_LEAK_VALID": {
+        "sonic-route-map:sonic-route-map": {
+            "sonic-route-map:ROUTE_MAP_SET": {
+                "ROUTE_MAP_SET_LIST": [
+                    {
+                        "name": "RM_IN"
+                    },
+                    {
+                        "name": "RM_OUT"
+                    }
+                ]
+            }
+        },
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf_a"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65000
+                    },
+                    {
+                        "vrf_name": "Vrf_a",
+                        "local_asn": 65000
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "Vrf_a",
+                        "afi_safi": "ipv4_unicast",
+                        "rd_vpn_export": "65000:1",
+                        "rt_vpn_import": [
+                            "65000:100",
+                            "65000:200"
+                        ],
+                        "rt_vpn_export": [
+                            "65000:900"
+                        ],
+                        "import_vpn": true,
+                        "export_vpn": true,
+                        "rmap_vpn_import": "RM_IN",
+                        "rmap_vpn_export": "RM_OUT"
+                    },
+                    {
+                        "vrf_name": "Vrf_a",
+                        "afi_safi": "ipv6_unicast",
+                        "rd_vpn_export": "10.1.0.1:1",
+                        "rt_vpn_both": [
+                            "10.1.0.1:5"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_VPN_LEAK_SINGLE_LEAF_VALID": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf_a"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65000
+                    },
+                    {
+                        "vrf_name": "Vrf_a",
+                        "local_asn": 65000
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "Vrf_a",
+                        "afi_safi": "ipv4_unicast",
+                        "export_vpn": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_RD_VPN_EXPORT_ON_L2VPN_EVPN_INVALID": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf_a"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65000
+                    },
+                    {
+                        "vrf_name": "Vrf_a",
+                        "local_asn": 65000
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "Vrf_a",
+                        "afi_safi": "l2vpn_evpn",
+                        "rd_vpn_export": "65000:1"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_RT_VPN_BOTH_WITH_IMPORT_INVALID": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf_a"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65000
+                    },
+                    {
+                        "vrf_name": "Vrf_a",
+                        "local_asn": 65000
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "Vrf_a",
+                        "afi_safi": "ipv4_unicast",
+                        "rt_vpn_both": [
+                            "65000:100"
+                        ],
+                        "rt_vpn_import": [
+                            "65000:200"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_GLOBALS_AF_IMPORT_VPN_WITH_IMPORT_VRF_INVALID": {
+        "sonic-vrf:sonic-vrf": {
+            "sonic-vrf:VRF": {
+                "VRF_LIST": [
+                    {
+                        "name": "Vrf_a"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65000
+                    },
+                    {
+                        "vrf_name": "Vrf_a",
+                        "local_asn": 65000
+                    }
+                ]
+            },
+            "sonic-bgp-global:BGP_GLOBALS_AF": {
+                "BGP_GLOBALS_AF_LIST": [
+                    {
+                        "vrf_name": "Vrf_a",
+                        "afi_safi": "ipv4_unicast",
+                        "import_vrf": "default",
+                        "import_vpn": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_VLAN_MISSING": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Vlan100",
+                        "asn": 65200
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_SUBINTF_VALID": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        },
+        "sonic-vlan-sub-interface:sonic-vlan-sub-interface": {
+            "sonic-vlan-sub-interface:VLAN_SUB_INTERFACE": {
+                "VLAN_SUB_INTERFACE_LIST": [
+                    {
+                        "name": "Ethernet0.10"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Ethernet0.10",
+                        "asn": 65200
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_SUBINTF_MISSING": {
+        "sonic-port:sonic-port": {
+            "sonic-port:PORT": {
+                "PORT_LIST": [
+                    {
+                        "name": "Ethernet0",
+                        "lanes": "0",
+                        "speed": 25000,
+                        "admin_status": "up"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Ethernet0.10",
+                        "asn": 65200
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_VLAN_VALID": {
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan100"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "10.0.0.1",
+                        "asn": 65200,
+                        "local_addr": "Vlan100"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_VLAN_MISSING": {
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "10.0.0.1",
+                        "asn": 65200,
+                        "local_addr": "Vlan100"
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_VLAN_4095": {
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan4095"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "Vlan4095",
+                        "asn": 65200,
+                        "v6only": true
+                    }
+                ]
+            }
+        }
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_VLAN_4095": {
+        "sonic-vlan:sonic-vlan": {
+            "sonic-vlan:VLAN": {
+                "VLAN_LIST": [
+                    {
+                        "name": "Vlan4095"
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-global:sonic-bgp-global": {
+            "sonic-bgp-global:BGP_GLOBALS": {
+                "BGP_GLOBALS_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "local_asn": 65001
+                    }
+                ]
+            }
+        },
+        "sonic-bgp-neighbor:sonic-bgp-neighbor": {
+            "sonic-bgp-neighbor:BGP_NEIGHBOR": {
+                "BGP_NEIGHBOR_LIST": [
+                    {
+                        "vrf_name": "default",
+                        "neighbor": "10.0.0.1",
+                        "asn": 65200,
+                        "local_addr": "Vlan4095"
+                    }
+                ]
+            }
+        }
+>>>>>>> daa4ca69e (NOS-15644: [yang] let BGP local_addr name a VLAN sub-interface (#13864))
     }
 }

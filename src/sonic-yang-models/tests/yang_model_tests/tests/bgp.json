@@ -29,6 +29,207 @@
         "desc": "BGP Address Family l2vpn_evpn with advertise-svi-ip set to an invalid value",
         "eStr": "Invalid value \"invalid value\" in \"advertise-svi-ip\" element."
     },
+<<<<<<< HEAD
+=======
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_DISABLED": {
+        "desc": "BGP Address Family with install_backup_path set to disabled (explicit default)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_PIC": {
+        "desc": "BGP Address Family with install_backup_path set to pic (single backup path)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_PIC_ECMP": {
+        "desc": "BGP Address Family with install_backup_path set to pic-ecmp (ECMP backup paths)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_PIC_TUNNEL_ONLY": {
+        "desc": "BGP Address Family with install_backup_path set to pic-tunnel-only (tunnel-resolved backups only)"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_PIC_ECMP_TUNNEL_ONLY": {
+        "desc": "BGP Address Family with install_backup_path set to pic-ecmp-tunnel-only"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_DIFFERENT_PER_AFI_SAFI": {
+        "desc": "install_backup_path can be set independently per address family: pic on ipv4, pic-ecmp on ipv6"
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_INVALID": {
+        "desc": "BGP Address Family with install_backup_path set to an invalid enum value",
+        "eStrKey": "InvalidValue",
+        "eStr": ["install_backup_path"]
+    },
+    "BGP_GLOBALS_AF_INSTALL_BACKUP_PATH_NON_UNICAST_INVALID": {
+        "desc": "install_backup_path pic on a non-unicast AFI (l2vpn_evpn) must be rejected by the must constraint",
+        "eStr": ["unicast address families"]
+    },
+    "BGP_GLOBALS_RR_CLUSTER_ID_DOTTED_VALID": {
+        "desc": "rr_cluster_id accepts dotted-quad notation."
+    },
+    "BGP_GLOBALS_RR_CLUSTER_ID_INTEGER_VALID": {
+        "desc": "rr_cluster_id accepts a 32-bit integer (top of range, unambiguously not dotted-quad)."
+    },
+    "BGP_GLOBALS_RR_CLUSTER_ID_INVALID": {
+        "desc": "rr_cluster_id must reject a value that is neither an IPv4 address nor a 32-bit integer.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["rr_cluster_id"]
+    },
+    "BGP_GLOBALS_AF_SRPOLICY_INVALID": {
+        "desc": "BGP_GLOBALS_AF has no global AFI-SAFI configuration for SR-Policy SAFI; afi_safi=ipv4_srpolicy must be rejected outright by the restricted key type.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi_safi"]
+    },
+    "BGP_GLOBALS_AF_AFI_SAFI_HYPHENATED_INVALID": {
+        "desc": "BGP_GLOBALS_AF with a hyphenated afi_safi spelling (ipv4-unicast) must be rejected; the canonical form is underscore-separated.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi_safi"]
+    },
+    "BGP_GLOBALS_AF_AGGREGATE_ADDR_SRPOLICY_INVALID": {
+        "desc": "BGP_GLOBALS_AF_AGGREGATE_ADDR with an SR-Policy afi_safi must be rejected by the restricted key type.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi_safi"]
+    },
+    "BGP_GLOBALS_AF_NETWORK_SRPOLICY_INVALID": {
+        "desc": "BGP_GLOBALS_AF_NETWORK with an SR-Policy afi_safi must be rejected by the restricted key type.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi_safi"]
+    },
+    "BGP_GLOBALS_AF_LINK_STATE_VALID": {
+        "desc": "BGP_GLOBALS_AF accepts afi_safi=link_state_link_state with distribute_bgp_fabric_link_state set; this is the CONFIG_DB equivalent of 'address-family link-state link-state' / 'distribute bgp-fabric-link-state' in FRR."
+    },
+    "BGP_GLOBALS_AF_LINK_STATE_INSTANCE_ID_VALID": {
+        "desc": "BGP_GLOBALS_AF accepts distribute_bgp_fabric_link_state_instance_id under afi_safi=link_state_link_state; this is the CONFIG_DB equivalent of the optional 'instance-id WORD' argument of 'distribute bgp-fabric-link-state' in FRR."
+    },
+    "BGP_GLOBALS_AF_INSTANCE_ID_LINK_STATE_WRONG_AF_INVALID": {
+        "desc": "distribute_bgp_fabric_link_state_instance_id is only meaningful under afi_safi=link_state_link_state; setting it on ipv4_unicast must be rejected by the must guard on the leaf.",
+        "eStr": ["supported only for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_LINK_STATE_DISTRIBUTION_POLICY_VALID": {
+        "desc": "BGP_GLOBALS_AF accepts distribution_policy under afi_safi=link_state_link_state, referencing an existing route-map; this is the CONFIG_DB equivalent of 'distribution-policy route-map <name>' in FRR."
+    },
+    "BGP_GLOBALS_AF_DISTRIBUTION_POLICY_LINK_STATE_WRONG_AF_INVALID": {
+        "desc": "distribution_policy is only meaningful under afi_safi=link_state_link_state; setting it on ipv4_unicast must be rejected by the must guard on the leaf.",
+        "eStr": ["supported only for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_ROUTE_DISTANCE_LINK_STATE_INVALID": {
+        "desc": "ebgp_route_distance (and ibgp_route_distance/local_route_distance, guarded identically) has no FRR command under address-family link-state link-state -- BGP-LS is a topology-distribution AF, not a route-carrying one, so admin-distance is meaningless there. Must be rejected by the must guard on the leaf.",
+        "eStr": ["ebgp_route_distance is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_IMPORT_VRF_LINK_STATE_INVALID": {
+        "desc": "import_vrf has no 'import vrf' command under address-family link-state link-state (BGP-LS is not route-carrying). Must be rejected on a link_state_link_state row even for a genuinely different, resolvable VRF -- otherwise this would only be caught by the separate, unrelated self-import guard when the value happens to equal the row's own vrf_name.",
+        "eStr": ["import_vrf is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_IMPORT_VRF_ROUTE_MAP_LINK_STATE_INVALID": {
+        "desc": "import_vrf_route_map has no 'import vrf route-map' command under address-family link-state link-state. Must be rejected by the must guard on the leaf.",
+        "eStr": ["import_vrf_route_map is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_AUTORT_LINK_STATE_INVALID": {
+        "desc": "autort is an L2VPN EVPN route-target-derivation knob with no FRR command under address-family link-state link-state. Must be rejected by the must guard on the leaf.",
+        "eStr": ["autort is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_ADVERTISE_ALL_VNI_LINK_STATE_INVALID": {
+        "desc": "advertise-all-vni is an L2VPN EVPN knob with no FRR command under address-family link-state link-state. Must be rejected by the must guard on the leaf.",
+        "eStr": ["advertise-all-vni is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_ADVERTISE_SVI_IP_LINK_STATE_INVALID": {
+        "desc": "advertise-svi-ip is an L2VPN EVPN knob with no FRR command under address-family link-state link-state. Must be rejected by the must guard on the leaf.",
+        "eStr": ["advertise-svi-ip is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_DISTRIBUTE_LINK_STATE_WRONG_AF_INVALID": {
+        "desc": "distribute_bgp_fabric_link_state is only meaningful under afi_safi=link_state_link_state; setting it on ipv4_unicast must be rejected by the must guard on the leaf.",
+        "eStr": ["supported only for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_AGGREGATE_ADDR_LINK_STATE_INVALID": {
+        "desc": "BGP-LS is a topology-distribution AF, not a route-carrying one; FRR has no aggregate-address command under address-family link-state link-state. afi_safi=link_state_link_state must be rejected by the must guard on BGP_GLOBALS_AF_AGGREGATE_ADDR_LIST.afi_safi.",
+        "eStr": ["Aggregate-address is not supported for the link_state_link_state address family"]
+    },
+    "BGP_GLOBALS_AF_NETWORK_LINK_STATE_INVALID": {
+        "desc": "Same reasoning as BGP_GLOBALS_AF_AGGREGATE_ADDR_LINK_STATE_INVALID: FRR has no network command under address-family link-state link-state either.",
+        "eStr": ["Network statement is not supported for the link_state_link_state address family"]
+    },
+    "BGP_NEIGHBOR_AF_L2VPN_EVPN_VALID": {
+        "desc": "BGP_NEIGHBOR_AF accepts l2vpn_evpn, which is required to activate a neighbor for EVPN."
+    },
+    "BGP_NEIGHBOR_EMPTY_AUTH_PASSWORD_INVALID": {
+        "desc": "BGP_NEIGHBOR with an empty auth_password must be rejected.",
+        "eStrKey": "Length"
+    },
+    "BGP_PEER_GROUP_EMPTY_AUTH_PASSWORD_INVALID": {
+        "desc": "BGP_PEER_GROUP with an empty auth_password must be rejected.",
+        "eStrKey": "Length"
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_SUB_INTERFACE_VALID": {
+        "desc": "BGP_NEIGHBOR and BGP_PEER_GROUP local_addr name a configured VLAN sub-interface of a port or a portchannel, in full (Ethernet64.145, PortChannel1.10) and short (Eth64.146, Po1.20) form; frrcfgd renders it as update-source."
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_SUB_INTERFACE_NON_EXISTING_INVALID": {
+        "desc": "BGP_NEIGHBOR local_addr naming a sub-interface with no VLAN_SUB_INTERFACE row is rejected.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_NEIGHBOR_LOCAL_ADDR_SUB_INTERFACE_OTHER_NAME_FORM_INVALID": {
+        "desc": "BGP_NEIGHBOR local_addr must spell the sub-interface as its VLAN_SUB_INTERFACE key: Ethernet64.145 does not match a configured Eth64.145.",
+        "eStrKey": "LeafRef"
+    },
+    "BGP_NEIGHBOR_AF_AFI_SAFI_HYPHENATED_INVALID": {
+        "desc": "BGP_NEIGHBOR_AF with a hyphenated afi_safi spelling (ipv4-unicast) must be rejected; the canonical form is underscore-separated.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi_safi"]
+    },
+    "BGP_PEER_GROUP_AF_SRPOLICY_VALID": {
+        "desc": "BGP_PEER_GROUP_AF (with BGP_NEIGHBOR_AF) is one of only two tables carrying the full bgp_afi_safi vocabulary; both SR-Policy families must remain admissible keys."
+    },
+    "BGP_PEER_GROUP_AF_AFI_SAFI_HYPHENATED_INVALID": {
+        "desc": "BGP_PEER_GROUP_AF with a hyphenated afi_safi spelling (ipv4-unicast) must be rejected; the canonical form is underscore-separated.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["afi_safi"]
+    },
+    "BGP_GLOBALS_LLGR_STALE_TIME_VALID": {
+        "desc": "BGP global with llgr_stale_time set to a valid value (3600s). LLGR can operate independently of GR per RFC 9494."
+    },
+    "BGP_GLOBALS_LLGR_STALE_TIME_BELOW_RANGE_INVALID": {
+        "desc": "llgr_stale_time of 0 is below the valid range (1-16777215) and must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_LLGR_STALE_TIME_ABOVE_RANGE_INVALID": {
+        "desc": "llgr_stale_time of 16777216 exceeds the 24-bit capability field maximum and must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_GR_SELECT_DEFER_TIME_VALID": {
+        "desc": "BGP global with gr_select_defer_time set to 240s. Controls how long bgpd defers best-path selection after graceful restart."
+    },
+    "BGP_GLOBALS_GR_SELECT_DEFER_TIME_ZERO_VALID": {
+        "desc": "gr_select_defer_time of 0 is valid (disables the defer timer)."
+    },
+    "BGP_GLOBALS_GR_SELECT_DEFER_TIME_ABOVE_RANGE_INVALID": {
+        "desc": "gr_select_defer_time of 3601 exceeds the maximum of 3600 and must be rejected.",
+        "eStrKey": "Range"
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_VALID_TRUE": {
+        "desc": "BGP global with ebgp_requires_policy set to true. Enforces RFC 8212 policy requirement on eBGP peers."
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_VALID_FALSE": {
+        "desc": "BGP global with ebgp_requires_policy set to false. BGP session exchange routes without policy."
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_INVALID_INT_ZERO": {
+        "desc": "BGP global with ebgp_requires_policy does not accept int 0 as false.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_EBGP_REQUIRES_POLICY_INVALID_INT_NON_ZERO": {
+        "desc": "BGP global with ebgp_requires_policy does not accept int !0 as true.",
+        "eStrKey": "InvalidValue"
+    },
+    "BGP_GLOBALS_BESTPATH_BANDWIDTH_IGNORE_VALID": {
+        "desc": "bestpath_bandwidth of 'ignore' is accepted; the instance disregards received link-bandwidth, so every multipath gets equal weight."
+    },
+    "BGP_GLOBALS_BESTPATH_BANDWIDTH_SKIP_MISSING_VALID": {
+        "desc": "bestpath_bandwidth of 'skip-missing' is accepted; weighted ECMP stays active over the paths that do carry link-bandwidth, and only the paths lacking it leave the multipath set."
+    },
+    "BGP_GLOBALS_BESTPATH_BANDWIDTH_DEFAULT_WEIGHT_FOR_MISSING_VALID": {
+        "desc": "bestpath_bandwidth of 'default-weight-for-missing' is accepted; paths without link-bandwidth get a weight of 1."
+    },
+    "BGP_GLOBALS_BESTPATH_BANDWIDTH_NON_DEFAULT_VRF_VALID": {
+        "desc": "bestpath_bandwidth is settable per-VRF: the default VRF and Vrf1 carry different values, each scoped to its own BGP instance."
+    },
+    "BGP_GLOBALS_BESTPATH_BANDWIDTH_INVALID": {
+        "desc": "bestpath_bandwidth admits only the three defined keywords. 'ecmp' must be rejected -- plain-ECMP behaviour is expressed by omitting the leaf, not by a fourth enum value.",
+        "eStrKey": "InvalidValue",
+        "eStr": ["bestpath_bandwidth"]
+    },
+>>>>>>> daa4ca69e (NOS-15644: [yang] let BGP local_addr name a VLAN sub-interface (#13864))
     "BGP_NEIGHBOR_ALL_VALID": {
         "desc": "Configure BGP neighbor table."
     },
