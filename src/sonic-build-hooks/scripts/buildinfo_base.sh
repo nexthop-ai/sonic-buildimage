@@ -291,6 +291,20 @@ download_packages()
     return $result
 }
 
+# Drop the frozen pins in the constraint file $1 that the pip arguments after it rule out:
+# the pin of a package the install requires at another version, and of a local wheel's own package.
+release_pip_constraints()
+{
+    local constraint_file=$1
+    shift
+    local python=$(sed -n '1s/^#![[:space:]]*//p' "$REAL_COMMAND")
+    [[ "$python" == */env\ * ]] && python=$(command -v ${python#* })
+    python=${python%% *}
+    [ -x "$python" ] || return 0
+    "$python" $BUILDINFO_PATH/scripts/pip_release_constraints.py "$constraint_file" "$@" ||
+        echo "pip build hook: could not read the install's requirements; every frozen version stays a constraint" 1>&2
+}
+
 run_pip_command()
 {
     declare -a parameters=("--default-timeout" "$PIP_HTTP_TIMEOUT" "$@")
@@ -345,6 +359,7 @@ run_pip_command()
     done
 
     if [ "$found" == "n" ] && [ "$install" == "y" ]; then
+        release_pip_constraints "$tmp_version_file" "$@"
         parameters+=("-c")
         parameters+=("${tmp_version_file}")
     fi
@@ -353,23 +368,40 @@ run_pip_command()
         parameters+=("--no-build-isolation")
     fi
 
-    if [ ! -z "$(get_version_cache_option)" ]; then
-        FLOCK ${PIP_CACHE_PATH}
-        $REAL_COMMAND ${PKG_CACHE_OPTION} "${parameters[@]}"
-        local result=$?
-        chmod -f -R 777 ${PIP_CACHE_PATH}
-        touch ${PIP_CACHE_PATH}
-        FUNLOCK ${PIP_CACHE_PATH}
-    else
-        $REAL_COMMAND "${parameters[@]}"
-		local result=$?
-		if [ "$result" != 0 ]; then
-			echo "Failed to run the command with constraint, try to install with the original command" 1>&2
-			$REAL_COMMAND "$@"
-			result=$?
-		fi
-	fi
-    rm $tmp_version_file
+    local result attempt pins pin name before
+    local pip_log=$(mktemp)
+    for attempt in 1 2 3 4 5; do
+        if [ ! -z "$(get_version_cache_option)" ]; then
+            FLOCK ${PIP_CACHE_PATH}
+            { $REAL_COMMAND ${PKG_CACHE_OPTION} "${parameters[@]}" 2>&1 1>&3 | tee $pip_log 1>&2; } 3>&1
+            result=${PIPESTATUS[0]}
+            chmod -f -R 777 ${PIP_CACHE_PATH}
+            touch ${PIP_CACHE_PATH}
+            FUNLOCK ${PIP_CACHE_PATH}
+        else
+            { $REAL_COMMAND "${parameters[@]}" 2>&1 1>&3 | tee $pip_log 1>&2; } 3>&1
+            result=${PIPESTATUS[0]}
+        fi
+        [ "$result" == 0 ] || [ "$found" == "y" ] || [ "$install" != "y" ] && break
+        # The resolver names each frozen pin that blocks it, such as a pin whose newer
+        # dependents need a newer release, or one with no usable wheel on this architecture.
+        # Release only those, and try again.
+        pins=$(sed -n 's/.*The user requested (constraint) \([^ ]*==[^ ]*\).*/\1/p' $pip_log | sort -u)
+        before=$(wc -l < $tmp_version_file)
+        for pin in $pins; do
+            echo "pip build hook: the frozen $pin blocks the install, releasing it" 1>&2
+            name=$(echo "${pin%%==*}" | tr '[:upper:]' '[:lower:]' | sed 's/[-_.]\+/-/g')
+            awk -F'==' -v name="$name" '{ n = tolower($1); gsub(/[-_.]+/, "-", n); if (n != name) print }' \
+                $tmp_version_file > $tmp_version_file.new
+            mv -f $tmp_version_file.new $tmp_version_file
+        done
+        # Stop when nothing was released; the same install would fail the same way.
+        [ "$(wc -l < $tmp_version_file)" == "$before" ] && break
+    done
+    if [ "$result" != 0 ] && [ "$install" == "y" ]; then
+        echo "pip build hook: the install failed with the frozen versions in $pip_version_file as constraints" 1>&2
+    fi
+    rm -f $tmp_version_file $pip_log
     return $result
 }
 
